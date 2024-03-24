@@ -1,0 +1,77 @@
+{% extends 'base_back.html.twig' %}
+
+    {% block body %}
+        <div class="col-lg-20 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title"> Table Stock </h4>
+                <div class="table-responsive">
+                  <table class="table table-hover" style="margin:auto">
+                    <thead>
+                      <tr>
+                        <tr>
+                            <th>Nom du stock</th>
+                            <th>Marque</th>
+                            <th>Quantités</th>
+                            <th>Nombre vendus</th>
+                            <th>Cout</th>
+                            <th>Action</th>
+                        </tr>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in stocks %}
+                             <tr  >
+                                {# <td class="py-1">{{ s.getRefProduit().getCategorie() }}</td> #} 
+                            
+                                <td class="py-1" >{{ s.nom }}</td>
+                            
+                                <td >{{ s.marque }}</td>
+                                <td style="font-size: 12px;">{{ s.quantite }}</td>
+                                <td style="font-size: 12px;">{{ s.nbvendu }}</td>
+                                <td >{{ s.cout }}</td>
+                          
+                        {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+               
+              </div>
+            </div>
+          </div>
+       
+
+  
+</div>
+
+    {% endblock %}
+    
+    {% block stylesheets %}
+        <style>
+            .selected {
+                background-color: red;
+            }
+            
+            /* CSS pour réduire la largeur du tableau */
+            .table-responsive {
+                max-width: 30%; /* Vous pouvez ajuster la valeur selon vos besoins */
+              
+            }
+        </style>
+    {% endblock %}
+   
+        {# <script>
+            $(document).ready(function() {
+                $('#btnAjouter').click(function() {
+                    $('#addStockModal').modal('show');
+                });
+                
+                $('.btnModifier').click(function() {
+            var id_s = $(this).data('id');
+            var formAction = '{{ path('stock_edit', {id: 'ID'}) }}'.replace('ID', id_s);
+            $('#updateStockForm').attr('action', formAction);
+        });
+            });
+        </script>
+        {% endblock %} #}
+     
