@@ -1,0 +1,125 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}Utilisateur
+{% endblock %}
+
+
+
+{% block body %}
+	<div class="col-lg-10 grid-margin stretch-card">
+		<div class="card">
+		<button type="button" class="btn btn-inverse-primary btn-fw" style="margin-top:20px; width:300px; margin-left:900px;" onclick="window.location.href='http://127.0.0.1:8000/ajouterConseiller';">Ajouter un conseiller</button>
+			<div class="card-body">
+				<div class="table-responsive">
+					<div class="table-wrapper">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>
+										Photo
+									</th>
+									<th>
+										Nom
+									</th>
+									<th>
+										Prénom
+									</th>
+									<th>
+										Genre
+									</th>
+									<th>
+										Email
+									</th>
+									<th>
+										Mot de passe
+									</th>
+									<th>
+										Numéro tel
+									</th>
+									<th>
+										Rôle
+									</th>
+									<th>
+										Matricule
+									</th>
+									<th>
+										Attestation
+									</th>
+									<th>
+										Adresse
+									</th>
+									<th>
+										Objectif
+									</th>
+									<th>
+										Taille
+									</th>
+									<th>
+										Poids
+									</th>
+									<th>
+										Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for user in users %}
+									<tr>
+										<td class="py-1">
+											<img src={{ user.photo }} alt="image"/>
+										</td>
+										<td>
+											{{ user.nom }}
+										</td>
+										<td>
+											{{ user.prenom }}
+										</td>
+										<td>
+											{{ user.genre }}
+										</td>
+										<td>
+											{{ user.email }}
+										</td>
+										<td>
+											{{ user.motDePasse }}
+										</td>
+										<td>
+											{{ user.numTel }}
+										</td>
+										<td>
+											{{ user.role }}
+										</td>
+										<td>
+											{{ user.matricule }}
+										</td>
+										<td>
+											{{ user.attestation }}
+										</td>
+										<td>
+											{{ user.adresse }}
+										</td>
+										<td>
+											{{ user.objectif }}
+										</td>
+										<td>
+											{{ user.taille }}
+										</td>
+										<td>
+											{{ user.poids }}
+										</td>
+										<td>
+											<a href="{{ path('conseiller_update', {'id': user.idUtilisateur}) }}"><i class="ti-pencil menu-icon"></i></a>         
+											<a href="{{ path('conseiller_delete', {'id': user.idUtilisateur}) }}"><i class="icon-trash menu-icon"></i></a>   
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+	
+		</div>
+		
+	</div>
+
+{% endblock %}

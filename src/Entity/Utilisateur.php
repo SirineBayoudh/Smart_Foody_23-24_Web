@@ -6,56 +6,58 @@ use App\Repository\UtilisateurRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-class Utilisateur
+class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id_utilisateur = null;
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(type: "integer", name: "id_utilisateur")]
+    private $idUtilisateur;
 
-    #[ORM\Column(length: 255)]
-    private ?string $nom = null;
+    #[ORM\Column(type: "string", length: 255, name: "nom")]
+    private $nom;
 
-    #[ORM\Column(length: 255)]
-    private ?string $prenom = null;
+    #[ORM\Column(type: "string", length: 255, name: "prenom")]
+    private $prenom;
 
-    #[ORM\Column(length: 255)]
-    private ?string $genre = null;
+    #[ORM\Column(type: "string", length: 255, name: "genre")]
+    private $genre;
 
-    #[ORM\Column(length: 255)]
-    private ?string $email = null;
+    #[ORM\Column(type: "string", length: 255, name: "email")]
+    private $email;
 
-    #[ORM\Column(length: 255)]
-    private ?string $mot_de_passe = null;
+    #[ORM\Column(type: "string", length: 255, name: "mot_de_passe")]
+    private $mot_de_passe;
 
-    #[ORM\Column]
-    private ?int $num_tel = null;
+    #[ORM\Column(type: "integer", name: "num_tel")]
+    private $num_tel;
 
-    #[ORM\Column(length: 255)]
-    private ?string $role = null;
+    #[ORM\Column(type: "string", length: 255, name: "role")]
+    private $role;
 
-    #[ORM\Column(length: 255)]
-    private ?string $matricule = null;
+    #[ORM\Column(type: "string", length: 255, name: "matricule")]
+    private $matricule;
 
-    #[ORM\Column(length: 255)]
-    private ?string $attestation = null;
+    #[ORM\Column(type: "string", length: 255, name: "attestation")]
+    private $attestation;
 
-    #[ORM\Column(length: 255)]
-    private ?string $adresse = null;
+    #[ORM\Column(type: "string", length: 255, name: "adresse")]
+    private $adresse;
 
-    #[ORM\Column]
-    private ?int $tentative = null;
+    #[ORM\Column(type: "integer", name: "tentative")]
+    private $tentative;
 
-    #[ORM\Column]
-    private ?float $taille = null;
+    #[ORM\Column(type: "float", name: "taille")]
+    private $taille;
 
-    #[ORM\Column]
-    private ?float $poids = null;
+    #[ORM\Column(type: "float", name: "poids")]
+    private $poids;
 
-    #[ORM\Column(length: 255)]
-    private ?string $photo = null;
+    #[ORM\Column(type: "string", length: 255, name: "photo")]
+    private $photo;
 
     #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
     #[ORM\JoinColumn(name: "objectif", referencedColumnName: "id_obj")]
@@ -85,9 +87,9 @@ class Utilisateur
         $this->paniers = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getIdUtilisateur(): ?int
     {
-        return $this->id_utilisateur;
+        return $this->idUtilisateur;
     }
 
     public function getNom(): ?string
@@ -418,5 +420,80 @@ class Utilisateur
         }
 
         return $this;
+    }
+
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @deprecated since Symfony 5.3, use getUserIdentifier instead
+     */
+    public function getUsername(): string
+    {
+        return (string) $this->email;
+    }
+
+    private $roles = [];
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->mot_de_passe;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->mot_de_passe = md5($password);
+
+        return $this;
+    }
+
+    /**
+     * Returning a salt is only needed, if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 }
