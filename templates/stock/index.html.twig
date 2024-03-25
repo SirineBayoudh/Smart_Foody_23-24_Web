@@ -30,7 +30,11 @@
                                 <td style="font-size: 12px;">{{ s.quantite }}</td>
                                 <td style="font-size: 12px;">{{ s.nbvendu }}</td>
                                 <td >{{ s.cout }}</td>
-                          
+                                <td>
+                                  <a href="{{ path('stock_delete', {id: s.id_s}) }}">
+                                      <button type="button" class="btn btn-danger">Supprimer</button>
+                                  </a>
+                              </td>
                         {% endfor %}
                     </tbody>
                   </table>

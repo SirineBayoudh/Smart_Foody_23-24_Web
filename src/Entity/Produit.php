@@ -28,25 +28,25 @@ class Produit
     private ?string $image = null;
 
 
-    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: Stock::class)]
+    #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: Stock::class)]
     private Collection $ref_produit;
 
-    // #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: Avis::class)]
-    // private Collection $avis;
+    #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: Avis::class)]
+    private Collection $avis;
 
     // #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: LigneCommande::class)]
     // private Collection $ligneCommandes;
 
-    // #[ORM\ManyToOne(inversedBy: 'produits')]
-    // #[ORM\JoinColumn(name: "critere", referencedColumnName: "id_obj")]
-    // private ?Objectif $critere = null;
+    #[ORM\ManyToOne(inversedBy: 'produits')]
+    #[ORM\JoinColumn(name: "critere", referencedColumnName: "id_obj")]
+    private ?Objectif $critere = null;
 
 
 
     public function __construct()
     {
         $this->ref_produit = new ArrayCollection();
-        // $this->avis = new ArrayCollection();
+        $this->avis = new ArrayCollection();
         // $this->ligneCommandes = new ArrayCollection();
 
     }
@@ -138,32 +138,32 @@ class Produit
     // /**
     //  * @return Collection<int, Avis>
     //  */
-    // public function getAvis(): Collection
-    // {
-    //     return $this->avis;
-    // }
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
 
-    // public function addAvi(Avis $avi): static
-    // {
-    //     if (!$this->avis->contains($avi)) {
-    //         $this->avis->add($avi);
-    //         $avi->setRefProduit($this);
-    //     }
+    public function addAvis(Avis $avi): static
+    {
+        if (!$this->avis->contains($avi)) {
+            $this->avis->add($avi);
+            $avi->setRefProduit($this);
+        }
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
-    // public function removeAvi(Avis $avi): static
-    // {
-    //     if ($this->avis->removeElement($avi)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($avi->getRefProduit() === $this) {
-    //             $avi->setRefProduit(null);
-    //         }
-    //     }
+    public function removeAvis(Avis $avi): static
+    {
+        if ($this->avis->removeElement($avi)) {
+            // set the owning side to null (unless already changed)
+            if ($avi->getRefProduit() === $this) {
+                $avi->setRefProduit(null);
+            }
+        }
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
     /**
      * @return Collection<int, LigneCommande>
@@ -195,17 +195,15 @@ class Produit
     //     return $this;
     // }
 
-    // public function getCritere(): ?Objectif
-    // {
-    //     return $this->critere;
-    // }
+    public function getCritere(): ?Objectif
+    {
+        return $this->critere;
+    }
 
-    // public function setCritere(?Objectif $critere): static
-    // {
-    //     $this->critere = $critere;
+    public function setCritere(?Objectif $critere): static
+    {
+        $this->critere = $critere;
 
-    //     return $this;
-    // }
-
-
+        return $this;
+    }
 }

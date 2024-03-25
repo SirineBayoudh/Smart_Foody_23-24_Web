@@ -36,7 +36,7 @@ class Stock
     #[ORM\JoinColumn(name: "ref_produit", referencedColumnName: "ref")]
     private ?Produit $produit = null;
 
-    public function getId(): ?int
+    public function getId_s(): ?int
     {
         return $this->id_s;
     }

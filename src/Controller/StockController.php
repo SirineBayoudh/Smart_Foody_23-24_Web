@@ -71,4 +71,15 @@ class StockController extends AbstractController
             'stocks' => $stocks,
         ]);
     }
+
+
+    #[Route('/deleteStock/{id}', name: 'stock_delete')]
+    public function deleteStock(ManagerRegistry $manager, $id, StockRepository $repo): Response
+    {
+        $stock = $repo->find($id);
+        $em = $manager->getManager();
+        $em->remove($stock);
+        $em->flush();
+        return $this->redirectToRoute("stock_get");
+    }
 }
