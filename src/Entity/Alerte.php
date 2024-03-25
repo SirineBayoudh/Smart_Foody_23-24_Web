@@ -23,7 +23,7 @@ class Alerte
     #[ORM\Column]
     private ?bool $Type = null;
 
-    public function getId(): ?int
+    public function getId_alerte(): ?int
     {
         return $this->id_alerte;
     }
