@@ -1,0 +1,73 @@
+{% extends 'base_accueil.html.twig' %}
+
+{% block bodyConseil %}
+    <div class="hero-wrap hero-bread" style="background-image: url('images/bg_1.jpg');">
+        <div class="container">
+            <div class="row no-gutters slider-text align-items-center justify-content-center">
+                <div class="col-md-9 ftco-animate text-center">
+                    <h1 class="mb-0 bread">Conseils</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section class="ftco-section contact-section bg-light">
+        <div class="container">
+            <h1>Liste des conseils</h1>
+            <div style="overflow: auto; max-height: 400px;">
+                <table class="table">
+                    <thead class="thead-primary">
+                        <tr class="text-center">
+                            <th>Statut</th>
+                            <th>Demande</th>
+                            <th>Réponse</th>
+                            <th>Note</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for conseil in conseils|sort((a, b) => b.dateConseil <=> a.dateConseil) %}
+                        <tr class="text-center">
+                            <td class="product-name">{{ conseil.statut }}</td>
+                            <td class="price">{{ conseil.demande }}</td>
+                            <td class="quantity">{{ conseil.reponse }}</td>
+                            <td class="total">{{ conseil.note }}</td>
+                            <td class="total">{{ conseil.dateConseil|date("d/m/Y") }}</td>
+                            <td><a href="/updateConseil/{{conseil.idConseil}}"</a>Évaluer</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div><br>
+            <div class="row block-9">
+                <div class="col-md-6 order-md-last d-flex">
+                    <div class="bg-white p-5 contact-form">
+                                    {% if success %}
+                <div class="alert alert-success" role="alert">
+                Demande ajoutée avec succès!
+                </div>
+                {% endif %}
+                                        {% if emptySubmission %}
+                            <div class="alert alert-danger" role="alert">
+                                Le formulaire est vide. Veuillez saisir une demande.
+                            </div>
+                        {% endif %}
+                        <div class="form-group">
+                            {{ form_start(f, {'attr': {'novalidate': 'novalidate'}}) }}
+                            {{ form_label(f.demande) }}
+                            {{ form_widget(f.demande, {'attr': {'class': 'form-control', 'placeholder': 'Votre demande'}}) }}
+                            {{ form_errors(f.demande) }}
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Envoyer" class="btn btn-primary py-3 px-5">
+                        </div>
+                        {{ form_end(f) }}
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex">
+                    <div id="map" class="bg-white"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base_back.html.twig' %}
+{% block body %}
+      <div class="main-panel">
+        <div class="content-wrapper" style="width: 2000px;">
+          <div class="row">
+            <div class="col-lg-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Liste des demandes</h4>
+                  <div class="table-responsive">
+                    <table class="table table-hover" >
+                      <thead>
+                        <tr class="text-center">
+                          <th>Client</th>
+                          <th>Statut</th>
+                          <th>Demande</th>
+                          <th>Réponse</th>
+                          <th>Note</th>
+                          <th>Date</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for a in conseils %}
+                      <tr class="text-center">
+                      <td>{{ a.getIdClient().getPrenom() ~ ' ' ~ a.getIdClient().getNom() }}</td>
+        {% if a.statut == 'terminé' %}
+            <td><label class="badge badge-success">{{ a.statut }}</label></td>
+                    {% elseif a.statut == 'en attente' %}
+            <td><label class="badge badge-warning">{{ a.statut }}</label></td>
+        {% else %}
+            <td>{{ a.statut }}</td>
+        {% endif %}
+                      <td>{{ a.demande }} </td>
+                      <td>{{ a.reponse }} </td>
+                                  {% if a.note <= 2 %}
+                <td class="text-danger">{{ a.note }}</td>
+            {% else %}
+                <td class="text-success">{{ a.note }}</td>
+            {% endif %}
+                      <td>{{ a.dateConseil|date("d/m/Y") }} </td>
+                      <td><button type="button" class="btn btn-danger btn-rounded btn-fw"><a href="{{ path('conseil_delete', {'id': a.idConseil}) }}" style="color: white;">Delete</a></button></td>
+                      </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

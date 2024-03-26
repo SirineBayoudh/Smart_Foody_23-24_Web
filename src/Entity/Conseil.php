@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ConseilRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as assert;
 
 #[ORM\Entity(repositoryClass: ConseilRepository::class)]
 class Conseil
@@ -18,6 +19,7 @@ class Conseil
     private ?string $statut = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"champs obligatoire")]
     private ?string $demande = null;
 
     #[ORM\Column(length: 255)]
@@ -33,7 +35,7 @@ class Conseil
     #[ORM\JoinColumn(name: "id_client", referencedColumnName: "id_utilisateur")]
     private ?Utilisateur $id_client = null;
 
-    public function getId(): ?int
+    public function getIdConseil(): ?int
     {
         return $this->id_conseil;
     }
