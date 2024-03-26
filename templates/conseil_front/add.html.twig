@@ -5,14 +5,14 @@
         <div class="container">
             <div class="row no-gutters slider-text align-items-center justify-content-center">
                 <div class="col-md-9 ftco-animate text-center">
-                    <h1 class="mb-0 bread">Conseils</h1>
+                    <h1 class="mb-0 bread">Demande des conseils</h1>
                 </div>
             </div>
         </div>
     </div>
     <section class="ftco-section contact-section bg-light">
         <div class="container">
-            <h1>Liste des conseils</h1>
+            <h1>Liste des demandes</h1>
             <div style="overflow: auto; max-height: 400px;">
                 <table class="table">
                     <thead class="thead-primary">
@@ -33,7 +33,7 @@
                             <td class="quantity">{{ conseil.reponse }}</td>
                             <td class="total">{{ conseil.note }}</td>
                             <td class="total">{{ conseil.dateConseil|date("d/m/Y") }}</td>
-                            <td><a href="/updateConseil/{{conseil.idConseil}}"</a>Évaluer</td>
+                            <td><a href="/updateNoteConseil/{{conseil.idConseil}}"</a>Évaluer</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -52,6 +52,7 @@
                                 Le formulaire est vide. Veuillez saisir une demande.
                             </div>
                         {% endif %}
+                        <h4>Envoyer une demande</h4><br>
                         <div class="form-group">
                             {{ form_start(f, {'attr': {'novalidate': 'novalidate'}}) }}
                             {{ form_label(f.demande) }}

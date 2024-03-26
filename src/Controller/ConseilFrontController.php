@@ -33,9 +33,8 @@ class ConseilFrontController extends AbstractController
             $em->persist($conseil);
             $em->flush();
             
-            $success = true; // Flag indicating success
+            $success = true; 
         } elseif ($form->isSubmitted()) {
-            // Form was submitted but not valid (empty)
             $emptySubmission = true;
         }
     
@@ -44,12 +43,12 @@ class ConseilFrontController extends AbstractController
         return $this->renderForm('conseil_front/add.html.twig', [
             'f' => $form,
             'conseils' => $conseils,
-            'success' => $success ?? false, // Default to false if not set
-            'emptySubmission' => $emptySubmission ?? false, // Default to false if not set
+            'success' => $success ?? false, 
+            'emptySubmission' => $emptySubmission ?? false, 
         ]);
     }
         
-    #[Route('/updateConseil/{id_conseil}', name: 'conseil_update')]
+    #[Route('/updateNoteConseil/{id_conseil}', name: 'conseil_note_update')]
     public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id_conseil): Response
     {
         $conseil = $repo->find($id_conseil);
@@ -58,7 +57,8 @@ class ConseilFrontController extends AbstractController
     
         $em = $manager->getManager();
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush(); 
+            $em->flush();
+            $this->addFlash('success', 'La note a été modifiée avec succès.'); 
         }
     
         $conseils = $this->getDoctrine()->getRepository(Conseil::class)->findBy(['id_client' => 2]);  //STATIQUE

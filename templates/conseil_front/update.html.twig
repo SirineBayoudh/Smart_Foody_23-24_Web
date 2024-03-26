@@ -24,7 +24,7 @@
                         <td class="quantity">{{ conseil.reponse }}</td>
                         <td class="total">{{ conseil.note }}</td>
                         <td class="total">{{ conseil.dateConseil|date("d/m/Y") }}</td>
-                        <td><a href="/updateConseil/{{conseil.idConseil}}">Évaluer</a></td>
+                        <td><a href="/updateNoteConseil/{{conseil.idConseil}}">Évaluer</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -33,7 +33,12 @@
         <div class="row block-9">
             <div class="col-md-6 order-md-last d-flex">
                 <div class="bg-white p-5 contact-form">
-                <h4>Évaluer un conseil</h4><br>
+                <h4>Évaluer le conseiller</h4><br>
+                {% for message in app.flashes('success') %}
+                <div class="alert alert-success" role="alert">
+                {{ message }}
+                </div>
+                {% endfor %}
                 <div class="form-group">
                     {{ form_start(fUpdate) }}
                     Demande

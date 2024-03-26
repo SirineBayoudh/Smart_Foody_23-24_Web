@@ -1,7 +1,7 @@
 {% extends 'base_back.html.twig' %}
 {% block body %}
       <div class="main-panel">
-        <div class="content-wrapper" style="width: 2000px;">
+        <div class="content-wrapper" style="width: 2200px;">
           <div class="row">
             <div class="col-lg-6 grid-margin stretch-card">
               <div class="card">
@@ -39,7 +39,9 @@
                 <td class="text-success">{{ a.note }}</td>
             {% endif %}
                       <td>{{ a.dateConseil|date("d/m/Y") }} </td>
-                      <td><button type="button" class="btn btn-danger btn-rounded btn-fw"><a href="{{ path('conseil_delete', {'id': a.idConseil}) }}" style="color: white;">Delete</a></button></td>
+                      <td><button type="button" class="btn btn-danger btn-rounded btn-fw"><a href="{{ path('conseil_delete', {'id': a.idConseil}) }}" style="color: white;">Supprimer</a></button>
+                      <button type="button" class="btn btn-danger btn-rounded btn-fw"><a href="{{ path('conseil_rep_update', {'id': a.idConseil}) }}" style="color: white;">Modifier</a></button>
+                      </td>
                       </tr>
                       {% endfor %}
                       </tbody>
