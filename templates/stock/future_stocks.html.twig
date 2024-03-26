@@ -1,0 +1,150 @@
+{% extends 'base_back.html.twig' %}
+
+    {% block body %}
+        <div class="col-lg-20 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title"> Table Stock </h4>
+                <div class="table-responsive">
+                  <table class="table table-hover" style="margin:auto">
+                    <thead>
+                      <tr>
+                        <tr>
+                            <th>Nom du stock</th>
+                            <th>Marque</th>
+                            <th>Quantités</th>
+                            <th>Nombre vendus</th>
+                            <th>Cout</th>
+                            <th>Action</th>
+                        </tr>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in futureStocks %}
+                            {# <tr  ><td class="py-1">{{ s.getRefProduit().getCategorie() }}</td> #}
+                            
+                                <td class="py-1" >{{ s.nom }}</td>
+                            
+                                <td >{{ s.marque }}</td>
+                                <td style="font-size: 12px;">{{ s.quantite }}</td>
+                                <td style="font-size: 12px;">{{ s.nbvendu }}</td>
+                                <td >{{ s.cout }}</td>
+                                <td>  <a href="{{ path('stock_edit', {id: s.id_s}) }}?mode=modifier">
+                                     <button class="btn btn-warning ">Modifier
+                                        </button>  </a></td>
+                                {# <td>
+                                    <a href="{{ path('stock_update', {id: s.id_s}) }}">
+                                        <button type="button" class="btn btn-warning">Modifier</button>
+                                    </a>
+                                </td> #}
+                                <td>
+                                    <a href="{{ path('stock_delete', {id: s.id_s}) }}">
+                                        <button type="button" class="btn btn-danger">Supprimer</button>
+                                    </a>
+                                </td> </tr>
+                        {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-12" style="margin-top: 70px;">
+                    <div class="card-body" style="text-align: center;">
+                        <a href="{{ path('app_ajouter_stock') }}?mode=ajouter"> <button type="button" id="addButton" class="btn btn-success" >Ajouter</button></a>
+  
+                       {# <a href="{{ path('app_ajouter_stock') }}"> <button type="button" id="addButton" class="btn btn-success" >Ajouter</button></a> #}
+                        {# <button type="button" class="btn btn-warning">Modifier</button> #}
+                        {# <button type="button" class="btn btn-danger" id="deleteSelected">Supprimer</button> #}
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+       
+        <!-- Modal for add stock form -->
+        {# <div class="modal fade" id="addStockModal" tabindex="-1" role="dialog" aria-labelledby="addStockModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addStockModalLabel">Ajouter un stock</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% include 'ajouter_stock/index.html.twig' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+         #}
+         {# <div class="modal fade" id="updateStockModal" tabindex="-1" role="dialog" aria-labelledby="updateStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStockModalLabel">Modifier un stock</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="updateStockForm" action="" method="post">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    {{ form_end(form) }}
+                </form>
+            </div>
+        </div>
+    </div> #}
+    {% for flash_message in app.session.flashbag.get('danger') %}
+        <div class="alert alert-danger" role="alert">
+            {{ flash_message }}
+        </div>
+    {% endfor %}
+  </div>
+  
+    {% endblock %}
+    
+    {% block stylesheets %}
+        <style>
+            .selected {
+                background-color: red;
+            }
+            
+            /* CSS pour réduire la largeur du tableau */
+            .table-responsive {
+                max-width: 30%; /* Vous pouvez ajuster la valeur selon vos besoins */
+              
+            }
+        </style>
+    {% endblock %}
+    {# {% block javascripts %} #}
+        {# <script>
+            $(document).ready(function() {
+                $('#btnAjouter').click(function() {
+                    $('#addStockModal').modal('show');
+                });
+                
+                $('.btnModifier').click(function() {
+            var id_s = $(this).data('id');
+            var formAction = '{{ path('stock_edit', {id: 'ID'}) }}'.replace('ID', id_s);
+            $('#updateStockForm').attr('action', formAction);
+        });
+            });
+        </script>
+        {% endblock %} #}
+        {% block javascripts %}
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    var addButton = document.querySelector("#addButton");
+                    addButton.addEventListener("click", function() {
+                        window.location.href = "{{ path('app_ajouter_stock') }}?mode=ajouter";
+                    });
+            
+                    var editButton = document.querySelector("#editButton");
+                    editButton.addEventListener("click", function() {
+                        window.location.href = "{{ path('app_ajouter_stock') }}?mode=modifier";
+                    });
+                });
+            </script>
+            
+        {% endblock %}

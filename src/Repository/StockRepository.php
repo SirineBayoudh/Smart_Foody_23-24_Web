@@ -62,4 +62,21 @@ class StockRepository extends ServiceEntityRepository
         return $formattedMarques;
         var_dump($formattedMarques);
     }
+
+    public function findFutureStocks(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.date_arrivage > :currentDate')
+            ->setParameter('currentDate', new \DateTime())
+            ->getQuery()
+            ->getResult();
+    }
+    public function findExistantStocks(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.date_arrivage < :currentDate')
+            ->setParameter('currentDate', new \DateTime())
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\StockRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: StockRepository::class)]
 class Stock
@@ -14,8 +15,12 @@ class Stock
     #[ORM\Column]
     private ?int $id_s = null;
 
+
     #[ORM\Column]
-    private ?int $quantite = null;
+    #[Assert\NotNull(message: "Le champ est obligatoire")]
+    #[Assert\NotBlank(message: "Le champ ne peut pas être vide")]
+    #[Assert\Positive(message: "La quantité doit être positive")]
+    private ?int $quantite;
 
     #[ORM\Column(nullable: true)]
     private ?int $nbVendu = null;

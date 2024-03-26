@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class StockController extends AbstractController
 {
@@ -75,7 +76,7 @@ class StockController extends AbstractController
     //         'stocks' => $stocks,
     //     ]);
     // }
-    #[Route('/stock', name: 'stock_get')]
+
     #[Route('/stock', name: 'stock_get')]
     public function getStock(
         StockRepository $stockRepo,
@@ -84,7 +85,7 @@ class StockController extends AbstractController
         FlashBagInterface $flashBag
     ): Response {
         // Récupérez les données de la table Stock et Produit
-        $stocks = $stockRepo->findAll();
+        $stocks = $stockRepo->findExistantStocks();
         $produits = $produitRepo->findAll();
 
         $alertMessages = []; // Tableau pour stocker les alertes temporaires
@@ -179,7 +180,7 @@ class StockController extends AbstractController
             ->getForm();
         $form->handleRequest($req);
         $em = $manager->getManager();
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted()  && $form->isValid()) {
 
             $em->persist($j);  // juste préparer les requetes
             $em->flush();
@@ -227,6 +228,19 @@ class StockController extends AbstractController
 
         return $this->render('stock/ajouter.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+
+
+    #[Route('/stock_venir', name: 'stock_venir')]
+    public function getFutureStocks(StockRepository $stockRepository): Response
+    {
+        // Récupérer les stocks à venir depuis le repository
+        $futureStocks = $stockRepository->findFutureStocks();
+
+        return $this->render('stock/future_stocks.html.twig', [
+            'futureStocks' => $futureStocks,
         ]);
     }
 }
