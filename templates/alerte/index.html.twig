@@ -1,0 +1,60 @@
+{% extends 'base_back.html.twig' %}
+
+    {% block body %}
+
+        <div class="col-lg-20 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title"> Table Alerte </h4>
+                <div class="table-responsive">
+        
+                  <table class="table table-hover" style="margin:auto">
+                    <thead>
+                      <tr>
+                        <tr>
+                            <th>Id alerte</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                         
+                        </tr>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in alerts  %}
+                        <tr class="{% if a.isType() == false %}alert-unread{% else %}alert-read{% endif %}">
+                            <td>{{ a.id_alerte }}</td>
+                            <td>{{ a.description_alerte }}</td>
+                            <td>{{ a.isType() ? 'Lue' : 'Non lue' }}</td>
+                        </tr>
+                    {% endfor %}
+                   
+                    </tbody>
+                  </table>
+                </div>
+               
+              </div>
+            </div>
+          </div>
+       
+        
+        
+  
+</div>
+
+    {% endblock %}
+    
+    {% block stylesheets %}
+        <style>
+            .selected {
+                background-color: red;
+            }
+            
+            /* CSS pour réduire la largeur du tableau */
+            .table-responsive {
+                max-width: 30%; /* Vous pouvez ajuster la valeur selon vos besoins */
+              
+            }
+        </style>
+    {% endblock %}
+   
+     

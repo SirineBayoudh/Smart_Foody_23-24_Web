@@ -34,7 +34,7 @@ class Stock
 
     #[ORM\ManyToOne(inversedBy: 'ref_produit')]
     #[ORM\JoinColumn(name: "ref_produit", referencedColumnName: "ref")]
-    private ?Produit $produit = null;
+    private ?Produit $ref_produit = null;
 
     public function getId_s(): ?int
     {
@@ -113,14 +113,25 @@ class Stock
         return $this;
     }
 
-    public function getProduit(): ?Produit
+    // public function getProduit(): ?Produit
+    // {
+    //     return $this->produit;
+    // }
+
+    // public function setProduit(?Produit $produit): static
+    // {
+    //     $this->produit = $produit;
+
+    //     return $this;
+    // }
+    public function getRefProduit(): ?Produit
     {
-        return $this->produit;
+        return $this->ref_produit;
     }
 
-    public function setProduit(?Produit $produit): static
+    public function setRefProduit(?Produit $ref_produit): static
     {
-        $this->produit = $produit;
+        $this->ref_produit = $ref_produit;
 
         return $this;
     }

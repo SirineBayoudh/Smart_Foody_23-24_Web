@@ -1,0 +1,101 @@
+{% extends 'base_back.html.twig' %}
+
+    {% block body %}<div class="col-12 grid-margin stretch-card">
+        <div class="main-panel">        
+            <div class="content-wrapper">
+    <div class="card">
+      <div class="card-body">
+        <h4 id="form-title" class="card-title">
+            {% if app.request.query.get('mode') == 'ajouter' %}
+                Ajouter un stock
+            {% elseif app.request.query.get('mode') == 'modifier' %}
+                Modifier un stock
+            {% endif %}
+        </h4>
+        <p class="card-description">
+        
+        </p>
+
+ 
+        {{ form_start(form, {'attr': {'class': 'forms-sample',  'novalidate': 'novalidate'}}) }}
+            <!-- Début du formulaire -->
+            <div class="form-group">
+                {{ form_label(form.nom) }}
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.nom) ? ' is-invalid' : '')}}) }}
+                {% if form_errors(form.nom) %}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.nom) }}
+                    </div>
+                {% endif %}
+            </div>
+            {% if app.request.query.get('mode') == 'ajouter' %}
+                <div class="form-group">
+                    {{ form_label(form.ref_produit) }} <!-- Label pour le champ ref_produit -->
+                    {{ form_widget(form.ref_produit, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.ref_produit) ? ' is-invalid' : '')}}) }}
+                    {% if form_errors(form.ref_produit) %}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.ref_produit) }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+                {# <div class="form-group">
+                    {{ form_label(form.ref_produit) }} <!-- Label pour le champ ref_produit -->
+                    {{ form_widget(form.ref_produit, {'attr': {'class': 'form-control form-control-lg'}}) }} <!-- Champ ref_produit -->
+                </div> #}
+                <div class="form-group">
+                    {{ form_label(form.marque) }} <!-- Label pour le champ marque -->
+                    {{ form_widget(form.marque, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.marque) ? ' is-invalid' : '')}}) }}
+                    {% if form_errors(form.marque) %}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.marque) }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.quantite) }} <!-- Label pour le champ quantite -->
+                    {{ form_widget(form.quantite, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.quantite ) ? ' is-invalid' : '')}}) }}
+                    {% if form_errors(form.quantite) %}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.quantite) }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.date_arrivage) }} <!-- Label pour le champ date_arrivage -->
+                    {{ form_widget(form.date_arrivage, {'attr': {'class': 'form-control form-control-lg date-input' ~ (form_errors(form.date_arrivage ) ? ' is-invalid' : ''), 'placeholder': 'yyyy-mm-dd'}}) }}
+                    {% if form_errors(form.date_arrivage) %}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.date_arrivage) }}
+                        </div>
+                    {% endif %}
+                </div>
+    
+                {{ form_end(form) }} <!-- Fin du formulaire --><br><br>
+                <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                <button class="btn btn-light">Cancel</button>
+            
+       
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+    {% endblock %}
+    {% block javascripts %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var mode = new URLSearchParams(window.location.search).get('mode');
+        var formTitle = document.querySelector("#form-title");
+
+        if (mode === 'ajouter') {
+            formTitle.textContent = "Ajouter un stock";
+        } else if (mode === 'modifier') {
+            formTitle.textContent = "Modifier un stock";
+        }
+    });
+</script>
+{% endblock %}
+
+   

@@ -117,7 +117,7 @@ class Produit
     {
         if (!$this->ref_produit->contains($refProduit)) {
             $this->ref_produit->add($refProduit);
-            $refProduit->setProduit($this);
+            $refProduit->setRefProduit($this);
         }
 
         return $this;
@@ -127,8 +127,8 @@ class Produit
     {
         if ($this->ref_produit->removeElement($refProduit)) {
             // set the owning side to null (unless already changed)
-            if ($refProduit->getProduit() === $this) {
-                $refProduit->setProduit(null);
+            if ($refProduit->getRefProduit() === $this) {
+                $refProduit->setRefProduit(null);
             }
         }
 
@@ -205,5 +205,30 @@ class Produit
         $this->critere = $critere;
 
         return $this;
+    }
+
+
+    private static $categories = [];
+    public function __toString()
+    {
+        if ($this->ref && $this->categorie) {
+            // Créer une clé unique en combinant la référence et la catégorie
+            $key = $this->ref . '-' . $this->categorie;
+
+            // Vérifier si la catégorie a déjà été rencontrée
+            if (in_array($this->categorie, self::$categories)) {
+                return ''; // Retourner une chaîne vide si la catégorie a déjà été rencontrée
+            } else {
+                // Ajouter la catégorie à la liste des catégories rencontrées
+                self::$categories[] = $this->categorie;
+                return $key; // Retourner la combinaison de référence et de catégorie
+            }
+        } elseif ($this->ref) {
+            return $this->ref; // Retourner uniquement la référence si la catégorie est absente
+        } elseif ($this->categorie) {
+            return $this->categorie; // Retourner uniquement la catégorie si la référence est absente
+        } else {
+            return ''; // Retourner une chaîne vide si à la fois la référence et la catégorie sont absentes
+        }
     }
 }

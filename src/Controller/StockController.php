@@ -8,7 +8,7 @@ use App\Entity\Stock;
 use App\Form\AjouterStockType;
 use App\Repository\ProduitRepository;
 use App\Repository\StockRepository;
-use Doctrine\DBAL\Types\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -101,7 +101,7 @@ class StockController extends AbstractController
             if ($stock->getNbvendu() === $stock->getQuantite()) {
                 // Créez une nouvelle instance d'Alerte
                 $alerte = new Alerte();
-                $alerte->setDescriptionAlerte('le stock ' . $stock->getNom() . ' est en rupture');
+                $alerte->setDescription_alerte('le stock ' . $stock->getNom() . ' est en rupture');
                 $alerte->setDateAlerte(new \DateTime()); // Date actuelle
                 $alerte->setType(false); // Mettez le type d'alerte à faux
 
@@ -109,7 +109,7 @@ class StockController extends AbstractController
                 $entityManager->persist($alerte);
 
                 // Ajoutez la description de l'alerte au tableau des messages
-                $alertMessages[] = $alerte->getDescriptionAlerte();
+                $alertMessages[] = $alerte->getDescription_alerte();
             }
         }
 
@@ -164,5 +164,69 @@ class StockController extends AbstractController
         $em->remove($stock);
         $em->flush();
         return $this->redirectToRoute("stock_get");
+    }
+    #[Route('/edit_stock/{id}', name: 'stock_edit')]
+    public function editstock(Request $req, ManagerRegistry $manager, $id, StockRepository $repo): Response
+    {
+        $j = $repo->find($id);
+        $form = $this->createFormBuilder($j)
+            ->add('nom', TextType::class, ['disabled' => true]) // Rend le champ 'nom' non éditable
+            // ->add('ref_produit', TextType::class, ['disabled' => true]) // Rend le champ 'ref_produit' non éditable
+            ->add('marque', TextType::class, ['disabled' => true]) // Rend le champ 'marque' non éditable
+            ->add('quantite') // Champ quantite reste éditable
+            ->add('date_arrivage') // Champ quantite reste éditable
+            ->add('submit', SubmitType::class)
+            ->getForm();
+        $form->handleRequest($req);
+        $em = $manager->getManager();
+        if ($form->isSubmitted()) {
+
+            $em->persist($j);  // juste préparer les requetes
+            $em->flush();
+
+            return $this->redirectToRoute("stock_get");
+        }
+        return  $this->renderForm(
+            'stock/ajouter.html.twig',
+            [
+                'form' => $form,
+                //'stocks' => $repo->findAll() // Passer les stocks à la vue
+            ]
+        );
+    }
+
+
+
+    #[Route('/ajouter/stock', name: 'app_ajouter_stock')]
+    public function index(Request $request, ManagerRegistry $manager, ProduitRepository $produitRepository): Response
+    {
+        $stock = new Stock();
+        $form = $this->createForm(AjouterStockType::class, $stock);
+        $form->handleRequest($request);
+        $em = $manager->getManager();
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer la marque sélectionnée dans le formulaire
+            $marque = $stock->getMarque();
+
+            // Rechercher l'objet Produit correspondant à la marque sélectionnée
+            $produit = $produitRepository->findOneBy(['marque' => $marque]);
+
+            // Vérifier si un produit correspondant a été trouvé
+            if ($produit instanceof Produit) {
+                // Récupérer la référence exacte du produit
+                $stock->setRefProduit($produit);
+            }
+            // Persister l'objet Stock dans la base de données
+            $em->persist($stock);
+            $em->flush();
+
+            // Rediriger l'utilisateur vers la page de liste des stocks ou une autre page appropriée
+            return $this->redirectToRoute('stock_get');
+        }
+
+        return $this->render('stock/ajouter.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 }

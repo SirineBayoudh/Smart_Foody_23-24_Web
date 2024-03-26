@@ -28,12 +28,12 @@ class Alerte
         return $this->id_alerte;
     }
 
-    public function getDescriptionAlerte(): ?string
+    public function getDescription_alerte(): ?string
     {
         return $this->description_alerte;
     }
 
-    public function setDescriptionAlerte(?string $description_alerte): static
+    public function setDescription_alerte(?string $description_alerte): static
     {
         $this->description_alerte = $description_alerte;
 
