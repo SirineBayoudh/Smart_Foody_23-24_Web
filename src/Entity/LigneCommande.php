@@ -13,71 +13,100 @@ class LigneCommande
     #[ORM\Column]
     private ?int $id_lc = null;
 
-    #[ORM\Column]
-    private ?int $quantite = null;
+    #[ORM\Column(length: 255)]
+    private ?string $quantite = null;
 
-    #[ORM\ManyToOne(inversedBy: 'ligneCommandes')]
-    #[ORM\JoinColumn(name: "id_commande", referencedColumnName: "id_commande")]
-    private ?commande $id_commande = null;
 
-    #[ORM\ManyToOne(inversedBy: 'ligneCommandes')]
+
+
+  
+    #[ORM\ManyToOne(inversedBy: 'panier')]
     #[ORM\JoinColumn(name: "id_panier", referencedColumnName: "id_panier")]
-    private ?panier $id_panier = null;
+    private ?Panier $panier = null;
 
-    #[ORM\ManyToOne(inversedBy: 'ligneCommandes')]
-    #[ORM\JoinColumn(name: "ref_produit", referencedColumnName: "ref")]
-    private ?Produit $ref_produit = null;
 
-    public function getId(): ?int
+
+
+      
+      #[ORM\ManyToOne(inversedBy: 'produit')]
+      #[ORM\JoinColumn(name: "ref_produit", referencedColumnName: "ref")]
+      private ?Produit $produit = null;
+
+   
+      #[ORM\ManyToOne(inversedBy: 'commande')]
+      #[ORM\JoinColumn(name: "id_commande", referencedColumnName: "id")]
+      private ?Commande $commande = null;
+  
+  
+      
+      public function getCommande(): ?Commande
+      {
+          return $this->commande;
+      }
+  
+      public function setCommande(?Commande $commande): self
+      {
+          $this->commande = $commande;
+          return $this;
+      }
+    
+      public function getProduit(): ?Produit
+      {
+          return $this->produit;
+      }
+  
+      public function setProduit(?Produit $produit): self
+      {
+          $this->produit = $produit;
+          return $this;
+      }
+
+    public function getId_lc(): ?int
     {
         return $this->id_lc;
     }
 
-    public function getQuantite(): ?int
+    public function getQuantite(): ?string
     {
         return $this->quantite;
     }
 
-    public function setQuantite(int $quantite): static
+    public function setQuantite(string $quantite): self
     {
         $this->quantite = $quantite;
-
         return $this;
     }
 
-    public function getIdCommande(): ?commande
+   /*    public function getCommande(): ?Commande
     {
-        return $this->id_commande;
+        return $this->commande;
     }
 
-    public function setIdCommande(?commande $id_commande): static
+    public function setCommande(?Commande $commande): self
     {
-        $this->id_commande = $id_commande;
+        $this->commande = $commande;
+        return $this;
+    }*/
 
+
+    public function getPanier(): ?Panier
+    {
+        return $this->panier;
+    }
+
+    public function setPanier(?Panier $panier): self
+    {
+        $this->panier = $panier;
         return $this;
     }
 
-    public function getIdPanier(): ?panier
-    {
-        return $this->id_panier;
-    }
+ 
 
-    public function setIdPanier(?panier $id_panier): static
-    {
-        $this->id_panier = $id_panier;
 
-        return $this;
-    }
 
-    public function getRefProduit(): ?Produit
-    {
-        return $this->ref_produit;
-    }
 
-    public function setRefProduit(?Produit $ref_produit): static
-    {
-        $this->ref_produit = $ref_produit;
 
-        return $this;
-    }
+
+
+  
 }

@@ -14,66 +14,132 @@ class Commande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id_commande = null;
+    private ?int $id = null;
+
+
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date_commande = null;
+    private ?\DateTimeInterface $dateCommande = null;
 
-    #[ORM\Column]
-    private ?float $totalecommande = null;
 
-    #[ORM\Column]
+
+    #[ORM\Column(name: "totalecommande", type: "float")]
+    private ?float $totaleCommande = null;
+
+    #[ORM\Column(type: "float")]
     private ?float $remise = null;
 
     #[ORM\Column(length: 255)]
     private ?string $etat = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: "float")]
     private ?float $longitude = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: "float")]
     private ?float $latitude = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $address = null;
 
-    #[ORM\ManyToOne(inversedBy: 'commandes')]
-    #[ORM\JoinColumn(name: "id_client", referencedColumnName: "id_utilisateur")]
-    private ?Utilisateur $id_client = null;
+    #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'commande')]
+    private Collection $lignesCommande;
 
-    #[ORM\OneToMany(mappedBy: 'id_commande', targetEntity: LigneCommande::class)]
-    private Collection $ligneCommandes;
+  #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'commandes')]
+#[ORM\JoinColumn(name: "id_client", referencedColumnName: "id_utilisateur")]
+private ?Utilisateur $utilisateur;
+
+
+public function getUtilisateur(): ?Utilisateur
+{
+    return $this->utilisateur;
+}
+
+public function setUtilisateur(?Utilisateur $utilisateur): self
+{
+    $this->utilisateur = $utilisateur;
+    return $this;
+}
+
+
+
+
+    
+
 
     public function __construct()
     {
-        $this->ligneCommandes = new ArrayCollection();
+        $this->lignesCommande = new ArrayCollection();
     }
 
-    public function getId(): ?int
+
+
+    public function getAddress(): ?string
     {
-        return $this->id_commande;
+        return $this->address;
     }
+
+    public function setAddress(string $address): self // Correction du type de retour et du paramètre
+    {
+        $this->address = $address;
+        return $this;
+    }
+
+  
+
+  public function addLigneCommande(LigneCommande $ligneCommande): self
+  {
+      if (!$this->lignesCommande->contains($ligneCommande)) {
+          $this->lignesCommande[] = $ligneCommande;
+          $ligneCommande->setCommande($this);
+      }
+
+      return $this;
+  }
+
+  public function removeLigneCommande(LigneCommande $ligneCommande): self
+  {
+      if ($this->lignesCommande->removeElement($ligneCommande)) {
+          if ($ligneCommande->getCommande() === $this) {
+              $ligneCommande->setCommande(null);
+          }
+      }
+
+      return $this;
+  }
+
+
+  public function getIdCommande(): ?int
+  {
+      return $this->id;
+  }
+
 
     public function getDateCommande(): ?\DateTimeInterface
     {
-        return $this->date_commande;
+        return $this->dateCommande;
     }
 
-    public function setDateCommande(\DateTimeInterface $date_commande): static
+    public function setDateCommande(\DateTimeInterface $dateCommande): static
     {
-        $this->date_commande = $date_commande;
+        $this->dateCommande = $dateCommande;
 
         return $this;
     }
 
-    public function getTotalecommande(): ?float
+
+    public function getTotaleCommande(): ?float
     {
-        return $this->totalecommande;
+        return $this->totaleCommande;
     }
 
-    public function setTotalecommande(float $totalecommande): static
+    public function setTotaleCommande(float $totaleCommande): static
     {
-        $this->totalecommande = $totalecommande;
+        $this->totaleCommande = $totaleCommande;
 
         return $this;
     }
@@ -107,76 +173,37 @@ class Commande
         return $this->longitude;
     }
 
-    public function setLongitude(float $longitude): static
-    {
-        $this->longitude = $longitude;
 
-        return $this;
-    }
+
+    public function setLatitude(float $latitude): self
+{
+    $this->latitude = $latitude;
+    return $this;
+}
+
+public function setLongitude(float $longitude): self
+{
+    $this->longitude = $longitude;
+    return $this;
+}
 
     public function getLatitude(): ?float
     {
         return $this->latitude;
     }
 
-    public function setLatitude(float $latitude): static
-    {
-        $this->latitude = $latitude;
+   }
 
-        return $this;
-    }
+   
 
-    public function getAddress(): ?string
-    {
-        return $this->address;
-    }
 
-    public function setAddress(?string $address): static
-    {
-        $this->address = $address;
 
-        return $this;
-    }
 
-    public function getIdClient(): ?Utilisateur
-    {
-        return $this->id_client;
-    }
+  
 
-    public function setIdClient(?Utilisateur $id_client): static
-    {
-        $this->id_client = $id_client;
+ 
 
-        return $this;
-    }
 
-    /**
-     * @return Collection<int, LigneCommande>
-     */
-    public function getLigneCommandes(): Collection
-    {
-        return $this->ligneCommandes;
-    }
 
-    public function addLigneCommande(LigneCommande $ligneCommande): static
-    {
-        if (!$this->ligneCommandes->contains($ligneCommande)) {
-            $this->ligneCommandes->add($ligneCommande);
-            $ligneCommande->setIdCommande($this);
-        }
 
-        return $this;
-    }
 
-    public function removeLigneCommande(LigneCommande $ligneCommande): static
-    {
-        if ($this->ligneCommandes->removeElement($ligneCommande)) {
-            // set the owning side to null (unless already changed)
-            if ($ligneCommande->getIdCommande() === $this) {
-                $ligneCommande->setIdCommande(null);
-            }
-        }
-
-        return $this;
-    }
-}

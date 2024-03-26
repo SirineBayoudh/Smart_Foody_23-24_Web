@@ -15,35 +15,51 @@ class Panier
     #[ORM\Column]
     private ?int $id_panier = null;
 
-    #[ORM\Column]
+  
+
+    #[ORM\Column(type: "float")]
     private ?float $totale = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: "float")]
     private ?float $remise = null;
 
-    #[ORM\OneToMany(mappedBy: 'id_panier', targetEntity: LigneCommande::class)]
-    private Collection $ligneCommandes;
+    #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'panier')]
+    private Collection $lignesCommande;
 
-    #[ORM\ManyToOne(inversedBy: 'paniers')]
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'panierUtilisateur')]
     #[ORM\JoinColumn(name: "id_client", referencedColumnName: "id_utilisateur")]
-    private ?Utilisateur $id_client = null;
+    private ?Utilisateur $utilisateur;
+    
+    
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+    
+    public function setUtilisateur(?Utilisateur $utilisateur): self
+    {
+        $this->utilisateur = $utilisateur;
+        return $this;
+    }
 
     public function __construct()
     {
-        $this->ligneCommandes = new ArrayCollection();
+        $this->lignesCommande = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId_panier(): ?int
     {
         return $this->id_panier;
     }
+
+ 
 
     public function getTotale(): ?float
     {
         return $this->totale;
     }
 
-    public function setTotale(float $totale): static
+    public function setTotale(float $totale): self
     {
         $this->totale = $totale;
 
@@ -55,52 +71,52 @@ class Panier
         return $this->remise;
     }
 
-    public function setRemise(float $remise): static
+    public function setRemise(float $remise): self
     {
         $this->remise = $remise;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, LigneCommande>
-     */
-    public function getLigneCommandes(): Collection
+    public function addLigneCommande(LigneCommande $ligneCommande): self
     {
-        return $this->ligneCommandes;
-    }
-
-    public function addLigneCommande(LigneCommande $ligneCommande): static
-    {
-        if (!$this->ligneCommandes->contains($ligneCommande)) {
-            $this->ligneCommandes->add($ligneCommande);
-            $ligneCommande->setIdPanier($this);
+        if (!$this->lignesCommande->contains($ligneCommande)) {
+            $this->lignesCommande[] = $ligneCommande;
+            $ligneCommande->setPanier($this);
         }
 
         return $this;
     }
 
-    public function removeLigneCommande(LigneCommande $ligneCommande): static
+    public function removeLigneCommande(LigneCommande $ligneCommande): self
     {
-        if ($this->ligneCommandes->removeElement($ligneCommande)) {
+        if ($this->lignesCommande->removeElement($ligneCommande)) {
             // set the owning side to null (unless already changed)
-            if ($ligneCommande->getIdPanier() === $this) {
-                $ligneCommande->setIdPanier(null);
+            if ($ligneCommande->getPanier() === $this) {
+                $ligneCommande->setPanier(null);
             }
         }
 
         return $this;
     }
 
-    public function getIdClient(): ?Utilisateur
+    public function getLignesCommande(): Collection
     {
-        return $this->id_client;
+        return $this->lignesCommande;
     }
 
-    public function setIdClient(?Utilisateur $id_client): static
-    {
-        $this->id_client = $id_client;
 
-        return $this;
-    }
+
+
+  
+
+  
+
+  
+
+   
+
+    
+
+
 }
