@@ -13,11 +13,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ConseilRepository;
 use App\Service\CalorieNinjasService;
+use App\Service\QuotableService;
 
 class ConseilFrontController extends AbstractController
 {
     #[Route('/conseil', name: 'conseil_app')]
-    public function addConseil(Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository, Request $request, CalorieNinjasService $calorieNinjasService): Response
+    public function addConseil(Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository, Request $request, CalorieNinjasService $calorieNinjasService, QuotableService $quotableService): Response
     {
         $conseil = new Conseil();
         $conseil->setStatut('en attente');
@@ -52,6 +53,8 @@ class ConseilFrontController extends AbstractController
             $calories = $calorieNinjasService->getCaloriesForFood($food);
         }
 
+        $randomQuote = $quotableService->getRandomQuote();
+
         return $this->renderForm('conseil_front/add.html.twig', [
             'f' => $form,
             'conseils' => $conseils,
@@ -60,6 +63,7 @@ class ConseilFrontController extends AbstractController
             'emptySubmission' => $emptySubmission ?? false,
             'numberOfConseils' => $numberOfConseils,
             'food' => $food,
+            'randomQuote' => $randomQuote,
             'calories' => $calories
         ]);
     }

@@ -12,6 +12,16 @@
 	</div>
 	<section class="ftco-section contact-section bg-light">
 		<div class="container">
+			<div style="text-align: center;margin-bottom:60px;">
+				<h1>Citation de motivation</h1>
+				<blockquote>
+					{% if randomQuote %}
+						<h5>"{{ randomQuote }}"</h5>
+					{% else %}
+						<p>No quote available</p>
+					{% endif %}
+				</blockquote>
+			</div>
 			<h1>Liste des demandes</h1>
 			<div style="overflow: auto; max-height: 400px;">
 				<table class="table">
@@ -88,7 +98,7 @@
 									alertify.alert('Erreur', 'Nombre de calories non disponible.');
 								</script>
 							{% else %}
-								<h4 style="margin-top: 20px;">Nombre de calories pour "{{ food }}s" :</h4>
+								<h4 style="margin-top: 20px;">Nombre de calories pour "{{ food }}" :</h4>
 								<h6>{{ calories }}
 									calories</h6>
 							{% endif %}
