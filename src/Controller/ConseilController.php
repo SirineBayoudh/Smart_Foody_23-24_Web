@@ -11,6 +11,7 @@ use App\Entity\Conseil;
 use App\Form\ConseilBackUpdateType;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Component\Pager\PaginatorInterface;
+use App\Service\TwilioService;
 
 class ConseilController extends AbstractController
 {
@@ -41,7 +42,7 @@ class ConseilController extends AbstractController
     }
 
     #[Route('/updateRepConseil/{id}', name: 'conseil_rep_update')]
-    public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id, PaginatorInterface $paginator, Request $request): Response
+    public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id, PaginatorInterface $paginator, Request $request, TwilioService $twilioService): Response
     {
         $conseil = $repo->find($id);
         $form = $this->createForm(ConseilBackUpdateType::class, $conseil);
@@ -51,6 +52,7 @@ class ConseilController extends AbstractController
         if ($form->isSubmitted()) {
             $em->persist($conseil);
             $em->flush();
+            //$twilioService->sendSMS('+21651600246', 'Conseil a été mis à jour avec succès', '+16562282121');
             $this->addFlash('success', 'Demande mis à jour avec succès.');
         }
 
