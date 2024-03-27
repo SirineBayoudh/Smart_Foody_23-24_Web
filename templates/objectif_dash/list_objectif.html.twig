@@ -1,0 +1,44 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}Ajouter objectif{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+<div class="col-lg-10 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Table des objectifs : </h4>
+        <div class="col text-right mb-4">
+            <a href="{{ path('add_object') }}" class="btn btn-primary hover-effect" style="background-color: #56ab2f; border-color: #56ab2f;" 
+               onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
+               onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+                <i class="ti-plus"></i>
+                Ajouter objectif
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Libelle</th>
+                  <th>ListCritere</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for o in obj %}
+                      <tr>
+                          <td>{{ o.libelle }}</td>
+                          <td>{{ o.listCritere }}</td>                          
+                      </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div>
+            {% endblock %}

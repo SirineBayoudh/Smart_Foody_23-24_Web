@@ -34,8 +34,8 @@ class Produit
     #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: Avis::class)]
     private Collection $avis;
 
-    #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: LigneCommande::class)]
-    private Collection $ligneCommandes;
+    //#[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: LigneCommande::class)]
+    //private Collection $ligneCommandes;
 
     #[ORM\ManyToOne(inversedBy: 'produits')]
     #[ORM\JoinColumn(name: "critere", referencedColumnName: "id_obj")]
@@ -47,7 +47,7 @@ class Produit
     {
         $this->ref_produit = new ArrayCollection();
         $this->avis = new ArrayCollection();
-        $this->ligneCommandes = new ArrayCollection();
+        //$this->ligneCommandes = new ArrayCollection();
 
     }
 
@@ -165,10 +165,10 @@ class Produit
         return $this;
     }
 
-    /**
+    /*/**
      * @return Collection<int, LigneCommande>
      */
-    public function getLigneCommandes(): Collection
+    /*public function getLigneCommandes(): Collection
     {
         return $this->ligneCommandes;
     }
@@ -193,7 +193,7 @@ class Produit
         }
 
         return $this;
-    }
+    }*/
 
     public function getCritere(): ?Objectif
     {

@@ -1,0 +1,60 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}Add Product{% endblock %}
+
+{% block body %}
+  <div class="col-10 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Ajouter un objectif</h4>
+        <p class="card-description">Please fill out the form below to add a new product.</p>
+        <form class="forms-sample" method="POST" enctype="multipart/form-data" id="objectifForm">
+          <div class="form-group">
+            <label for="objectif">Objectif :</label>
+            <select class="form-control" name="objectif" id="objectif">
+              <option value="Bien être">Bien être</option>
+              <option value="Perte de poids">Perte de poids</option>
+              <option value="Prise de poids">Prise de poids</option>
+              <option value="Prise de masse musculaire">Prise de masse musculaire</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="critere">Critères :</label>
+            <select class="form-control"  name="listCritereConcatenated[]" id="listCritereConcatenated" multiple>
+              <option value="Sans_glucose">Sans_glucose</option>
+              <option value="Sans_gluten">Sans_gluten</option>
+              <option value="Sans_lactose">Sans_lactose</option>
+              <option value="Protein">Protein</option>
+              <option value="Autre">Autre</option> <!-- Nouveau choix -->
+            </select>
+          </div>
+          <!-- Champ pour ajouter un nouveau critère -->
+          <div class="form-group" id="autreCritereDiv" style="display: none;">
+            <label for="autreCritere">Autre Critère :</label>
+            <input type="text" class="form-control" name="autreCritere" id="autreCritere">
+          </div>
+          <button type="button" class="btn btn-success" id="ajouterAutreCritere">Ajouter Autre Critère</button>
+          <br><br>
+          <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("ajouterAutreCritere").addEventListener("click", function() {
+        var autreCritereInput = document.getElementById("autreCritere");
+        if (autreCritereInput.value.trim() !== "") {
+            var selectCritere = document.getElementById("listCritereConcatenated");
+            var option = document.createElement("option");
+            option.text = autreCritereInput.value.trim();
+            option.value = autreCritereInput.value.trim();
+            selectCritere.add(option);
+            autreCritereInput.value = "";
+        } else {
+            document.getElementById("autreCritereDiv").style.display = "block";
+        }
+    });
+</script>
+
+{% endblock %}
