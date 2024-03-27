@@ -8,6 +8,7 @@ use App\Entity\Stock;
 use App\Form\AjouterStockType;
 use App\Repository\ProduitRepository;
 use App\Repository\StockRepository;
+use App\Service\SmsGenerator;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -82,8 +83,10 @@ class StockController extends AbstractController
         StockRepository $stockRepo,
         ProduitRepository $produitRepo,
         EntityManagerInterface $entityManager,
-        FlashBagInterface $flashBag
+        FlashBagInterface $flashBag,
+        SmsGenerator $smsGenerator
     ): Response {
+
         // Récupérez les données de la table Stock et Produit
         $stocks = $stockRepo->findExistantStocks();
         $produits = $produitRepo->findAll();
@@ -98,11 +101,13 @@ class StockController extends AbstractController
                 $stock->setNbvendu(0);
             }
 
-            // Vérifiez si nbVendu est égal à quantite
-            if ($stock->getNbvendu() === $stock->getQuantite()) {
+            // Vérifiez si nbVendu est égal à quantite - 5
+            if ($stock->getNbvendu() === $stock->getQuantite() - 5) {
+
+
                 // Créez une nouvelle instance d'Alerte
                 $alerte = new Alerte();
-                $alerte->setDescription_alerte('le stock ' . $stock->getNom() . ' est en rupture');
+                $alerte->setDescription_alerte('Le stock ' . $stock->getNom() . ' est bientôt en rupture.');
                 $alerte->setDateAlerte(new \DateTime()); // Date actuelle
                 $alerte->setType(false); // Mettez le type d'alerte à faux
 
@@ -111,6 +116,16 @@ class StockController extends AbstractController
 
                 // Ajoutez la description de l'alerte au tableau des messages
                 $alertMessages[] = $alerte->getDescription_alerte();
+            }
+
+            // Vérifiez si nbVendu est égal à quantite
+            if ($stock->getNbvendu() === $stock->getQuantite()) {
+                $phoneNumber = '+21627674746'; // Remplacez ceci par le numéro de téléphone approprié
+                $name = 'Nom'; // Remplacez ceci par le nom approprié
+                $message = 'Le stock ' . $stock->getNom() . ' est en rupture.'; // Message à envoyer
+
+                // Envoi du SMS en utilisant le service SmsGenerator
+                $smsGenerator->SendSms($phoneNumber, $name, $message);
             }
         }
 
@@ -155,6 +170,7 @@ class StockController extends AbstractController
             'stocks' => $stocks,
         ]);
     }
+
 
 
     #[Route('/deleteStock/{id}', name: 'stock_delete')]
