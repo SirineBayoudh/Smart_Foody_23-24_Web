@@ -26,6 +26,15 @@ class Objectif
 
     #[ORM\OneToMany(mappedBy: 'critere', targetEntity: Produit::class)]
     private Collection $produits;
+    /**
+     * Get the list of criteria as an array.
+     *
+     * @return array
+     */
+    public function getListCritereArray(): array
+    {
+        return explode(',', $this->listCritere);
+    }
 
 
     public function __construct()
@@ -124,5 +133,6 @@ class Objectif
         return $this;
     }
 
+    
     
 }

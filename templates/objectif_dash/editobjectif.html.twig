@@ -1,0 +1,72 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}Modifier Objectif{% endblock %}
+
+{% block body %}
+<div class="col-10 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Modifier un objectif</h4>
+            <p class="card-description">Veuillez mettre à jour les informations de l'objectif ci-dessous.</p>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="libelle">Libellé :</label>
+                    <select id="libelle" name="libelle" class="form-control">
+                        {% for libelle in libelles %}
+                            <option value="{{ libelle }}" {% if objectif.libelle == libelle %} selected {% endif %}>{{ libelle }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" id="listeCritere">
+                    <label for="critere">Critères :</label><br>
+                    {% for critere in criteres %}
+                        <input type="checkbox" id="{{ critere }}" name="criteres[]" value="{{ critere }}" {% if critere in objectif.getListCritereArray() %} checked {% endif %}>
+                        <label for="{{ critere }}">{{ critere }}</label><br>
+                    {% endfor %}
+                </div>
+                
+                <!-- Champ pour ajouter un nouveau critère -->
+                <div class="form-group" id="nouveauCritere">
+                    <button type="button" class="btn btn-secondary" id="ajouterCritereBtn">Ajouter un critère</button>
+                    <input type="text" class="form-control" name="nouveauCritere" id="nouveauCritereInput" style="display: none;">
+                </div>
+                
+                <!-- Autres champs du formulaire -->
+                <button type="submit" class="btn btn-primary mr-2" name="submit">Mettre à jour</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("ajouterCritereBtn").addEventListener("click", function() {
+        var nouveauCritereInput = document.getElementById("nouveauCritereInput");
+        var critereValue = nouveauCritereInput.value.trim();
+        if (nouveauCritereInput.style.display === "none") {
+            nouveauCritereInput.style.display = "block";
+            nouveauCritereInput.focus();
+        } else {
+            if (critereValue !== "") {
+                var listeCritereDiv = document.getElementById("listeCritere");
+                var input = document.createElement("input");
+                input.type = "checkbox";
+                input.name = "criteres[]";
+                input.value = critereValue;
+                input.id = critereValue.replace(/\s/g, '_');
+                var label = document.createElement("label");
+                label.htmlFor = input.id;
+                label.textContent = critereValue;
+                label.className = "custom-checkbox";
+                var div = document.createElement("div");
+                div.className = "custom-checkbox";
+                div.appendChild(input);
+                div.appendChild(label);
+                listeCritereDiv.appendChild(div);
+                nouveauCritereInput.value = ""; // Effacer le champ après avoir ajouté le critère
+                nouveauCritereInput.focus(); // Focus sur le champ pour faciliter l'ajout multiple
+            }
+        }
+    });
+</script>
+
+{% endblock %}
