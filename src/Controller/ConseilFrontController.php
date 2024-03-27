@@ -12,11 +12,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ConseilRepository;
+use App\Service\CalorieNinjasService;
 
 class ConseilFrontController extends AbstractController
 {
     #[Route('/conseil', name: 'conseil_app')]
-    public function addConseil(Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository): Response 
+    public function addConseil(Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository, Request $request, CalorieNinjasService $calorieNinjasService): Response
     {
         $conseil = new Conseil();
         $conseil->setStatut('en attente');
@@ -27,53 +28,60 @@ class ConseilFrontController extends AbstractController
         $conseil->setDateConseil(new \DateTime());
         $form = $this->createForm(ConseilType::class, $conseil);
         $form->handleRequest($req);
-    
+
         $em = $manager->getManager();
 
         $numberOfConseils = $conseilRepository->countConseilsForUserPerDay($utilisateur->getId());
 
-        if($form->isSubmitted() && $numberOfConseils >=3){
+        if ($form->isSubmitted() && $numberOfConseils >= 3) {
             $max = true;
-        }
-        else if ($form->isSubmitted() && $form->isValid()) {
+        } else if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($conseil);
             $em->flush();
-            $success = true; 
+            $success = true;
         } elseif ($form->isSubmitted()) {
             $emptySubmission = true;
         }
-    
+
         $conseils = $this->getDoctrine()->getRepository(Conseil::class)->findBy(['id_client' => 2]);  //STATIQUE
+
+        $food = $request->query->get('food');
+        $calories = null;
+
+        if ($food) {
+            $calories = $calorieNinjasService->getCaloriesForFood($food);
+        }
 
         return $this->renderForm('conseil_front/add.html.twig', [
             'f' => $form,
             'conseils' => $conseils,
-            'success' => $success ?? false, 
-            'max' => $max ?? false, 
+            'success' => $success ?? false,
+            'max' => $max ?? false,
             'emptySubmission' => $emptySubmission ?? false,
-            'numberOfConseils' => $numberOfConseils, 
+            'numberOfConseils' => $numberOfConseils,
+            'food' => $food,
+            'calories' => $calories
         ]);
     }
-        
+
     #[Route('/updateNoteConseil/{id_conseil}', name: 'conseil_note_update')]
     public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id_conseil): Response
     {
         $conseil = $repo->find($id_conseil);
         $form = $this->createForm(ConseilUpdateType::class, $conseil);
         $form->handleRequest($req);
-    
+
         $em = $manager->getManager();
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-            $this->addFlash('success', 'La note a été modifiée avec succès.'); 
+            $this->addFlash('success', 'La note a été modifiée avec succès.');
         }
-    
+
         $conseils = $this->getDoctrine()->getRepository(Conseil::class)->findBy(['id_client' => 2]);  //STATIQUE
-    
+
         return $this->renderForm('conseil_front/update.html.twig', [
             'conseils' => $conseils,
             'fUpdate' => $form
         ]);
     }
-    
 }

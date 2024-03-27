@@ -1,91 +1,92 @@
 {% extends 'base_back.html.twig' %}
 {% block body %}
-    <div class="main-panel">
-        <div class="content-wrapper" style="width: 2200px;">
-            <div class="row">
-                <div class="col-lg-6 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Liste des demandes</h4>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                    <tr class="text-center">
-                                        <th>Client</th>
-                                        <th>Statut</th>
-                                        <th>Demande</th>
-                                        <th>Réponse</th>
-                                        <th>Note</th>
-                                        <th>Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for a in conseils %}
-                                        <tr class="text-center">
-                                            <td>{{ a.getIdClient().getPrenom() ~ ' ' ~ a.getIdClient().getNom() }}</td>
-                                            {% if a.statut == 'terminé' %}
-                                                <td><label class="badge badge-success">{{ a.statut }}</label></td>
-                                            {% elseif a.statut == 'en attente' %}
-                                                <td><label class="badge badge-warning">{{ a.statut }}</label></td>
-                                            {% else %}
-                                                <td>{{ a.statut }}</td>
-                                            {% endif %}
-                                            <td>{{ a.demande }}</td>
-                                            <td>{{ a.reponse }}</td>
-                                            {% if a.note <= 2 %}
-                                                <td class="text-danger">{{ a.note }}</td>
-                                            {% else %}
-                                                <td class="text-success">{{ a.note }}</td>
-                                            {% endif %}
-                                            <td>{{ a.dateConseil|date("d/m/Y") }}</td>
-                                            <td>
-                                                <a href="{{ path('conseil_delete', {'id': a.idConseil}) }}" class="btn btn-danger btn-rounded btn-fw delete-button" data-id="{{ a.idConseil }}">Supprimer</a>
-                                                <button type="button" class="btn btn-danger btn-rounded btn-fw">
-                                                    <a href="{{ path('conseil_rep_update', {'id': a.idConseil}) }}" style="color: white;">Modifier</a>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="d-flex justify-content-center">
-                                {{ knp_pagination_render(conseils) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="main-panel">
+		<div class="content-wrapper" style="width: 2200px;">
+			<div class="row">
+				<div class="col-lg-6 grid-margin stretch-card">
+					<div class="card">
+						<div class="card-body">
+							<h4 class="card-title">Liste des demandes</h4>
+							<div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr class="text-center">
+											<th>Client</th>
+											<th>Statut</th>
+											<th>Demande</th>
+											<th>Réponse</th>
+											<th>Note</th>
+											<th>Date</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for a in conseils %}
+											<tr class="text-center">
+												<td>{{ a.getIdClient().getPrenom() ~ ' ' ~ a.getIdClient().getNom() }}</td>
+												{% if a.statut == 'terminé' %}
+													<td>
+														<label class="badge badge-success">{{ a.statut }}</label>
+													</td>
+												{% elseif a.statut == 'en attente' %}
+													<td>
+														<label class="badge badge-warning">{{ a.statut }}</label>
+													</td>
+												{% else %}
+													<td>{{ a.statut }}</td>
+												{% endif %}
+												<td>{{ a.demande }}</td>
+												<td>{{ a.reponse }}</td>
+												{% if a.note <= 2 %}
+													<td class="text-danger">{{ a.note }}</td>
+												{% else %}
+													<td class="text-success">{{ a.note }}</td>
+												{% endif %}
+												<td>{{ a.dateConseil|date("d/m/Y") }}</td>
+												<td>
+													<a href="{{ path('conseil_delete', {'id': a.idConseil}) }}" class="btn btn-danger btn-rounded btn-fw delete-button" data-id="{{ a.idConseil }}">Supprimer</a>
+													<button type="button" class="btn btn-danger btn-rounded btn-fw">
+														<a href="{{ path('conseil_rep_update', {'id': a.idConseil}) }}" style="color: white;">Modifier</a>
+													</button>
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+							<div class="d-flex justify-content-center">
+								{{ knp_pagination_render(conseils) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
-    <style>
-        .ajs-message.ajs-success {
-            color: white !important;
-        }
-    </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function (){
-            alertify.set('notifier','position', 'top-right');
-            $('.delete-button').click(function(e){
-                e.preventDefault(); 
-                var href = $(this).attr('href');
-                alertify.confirm('Confirmation', 'Êtes-vous sûr de bien vouloir supprimer cette demande?', 
-                    function(){
-                        alertify.success('Demande supprimée.');
-                        setTimeout(function(){
-                            window.location.href = href;
-                        }, 600);
-                    },
-                    function(){
-                        alertify.error('Suppression annulée.');
-                    }
-                );
-            });
-        });
-    </script>
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+	<style>
+		.ajs-message.ajs-success {
+			color: white !important;
+		}
+	</style>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () {
+alertify.set('notifier', 'position', 'top-right');
+$('.delete-button').click(function (e) {
+e.preventDefault();
+var href = $(this).attr('href');
+alertify.confirm('Confirmation', 'Êtes-vous sûr de bien vouloir supprimer cette demande?', function () {
+alertify.success('Demande supprimée.');
+setTimeout(function () {
+window.location.href = href;
+}, 600);
+}, function () {
+alertify.error('Suppression annulée.');
+});
+});
+});
+	</script>
 {% endblock %}

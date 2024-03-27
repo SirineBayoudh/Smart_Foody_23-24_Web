@@ -21,16 +21,17 @@ class ConseilController extends AbstractController
         $pagination = $paginator->paginate(
             $queryBuilder->getQuery(),
             $request->query->getInt('page', 1),
-            5 
+            5
         );
-    
+
         return $this->render('conseil/index.html.twig', [
             'conseils' => $pagination,
         ]);
     }
 
     #[Route('/deleteConseil/{id}', name: 'conseil_delete')]
-    public function deleteConseil(ManagerRegistry $manager, ConseilRepository $repo, $id) : Response {
+    public function deleteConseil(ManagerRegistry $manager, ConseilRepository $repo, $id): Response
+    {
         $conseil = $repo->find($id);
         $em = $manager->getManager();
         $em->remove($conseil);
@@ -45,26 +46,24 @@ class ConseilController extends AbstractController
         $conseil = $repo->find($id);
         $form = $this->createForm(ConseilBackUpdateType::class, $conseil);
         $form->handleRequest($req);
-    
+
         $em = $manager->getManager();
-        if($form->isSubmitted()){
-        $em->persist($conseil);
-        $em->flush();
-        $this->addFlash('success', 'Demande mis à jour avec succès.');
+        if ($form->isSubmitted()) {
+            $em->persist($conseil);
+            $em->flush();
+            $this->addFlash('success', 'Demande mis à jour avec succès.');
         }
 
         $queryBuilder = $repo->createQueryBuilder('a');
         $pagination = $paginator->paginate(
             $queryBuilder->getQuery(),
             $request->query->getInt('page', 1),
-            5 
+            5
         );
-        
+
         return $this->renderForm('conseil/update.html.twig', [
             'fUpdate' => $form,
             'conseils' => $pagination
         ]);
     }
-    
-    
 }
