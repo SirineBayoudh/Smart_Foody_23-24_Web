@@ -1,0 +1,7 @@
+knp_paginator:
+    page_range: 5                      # Nombre de pages affichées dans le sélecteur de pagination
+    default_options:
+        page_name: page                # Nom du paramètre de requête utilisé pour la pagination
+        sort_field_name: sort          # Nom du paramètre de requête utilisé pour le tri
+        sort_direction_name: direction # Nom du paramètre de requête utilisé pour la direction de tri
+        distinct: true                 # Utilise DISTINCT pour compter les résultats, utile lors de l'utilisation de jointures dans les requêtes

@@ -10,15 +10,22 @@ use App\Repository\ConseilRepository;
 use App\Entity\Conseil;
 use App\Form\ConseilBackUpdateType;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 
 class ConseilController extends AbstractController
 {
     #[Route('/conseil_dash', name: 'conseil_listDB')]
-    public function getAll(ConseilRepository $repo) : Response {
-
-        $list = $repo->findAll();
+    public function getAll(ConseilRepository $repo, PaginatorInterface $paginator, Request $request): Response
+    {
+        $queryBuilder = $repo->createQueryBuilder('a');
+        $pagination = $paginator->paginate(
+            $queryBuilder->getQuery(),
+            $request->query->getInt('page', 1),
+            5 
+        );
+    
         return $this->render('conseil/index.html.twig', [
-            'conseils' => $list
+            'conseils' => $pagination,
         ]);
     }
 
@@ -33,29 +40,29 @@ class ConseilController extends AbstractController
     }
 
     #[Route('/updateRepConseil/{id}', name: 'conseil_rep_update')]
-    public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id): Response
+    public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id, PaginatorInterface $paginator, Request $request): Response
     {
         $conseil = $repo->find($id);
         $form = $this->createForm(ConseilBackUpdateType::class, $conseil);
         $form->handleRequest($req);
     
         $em = $manager->getManager();
-    
-        if ($form->isSubmitted()) {
-            $reponse = $form->get('reponse')->getData();
-    
-            if (empty($reponse)) {
-                $this->addFlash('danger', 'Veuillez renseigner le champ de réponse.');
-            } else {
-                if ($form->isValid()) {
-                    $em->flush(); 
-                    $this->addFlash('success', 'La réponse a été modifiée avec succès.');
-                }
-            }
+        if($form->isSubmitted()){
+        $em->persist($conseil);
+        $em->flush();
+        $this->addFlash('success', 'Demande mis à jour avec succès.');
         }
+
+        $queryBuilder = $repo->createQueryBuilder('a');
+        $pagination = $paginator->paginate(
+            $queryBuilder->getQuery(),
+            $request->query->getInt('page', 1),
+            5 
+        );
         
         return $this->renderForm('conseil/update.html.twig', [
-            'fUpdate' => $form
+            'fUpdate' => $form,
+            'conseils' => $pagination
         ]);
     }
     
