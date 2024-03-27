@@ -21,6 +21,19 @@ class ConseilRepository extends ServiceEntityRepository
         parent::__construct($registry, Conseil::class);
     }
 
+    public function countConseilsForUserPerDay(int $userId)
+    {
+        $today = new \DateTime('today');
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c)')
+            ->andWhere('c.id_client = :userId')
+            ->andWhere('c.date_conseil >= :today')
+            ->setParameter('userId', $userId)
+            ->setParameter('today', $today)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
 //    /**
 //     * @return Conseil[] Returns an array of Conseil objects
 //     */

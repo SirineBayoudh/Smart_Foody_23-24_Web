@@ -42,16 +42,23 @@
             <div class="row block-9">
                 <div class="col-md-6 order-md-last d-flex">
                     <div class="bg-white p-5 contact-form">
-                                    {% if success %}
+                {% if success %}
                 <div class="alert alert-success" role="alert">
                 Demande ajoutée avec succès!
                 </div>
                 {% endif %}
-                                        {% if emptySubmission %}
-                            <div class="alert alert-danger" role="alert">
-                                Le formulaire est vide. Veuillez saisir une demande.
-                            </div>
-                        {% endif %}
+                {% if emptySubmission %}
+                <div class="alert alert-danger" role="alert">
+                Le formulaire est vide. Veuillez saisir une demande.
+                </div>
+                {% endif %}
+                {% if max %}
+                <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+                <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+                <script>
+                alertify.alert('Erreur', 'Vous avez atteint le maximum de 3 demandes par jour.');
+                </script>
+                {% endif %}
                         <h4>Envoyer une demande</h4><br>
                         <div class="form-group">
                             {{ form_start(f, {'attr': {'novalidate': 'novalidate'}}) }}

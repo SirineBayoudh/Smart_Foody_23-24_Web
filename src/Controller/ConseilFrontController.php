@@ -16,7 +16,7 @@ use App\Repository\ConseilRepository;
 class ConseilFrontController extends AbstractController
 {
     #[Route('/conseil', name: 'conseil_app')]
-    public function addConseil(Request $req, ManagerRegistry $manager): Response 
+    public function addConseil(Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository): Response 
     {
         $conseil = new Conseil();
         $conseil->setStatut('en attente');
@@ -29,22 +29,29 @@ class ConseilFrontController extends AbstractController
         $form->handleRequest($req);
     
         $em = $manager->getManager();
-        if ($form->isSubmitted() && $form->isValid()) {
+
+        $numberOfConseils = $conseilRepository->countConseilsForUserPerDay($utilisateur->getId());
+
+        if($form->isSubmitted() && $numberOfConseils >=3){
+            $max = true;
+        }
+        else if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($conseil);
             $em->flush();
-            
             $success = true; 
         } elseif ($form->isSubmitted()) {
             $emptySubmission = true;
         }
     
         $conseils = $this->getDoctrine()->getRepository(Conseil::class)->findBy(['id_client' => 2]);  //STATIQUE
-    
+
         return $this->renderForm('conseil_front/add.html.twig', [
             'f' => $form,
             'conseils' => $conseils,
             'success' => $success ?? false, 
-            'emptySubmission' => $emptySubmission ?? false, 
+            'max' => $max ?? false, 
+            'emptySubmission' => $emptySubmission ?? false,
+            'numberOfConseils' => $numberOfConseils, 
         ]);
     }
         
