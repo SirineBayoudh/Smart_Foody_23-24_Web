@@ -1,0 +1,70 @@
+{% extends 'base_back.html.twig' %}
+{% block body %}
+	<div class="main-panel">
+		<div class="content-wrapper" style="width: 2200px;">
+			<div class="row">
+				<div class="col-lg-6 grid-margin stretch-card">
+					<div class="card">
+						<div class="card-body">
+							<h4 class="card-title">Liste des questions - réponses</h4>
+							<div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr class="text-center">
+											<th>ID</th>
+											<th>Question</th>
+											<th>Réponse</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for a in chats %}
+											<tr class="text-center">
+												<td>{{ a.idChat }}</td>
+												<td class="text-danger">
+													{{ a.question }}</td>
+												<td class="text-success">
+													{{ a.reponse }}</td>
+												<td>
+													<a href="{{ path('chat_delete', {'id': a.idChat}) }}" class="btn btn-danger btn-rounded btn-fw delete-button" data-id="{{ a.idChat }}">Supprimer</a>
+													<button type="button" class="btn btn-danger btn-rounded btn-fw">
+														<a href="{{ path('chat_update', {'id': a.idChat}) }}" style="color: white;">Modifier</a>
+													</button>
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+	<style>
+		.ajs-message.ajs-success {
+			color: white !important;
+		}
+	</style>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () {
+alertify.set('notifier', 'position', 'top-right');
+$('.delete-button').click(function (e) {
+e.preventDefault();
+var href = $(this).attr('href');
+alertify.confirm('Confirmation', 'Êtes-vous sûr de bien vouloir supprimer cette ligne?', function () {
+alertify.success('Question supprimée.');
+setTimeout(function () {
+window.location.href = href;
+}, 600);
+}, function () {
+alertify.error('Suppression annulée.');
+});
+});
+});
+	</script>
+{% endblock %}

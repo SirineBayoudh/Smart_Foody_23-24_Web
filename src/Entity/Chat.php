@@ -19,7 +19,7 @@ class Chat
     #[ORM\Column(length: 255)]
     private ?string $reponse = null;
 
-    public function getId(): ?int
+    public function getIdChat(): ?int
     {
         return $this->id_chat;
     }

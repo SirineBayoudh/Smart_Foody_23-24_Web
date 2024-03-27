@@ -61,8 +61,26 @@
 						{{ form_end(fUpdate) }}
 					</div>
 				</div>
-				<div class="col-md-6 d-flex">
-					<div id="map" class="bg-white"></div>
+				<div class="bg-white col-md-6 d-flex p-5 contact-form">
+					<form action="{{ path('conseil_app') }}" method="get">
+						<h4>Calories des aliments (100g)</h4>
+						<label for="food" style="margin-top: 20px;">Entrez un aliment :</label>
+						<input type="text" id="food" name="food" required style="margin-left: 5px;">
+						<input type="submit" value="Chercher" class="btn btn-primary py-1 px-3" style="margin-left: 10px;">
+						{% if food %}
+							{% if calories is null %}
+								<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+								<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+								<script>
+									alertify.alert('Erreur', 'Nombre de calories non disponible.');
+								</script>
+							{% else %}
+								<h4 style="margin-top: 20px;">Nombre de calories pour "{{ food }}" :</h4>
+								<h6>{{ calories }}
+									calories</h6>
+							{% endif %}
+						{% endif %}
+					</form>
 				</div>
 			</div>
 		</div>

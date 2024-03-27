@@ -1,0 +1,90 @@
+{% extends 'base_back.html.twig' %}
+{% block body %}
+	<div class="main-panel">
+		<div class="content-wrapper" style="width: 2200px;">
+			<div class="row" style="width: 1000px;">
+				<div class="col-md-6 grid-margin stretch-card">
+					<div class="card">
+						<div class="card-body">
+							<h4 class="card-title">Modifier les questions - réponses</h4>
+							<div class="form-group">
+								{{ form_start(fUpdate) }}
+								{{ form_label(fUpdate.question, 'Question') }}
+								{{ form_widget(fUpdate.question, {'attr': {'class': 'form-control'}}) }}
+								{{ form_errors(fUpdate.question) }}
+							</div>
+							<div class="form-group">
+								{{ form_label(fUpdate.reponse, 'Réponse') }}
+								{{ form_widget(fUpdate.reponse, {'attr': {'class': 'form-control'}}) }}
+								{{ form_errors(fUpdate.reponse) }}
+							</div>
+							<br>
+							<button type="submit" class="btn btn-success">Modifier</button>
+							{{ form_end(fUpdate) }}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 grid-margin stretch-card">
+					<div class="card">
+						<div class="card-body">
+							<h4 class="card-title">Liste des questions - réponses</h4>
+							<div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr class="text-center">
+											<th>ID</th>
+											<th>Question</th>
+											<th>Réponse</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for a in chats %}
+											<tr class="text-center">
+												<td>{{ a.idChat }}</td>
+												<td>{{ a.question }}</td>
+												<td>{{ a.reponse }}</td>
+												<td>
+													<button type="button" class="btn btn-danger btn-rounded btn-fw">
+														<a href="{{ path('chat_update', {'id': a.idChat}) }}" style="color: white;">Modifier</a>
+													</button>
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+	<style>
+		.ajs-message.ajs-success {
+			color: white !important;
+		}
+	</style>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () {
+alertify.set('notifier', 'position', 'top-right');
+$('.delete-button').click(function (e) {
+e.preventDefault();
+var href = $(this).attr('href');
+alertify.confirm('Confirmation', 'Êtes-vous sûr de bien vouloir supprimer cette question?', function () {
+alertify.success('Question supprimée.');
+setTimeout(function () {
+window.location.href = href;
+}, 600);
+}, function () {
+alertify.error('Suppression annulée.');
+});
+});
+});
+	</script>
+{% endblock %}

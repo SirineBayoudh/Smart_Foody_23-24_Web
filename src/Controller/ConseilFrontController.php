@@ -69,7 +69,7 @@ class ConseilFrontController extends AbstractController
     }
 
     #[Route('/updateNoteConseil/{id_conseil}', name: 'conseil_note_update')]
-    public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id_conseil): Response
+    public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id_conseil, CalorieNinjasService $calorieNinjasService, Request $request): Response
     {
         $conseil = $repo->find($id_conseil);
         $form = $this->createForm(ConseilUpdateType::class, $conseil);
@@ -83,8 +83,16 @@ class ConseilFrontController extends AbstractController
 
         $conseils = $this->getDoctrine()->getRepository(Conseil::class)->findBy(['id_client' => 2]);  //STATIQUE
 
+        $food = $request->query->get('food');
+        $calories = null;
+
+        if ($food) {
+            $calories = $calorieNinjasService->getCaloriesForFood($food);
+        }
+
         return $this->renderForm('conseil_front/update.html.twig', [
             'conseils' => $conseils,
+            'food' => $food,
             'fUpdate' => $form
         ]);
     }
