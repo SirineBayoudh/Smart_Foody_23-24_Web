@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
   </head>
   <body class="goto-here">
+	
 		<div class="py-1 bg-primary">
     	<div class="container">
     		<div class="row no-gutters d-flex align-items-start align-items-center px-md-0">
@@ -79,8 +80,9 @@
 	      </div>
 	    </div>
 	  </nav>
-    <!-- END nav -->
-
+   
+	  <!-- END nav -->
+	  {% block bodyStock %}
     <section id="home-section" class="hero">
 		  <div class="home-slider owl-carousel">
 	      <div class="slider-item" style="background-image: url(images/bg_1.jpg);">
@@ -605,6 +607,7 @@
         </div>
       </div>
     </section>
+{% endblock %}
     <footer class="ftco-footer ftco-section">
       <div class="container">
       	<div class="row">
