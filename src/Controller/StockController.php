@@ -215,6 +215,7 @@ class StockController extends AbstractController
 
 
     #[Route('/ajouter/stock', name: 'app_ajouter_stock')]
+
     public function index(Request $request, ManagerRegistry $manager, ProduitRepository $produitRepository): Response
     {
         $stock = new Stock();
@@ -223,17 +224,28 @@ class StockController extends AbstractController
         $em = $manager->getManager();
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Récupérer la marque sélectionnée dans le formulaire
-            $marque = $stock->getMarque();
+            // Vérifier si des fichiers ont été téléchargés
+            if ($request->files->has('img')) {
+                $imageFile = $request->files->get('img')[0];
+                if ($imageFile) {
+                    // Récupérer le nom du fichier de l'image
+                    $image = $imageFile->getClientOriginalName();
 
-            // Rechercher l'objet Produit correspondant à la marque sélectionnée
-            $produit = $produitRepository->findOneBy(['marque' => $marque]);
+                    // Enregistrer le nom du fichier dans l'entité Stock
+                    $stock->setImage($image);
+                }
+                $marque = $stock->getMarque();
 
-            // Vérifier si un produit correspondant a été trouvé
-            if ($produit instanceof Produit) {
-                // Récupérer la référence exacte du produit
-                $stock->setRefProduit($produit);
+                // Rechercher l'objet Produit correspondant à la marque sélectionnée
+                $produit = $produitRepository->findOneBy(['marque' => $marque]);
+
+                // Vérifier si un produit correspondant a été trouvé
+                if ($produit instanceof Produit) {
+                    // Récupérer la référence exacte du produit
+                    $stock->setRefProduit($produit);
+                }
             }
+
             // Persister l'objet Stock dans la base de données
             $em->persist($stock);
             $em->flush();
@@ -242,6 +254,7 @@ class StockController extends AbstractController
             return $this->redirectToRoute('stock_get');
         }
 
+        // Afficher le formulaire si celui-ci n'est pas soumis ou n'est pas valide
         return $this->render('stock/ajouter.html.twig', [
             'form' => $form->createView(),
         ]);

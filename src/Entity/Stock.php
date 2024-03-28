@@ -33,7 +33,8 @@ class Stock
 
     #[ORM\Column(length: 255)]
     private ?string $marque = null;
-
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date_arrivage = null;
 
@@ -137,6 +138,26 @@ class Stock
     public function setRefProduit(?Produit $ref_produit): static
     {
         $this->ref_produit = $ref_produit;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of image
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set the value of image
+     *
+     * @return  self
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
 
         return $this;
     }

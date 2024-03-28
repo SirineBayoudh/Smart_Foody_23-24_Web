@@ -29,6 +29,7 @@
                               <td style="font-size: 12px;">{{ s.quantite }}</td>
                               <td style="font-size: 12px;">{{ s.nbvendu }}</td>
                               <td >{{ s.cout }}</td>
+                              <td><img src="{{ asset('images/' ~ s.image) }}" alt="Image"></td>
                               <td>  <a href="{{ path('stock_edit', {id: s.id_s}) }}?mode=modifier">
                                    <button class="btn btn-warning ">Modifier
                                       </button>  </a></td>
