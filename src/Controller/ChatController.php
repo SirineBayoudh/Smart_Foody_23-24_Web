@@ -8,16 +8,39 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ChatRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 use App\Form\ChatType;
+use App\Entity\Chat;
 
 class ChatController extends AbstractController
 {
     #[Route('/chat_dash', name: 'chat_listDB')]
-    public function getAll(ChatRepository $repo) : Response {
+    public function getAll(Request $req,ManagerRegistry $manager,ChatRepository $repo, PaginatorInterface $paginator, Request $request) : Response {
 
-        $list = $repo->findAll();
-        return $this->render('chat/index.html.twig', [
-            'chats' => $list
+        $queryBuilder = $repo->createQueryBuilder('a');
+        $pagination = $paginator->paginate(
+            $queryBuilder->getQuery(),
+            $request->query->getInt('page', 1),
+            5
+        );
+
+        $chat = new Chat();
+        $form = $this->createForm(ChatType::class,$chat);
+        $form->handleRequest($req);
+
+        $em = $manager->getManager();
+        if($form->isSubmitted() && $form->isValid()){
+        $em->persist($chat);
+        $em->flush();
+        $this->addFlash('success', 'Ajout avec succès.');
+        return $this->redirectToRoute('chat_listDB');
+        }elseif ($form->isSubmitted()) {
+            $emptySubmission = true;
+        }
+        return $this->renderForm('chat/index.html.twig', [
+            'f' => $form,
+            'emptySubmission' => $emptySubmission ?? false,
+            'chats' => $pagination
         ]);
     }
 

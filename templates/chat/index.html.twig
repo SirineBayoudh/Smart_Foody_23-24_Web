@@ -2,6 +2,39 @@
 {% block body %}
 	<div class="main-panel">
 		<div class="content-wrapper" style="width: 2200px;">
+			<div class="row" style="width: 1000px;">
+				<div class="col-md-6 grid-margin stretch-card">
+					<div class="card">
+						<div class="card-body">
+							<h4 class="card-title">Ajouter une question - réponse</h4>
+							{% for message in app.flashes('success') %}
+								<div class="alert alert-success" role="alert">
+									{{ message }}
+								</div>
+							{% endfor %}
+							{% if emptySubmission %}
+								<div class="alert alert-danger" role="alert">
+									Veuillez remplir tous les champs.
+								</div>
+							{% endif %}
+							<div class="form-group">
+								{{ form_start(f,{'attr':{'novalidate':'novalidate'}})}}
+								{{ form_label(f.question, 'Question') }}
+								{{ form_widget(f.question, {'attr': {'class': 'form-control'}}) }}
+								{{ form_errors(f.question) }}
+							</div>
+							<div class="form-group">
+								{{ form_label(f.reponse, 'Réponse') }}
+								{{ form_widget(f.reponse, {'attr': {'class': 'form-control'}}) }}
+								{{ form_errors(f.reponse) }}
+							</div>
+							<br>
+							<button type="submit" class="btn btn-success">Ajouter</button>
+							{{ form_end(f) }}
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-lg-6 grid-margin stretch-card">
 					<div class="card">
@@ -35,6 +68,9 @@
 										{% endfor %}
 									</tbody>
 								</table>
+							</div>
+							<div class="d-flex justify-content-center">
+								{{ knp_pagination_render(chats) }}
 							</div>
 						</div>
 					</div>

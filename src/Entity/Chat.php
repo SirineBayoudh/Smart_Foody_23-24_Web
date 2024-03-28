@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ChatRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as assert;
 
 #[ORM\Entity(repositoryClass: ChatRepository::class)]
 class Chat
@@ -14,9 +15,11 @@ class Chat
     private ?int $id_chat = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"champs obligatoire")]
     private ?string $question = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"champs obligatoire")]
     private ?string $reponse = null;
 
     public function getIdChat(): ?int
