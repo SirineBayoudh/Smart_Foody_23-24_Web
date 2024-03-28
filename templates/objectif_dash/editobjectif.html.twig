@@ -3,6 +3,59 @@
 {% block title %}Modifier Objectif{% endblock %}
 
 {% block body %}
+<style>
+  /* CSS pour les checkboxes */
+  .custom-checkbox {
+    margin-bottom: 10px;
+  }
+  
+  .custom-checkbox input[type="checkbox"] {
+    display: none;
+  }
+  
+  .custom-checkbox label {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    padding-left: 25px;
+  }
+  
+  .custom-checkbox label::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    position: absolute;
+    left: 0;
+    bottom: 1px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+  }
+  
+  .custom-checkbox input[type="checkbox"]:checked + label::before {
+    background-color: #fff;
+    border-color: #28a745;
+  }
+  
+  .custom-checkbox input[type="checkbox"]:checked + label::after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 12px;
+    border: solid #28a745;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 5px;
+    bottom: 3px;
+  }
+  
+  .custom-checkbox input[type="checkbox"]:checked + label {
+    font-weight: bold;
+  }
+</style>
+
 <div class="col-10 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
@@ -20,17 +73,20 @@
                 <div class="form-group" id="listeCritere">
                     <label for="critere">Critères :</label><br>
                     {% for critere in criteres %}
-                        <input type="checkbox" id="{{ critere }}" name="criteres[]" value="{{ critere }}" {% if critere in objectif.getListCritereArray() %} checked {% endif %}>
-                        <label for="{{ critere }}">{{ critere }}</label><br>
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="{{ critere }}" name="criteres[]" value="{{ critere }}" {% if critere in objectif.getListCritereArray() %} checked {% endif %}>
+                            <label for="{{ critere }}">{{ critere }}</label>
+                        </div>
                     {% endfor %}
                 </div>
                 
                 <!-- Champ pour ajouter un nouveau critère -->
-                <div class="form-group" id="nouveauCritere">
-                    <button type="button" class="btn btn-secondary" id="ajouterCritereBtn">Ajouter un critère</button>
-                    <input type="text" class="form-control" name="nouveauCritere" id="nouveauCritereInput" style="display: none;">
+                <div class="form-group" id="nouveauCritere" style="display: none;">
+                    <label for="nouveauCritere">Nouveau Critère :</label>
+                    <input type="text" class="form-control" name="nouveauCritere" id="nouveauCritereInput">
                 </div>
-                
+                <button type="button" class="btn btn-success" id="ajouterCritereBtn">Ajouter un critère</button>
+                <br><br>
                 <!-- Autres champs du formulaire -->
                 <button type="submit" class="btn btn-primary mr-2" name="submit">Mettre à jour</button>
             </form>
@@ -40,30 +96,39 @@
 
 <script>
     document.getElementById("ajouterCritereBtn").addEventListener("click", function() {
-        var nouveauCritereInput = document.getElementById("nouveauCritereInput");
-        var critereValue = nouveauCritereInput.value.trim();
+        var nouveauCritereInput = document.getElementById("nouveauCritere");
         if (nouveauCritereInput.style.display === "none") {
             nouveauCritereInput.style.display = "block";
             nouveauCritereInput.focus();
         } else {
+            var critereValue = document.getElementById("nouveauCritereInput").value.trim();
             if (critereValue !== "") {
                 var listeCritereDiv = document.getElementById("listeCritere");
+                
+                // Créer une div pour envelopper la nouvelle case à cocher
+                var div = document.createElement("div");
+                div.className = "custom-checkbox";
+                
                 var input = document.createElement("input");
                 input.type = "checkbox";
                 input.name = "criteres[]";
                 input.value = critereValue;
                 input.id = critereValue.replace(/\s/g, '_');
+                
                 var label = document.createElement("label");
                 label.htmlFor = input.id;
                 label.textContent = critereValue;
                 label.className = "custom-checkbox";
-                var div = document.createElement("div");
-                div.className = "custom-checkbox";
+                
+                // Ajouter la case à cocher et l'étiquette dans la div
                 div.appendChild(input);
                 div.appendChild(label);
+                
+                // Ajouter la div à la liste des critères
                 listeCritereDiv.appendChild(div);
-                nouveauCritereInput.value = ""; // Effacer le champ après avoir ajouté le critère
-                nouveauCritereInput.focus(); // Focus sur le champ pour faciliter l'ajout multiple
+                
+                document.getElementById("nouveauCritereInput").value = ""; // Effacer le champ après avoir ajouté le critère
+                document.getElementById("nouveauCritereInput").focus(); // Focus sur le champ pour faciliter l'ajout multiple
             }
         }
     });
