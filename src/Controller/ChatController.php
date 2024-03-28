@@ -66,6 +66,7 @@ class ChatController extends AbstractController
         if($form->isSubmitted()){
         $em->persist($chat );
         $em->flush();
+        $this->addFlash('success', 'Mise à jour effectuée avec succès.');
         }
         
         $list = $repo->findAll();

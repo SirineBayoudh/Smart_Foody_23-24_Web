@@ -14,11 +14,12 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ConseilRepository;
 use App\Service\CalorieNinjasService;
 use App\Service\QuotableService;
+use App\Repository\ChatRepository;
 
 class ConseilFrontController extends AbstractController
 {
     #[Route('/conseil', name: 'conseil_app')]
-    public function addConseil(Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository, Request $request, CalorieNinjasService $calorieNinjasService, QuotableService $quotableService): Response
+    public function addConseil(ChatRepository $repo,Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository, Request $request, CalorieNinjasService $calorieNinjasService, QuotableService $quotableService): Response
     {
         $conseil = new Conseil();
         $conseil->setStatut('en attente');
@@ -55,6 +56,8 @@ class ConseilFrontController extends AbstractController
 
         $randomQuote = $quotableService->getRandomQuote();
 
+        $list = $repo->findAll();
+
         return $this->renderForm('conseil_front/add.html.twig', [
             'f' => $form,
             'conseils' => $conseils,
@@ -64,6 +67,7 @@ class ConseilFrontController extends AbstractController
             'numberOfConseils' => $numberOfConseils,
             'food' => $food,
             'randomQuote' => $randomQuote,
+            'chats' => $list,
             'calories' => $calories
         ]);
     }

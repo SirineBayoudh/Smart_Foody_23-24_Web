@@ -1,12 +1,17 @@
 {% extends 'base_back.html.twig' %}
 {% block body %}
 	<div class="main-panel">
-		<div class="content-wrapper" style="width: 2200px;">
+		<div class="content-wrapper" style="width: 2500px;">
 			<div class="row" style="width: 1000px;">
 				<div class="col-md-6 grid-margin stretch-card">
 					<div class="card">
 						<div class="card-body">
 							<h4 class="card-title">Modifier les questions - réponses</h4>
+							{% for message in app.flashes('success') %}
+								<div class="alert alert-success" role="alert">
+									{{ message }}
+								</div>
+							{% endfor %}
 							<div class="form-group">
 								{{ form_start(fUpdate) }}
 								{{ form_label(fUpdate.question, 'Question') }}
@@ -34,7 +39,6 @@
 								<table class="table table-hover">
 									<thead>
 										<tr class="text-center">
-											<th>ID</th>
 											<th>Question</th>
 											<th>Réponse</th>
 											<th>Actions</th>
@@ -43,7 +47,6 @@
 									<tbody>
 										{% for a in chats %}
 											<tr class="text-center">
-												<td>{{ a.idChat }}</td>
 												<td>{{ a.question }}</td>
 												<td>{{ a.reponse }}</td>
 												<td>
