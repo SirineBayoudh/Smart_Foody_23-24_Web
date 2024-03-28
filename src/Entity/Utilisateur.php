@@ -8,8 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
+#[Assert\GroupSequence(["Utilisateur", "Conseiller","Client"])]
 class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -18,45 +20,59 @@ class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
     private $idUtilisateur;
 
     #[ORM\Column(type: "string", length: 255, name: "nom")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $nom;
 
     #[ORM\Column(type: "string", length: 255, name: "prenom")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $prenom;
 
     #[ORM\Column(type: "string", length: 255, name: "genre")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $genre;
 
     #[ORM\Column(type: "string", length: 255, name: "email")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $email;
 
     #[ORM\Column(type: "string", length: 255, name: "mot_de_passe")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $mot_de_passe;
 
     #[ORM\Column(type: "integer", name: "num_tel")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $num_tel;
 
     #[ORM\Column(type: "string", length: 255, name: "role")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $role;
 
     #[ORM\Column(type: "string", length: 255, name: "matricule")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $matricule;
 
     #[ORM\Column(type: "string", length: 255, name: "attestation")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $attestation;
 
     #[ORM\Column(type: "string", length: 255, name: "adresse")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $adresse;
 
     #[ORM\Column(type: "integer", name: "tentative")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $tentative;
 
     #[ORM\Column(type: "float", name: "taille")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $taille;
 
     #[ORM\Column(type: "float", name: "poids")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $poids;
 
     #[ORM\Column(type: "string", length: 255, name: "photo")]
+    #[Assert\NotBlank(message:"champ obligatoire")]
     private $photo;
 
     #[ORM\ManyToOne(inversedBy: 'utilisateurs')]

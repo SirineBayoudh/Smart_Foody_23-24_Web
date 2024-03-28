@@ -22,7 +22,9 @@ class ConseillerType extends AbstractType
             ->add('matricule')
             ->add('attestation')
             ->add('photo')
-            ->add('SignUp', SubmitType::class)
+            ->add('Ajouter', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary mr-2']
+            ]);
         ;
     }
 
@@ -30,6 +32,7 @@ class ConseillerType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Utilisateur::class,
+            'validation_groups' => ['Conseiller']
         ]);
     }
 }

@@ -24,7 +24,9 @@ class ClientType extends AbstractType
             ->add('taille')
             ->add('poids')
             ->add('photo')
-            ->add('SignUp', SubmitType::class)
+            ->add('Inscription', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary mr-2']
+            ]);
         ;
     }
 
@@ -32,6 +34,7 @@ class ClientType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Utilisateur::class,
+            'validation_groups' => ['Client']
         ]);
     }
 }

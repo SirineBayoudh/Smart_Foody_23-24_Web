@@ -71,7 +71,7 @@ class BackUserController extends AbstractController
 
             $em->persist($user);
             $em->flush();
-            return $this->redirectToRoute("app_login");
+            return $this->redirectToRoute("usersList");
         }
         return $this->renderform('back_user/ajouterConseiller.html.twig', ['f' => $form]);
     }
@@ -88,11 +88,11 @@ class BackUserController extends AbstractController
         $em = $manager->getManager();
 
         $form->handleRequest($req);
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
 
             $em->persist($user);
             $em->flush();
-            return $this->redirectToRoute("app_login");
+            return $this->redirectToRoute("usersList");
         }
         return $this->renderform('back_user/modifierConseiller.html.twig', ['f' => $form]);
     }
