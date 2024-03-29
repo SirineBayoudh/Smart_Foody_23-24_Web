@@ -25,8 +25,17 @@ class ConseilController extends AbstractController
             5
         );
 
+        $averageRating = $repo->getAverageRating();
+        $totalConseils = $repo->getTotalConseils();
+        $conseilsEnAttente = $repo->getCountByStatut('en attente');
+        $conseilsTermines = $repo->getCountByStatut('terminé');
+
         return $this->render('conseil/index.html.twig', [
             'conseils' => $pagination,
+            'totalConseils' => $totalConseils,
+            'conseilsEnAttente' => $conseilsEnAttente,
+            'conseilsTermines' => $conseilsTermines,
+            'averageRating' => $averageRating
         ]);
     }
 
@@ -50,6 +59,7 @@ class ConseilController extends AbstractController
 
         $em = $manager->getManager();
         if ($form->isSubmitted()) {
+            $conseil->setStatut('terminé');
             $em->persist($conseil);
             $em->flush();
             //$twilioService->sendSMS('+21651600246', 'Conseil a été mis à jour avec succès', '+16562282121');

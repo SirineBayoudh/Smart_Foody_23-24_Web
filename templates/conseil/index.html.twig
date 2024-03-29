@@ -2,6 +2,34 @@
 {% block body %}
 	<div class="main-panel">
 		<div class="content-wrapper" style="width: 2200px;">
+			<div class="row" style="width: 500px;">
+				<div class="col-md-6 grid-margin stretch-card">
+					<div class="card card-tale" style="background-color: #56AB2F;">
+						<div class="card-body text text-center">
+							<h4 class="mb-4">Moyenne des notes</h4>
+							<p class="fs-30 mb-2">{{ averageRating }}</p>
+						</div>
+					</div>
+					<div class="card card-tale" style="background-color: #56AB2F;margin-left:10px;">
+						<div class="card-body text text-center">
+							<h4 class="mb-4">Total des conseils</h4>
+							<p class="fs-30 mb-2">{{ totalConseils }}</p>
+						</div>
+					</div>
+					<div class="card card-tale" style="background-color: #56AB2F;margin-left:10px;">
+						<div class="card-body text text-center">
+							<h4 class="mb-4">Conseils en attente</h4>
+							<p class="fs-30 mb-2">{{ conseilsEnAttente }}</p>
+						</div>
+					</div>
+					<div class="card card-tale" style="background-color: #56AB2F;margin-left:10px;">
+						<div class="card-body text text-center">
+							<h4 class="mb-4">Conseils terminés</h4>
+							<p class="fs-30 mb-2">{{ conseilsTermines }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-lg-6 grid-margin stretch-card">
 					<div class="card">

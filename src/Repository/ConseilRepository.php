@@ -34,6 +34,32 @@ class ConseilRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function getAverageRating(): float
+    {
+        return $this->createQueryBuilder('c')
+            ->select('AVG(c.note) as averageRating')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getTotalConseils(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c.id_conseil)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getCountByStatut(string $statut): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c)')
+            ->where('c.statut = :statut')
+            ->setParameter('statut', $statut)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
 //    /**
 //     * @return Conseil[] Returns an array of Conseil objects
 //     */
