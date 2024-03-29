@@ -12,45 +12,60 @@
         background-color: #bbddab; /* Couleur de fond au survol */
         color: #fff; /* Couleur du texte au survol */
     }
+
+    /* Styles pour les boutons */
+    .btn {
+        /* Styles normaux des boutons */
+        background-color: #56ab2f;
+        border-color: #56ab2f;
+        color: #ffffff; /* Couleur du texte */
+        transition: background-color 0.3s; /* Transition fluide pour la couleur de fond */
+    }
+
+    /* Styles pour les boutons lorsqu'ils sont survolés */
+    .btn:hover {
+        background-color: #72c22f; /* Nouvelle couleur de fond */
+    }
 </style>
+
 <div class="col-lg-10 grid-margin stretch-card">
     <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">Table des objectifs : </h4>
-        <div class="col text-right mb-4">
-            <a href="{{ path('add_object') }}" class="btn btn-primary" style="background-color: #56ab2f; border-color: #56ab2f;">
-                <i class="ti-plus"></i>
-                Ajouter objectif
-            </a>
+        <div class="card-body">
+            <h4 class="card-title">Table des objectifs :</h4>
+            <div class="col text-right mb-4">
+                <a href="{{ path('add_object') }}" class="btn btn-primary">
+                    <i class="ti-plus"></i>
+                    Ajouter objectif
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Libelle</th>
+                            <th>ListCritere</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in obj %}
+                        <tr>
+                            <td>{{ o.libelle }}</td>
+                            <td>{{ o.listCritere }}</td>
+                            <td>
+                                <a href="{{ path('edit_objectif', {'id': o.id}) }}" class="btn btn-warning btn-sm">
+                                    <i class="ti-pencil-alt"></i>
+                                </a>
+                                <a href="{{ path('delete_objectif', {'id': o.id}) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet objectif ?');">
+                                    <i class="ti-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Libelle</th>
-                  <th>ListCritere</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                  {% for o in obj %}
-                      <tr>
-                          <td>{{ o.libelle }}</td>
-                          <td>{{ o.listCritere }}</td>  
-                          <td>
-                            <a href="{{ path('edit_objectif', {'id': o.id}) }}" class="btn btn-warning btn-sm" title="Modifier" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;">
-                                <i class="ti-pencil-alt"></i>
-                            </a>
-                            <a href="{{ path('delete_objectif', {'id': o.id}) }}" class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;">
-                                <i class="ti-trash"></i>
-                            </a>
-                          </td>                        
-                      </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-      </div>
     </div>
-  </div>
+</div>
 {% endblock %}

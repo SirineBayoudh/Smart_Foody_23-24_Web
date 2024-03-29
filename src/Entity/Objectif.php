@@ -6,6 +6,8 @@ use App\Repository\ObjectifRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: ObjectifRepository::class)]
 class Objectif
@@ -16,6 +18,7 @@ class Objectif
     private ?int $id_obj = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:'Le libellé est obligatoire')]
     private ?string $libelle = null;
 
     #[ORM\Column(length: 255)]
@@ -132,6 +135,8 @@ class Objectif
 
         return $this;
     }
+    
+    
 
     
     

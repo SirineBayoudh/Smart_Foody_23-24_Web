@@ -39,22 +39,25 @@ public function addProduct(Request $request): Response
 
     if ($form->isSubmitted() && $form->isValid()) {
         // Récupérer les données du formulaire
-        $libelle = $form->get('libelle')->getData();
-        $selectedCriteres = $form->get('listCritere')->getData();
-        
-        // Convertir le tableau de choix en une chaîne de caractères séparée par des virgules
-        $listCritereConcatenated = implode(",", $selectedCriteres);
-        
-        // Assigner la chaîne de caractères à la propriété listCritere
-        $objectif->setListCritere($listCritereConcatenated);
-                
-        // Enregistrement des données dans la base de données
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($objectif);
-        $entityManager->flush();
+    $libelle = $form->get('libelle')->getData();
+    $selectedCriteres = $form->get('listCritere')->getData();
     
-        // Redirection vers la page 'objectif_all'
-        return $this->redirectToRoute('objectif_all');
+    // Filtrer les valeurs pour ne conserver que celles qui sont cochées
+    $checkedCriteres = array_filter($selectedCriteres);
+
+    // Concaténer les valeurs sélectionnées dans une chaîne séparée par des virgules
+    $listCritereConcatenated = implode(",", $checkedCriteres);
+    
+    // Assigner la chaîne de caractères à la propriété listCritere
+    $objectif->setListCritere($listCritereConcatenated);
+            
+    // Enregistrement des données dans la base de données
+    $entityManager = $this->getDoctrine()->getManager();
+    $entityManager->persist($objectif);
+    $entityManager->flush();
+
+    // Redirection vers la page 'objectif_all'
+    return $this->redirectToRoute('objectif_all');
     }
 
     // Affichage du formulaire d'ajout
@@ -88,6 +91,7 @@ public function editObjectif(int $id, Request $request): Response
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+        
         // Mettre à jour la chaîne de critères avec les nouvelles valeurs sélectionnées
         $listeCritereString = implode(',', $form->get('listCritere')->getData());
         $objectif->setListCritere($listeCritereString);

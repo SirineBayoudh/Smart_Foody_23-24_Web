@@ -1,36 +1,79 @@
 {% extends 'base_back.html.twig' %}
 
-{% block title %}Modifier Objectif{% endblock %}
+{% block title %}Ajouter un objectif{% endblock %}
 
 {% block body %}
 <div class="col-10 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title">Modifier un objectif</h4>
-            <p class="card-description">Veuillez mettre à jour les informations de l'objectif ci-dessous.</p>
-            {{ form_start(form) }}
+            <h4 class="card-title">Ajouter un objectif</h4>
+            <p class="card-description">Veuillez ajouter les informations de l'objectif ci-dessous.</p>
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'objectif-form'}}) }}
             <div class="form-group">
-                {{ form_label(form.libelle, 'Libellé :') }}
-                {{ form_widget(form.libelle, {'attr': {'class': 'form-control'}}) }}
-            </div>
+              {{ form_label(form.libelle, 'Libelle') }}
+              {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Libelle'}}) }}
+              {% if form_errors(form.libelle) and form.libelle.vars.value is not null %}
+                  <div class="invalid-feedback">
+                      {{ form_errors(form.libelle) }}
+                  </div>
+              {% endif %}
+          </div>
             <div class="form-group">
-                {{ form_label(form.listCritere, 'Critères :') }}
+                {{ form_label(form.listCritere, 'Critères') }}
                 {% for choice in form.listCritere %}
                 <div class="form-check critere-item">
-                    {{ form_widget(choice, { 'attr': {'class': 'form-check-input custom-checkbox'} }) }}
-                    <label class="form-check-label">{{ choice.vars.label }}</label>
+                    <div style="display: flex; align-items: center;"> <!-- Div pour aligner les éléments -->
+                        {{ form_widget(choice, { 'attr': {'class': 'form-check-input custom-checkbox', 'required': 'required'} }) }}
+                        <label class="form-check-label" style="margin-left: 10px; font-weight: bold;">{{ choice.vars.label }}</label>
+                    </div>
                 </div>
                 {% endfor %}
+                {{ form_errors(form.listCritere) }} {# Affiche les erreurs éventuelles des critères #}
             </div>
-            <button type="submit" class="btn btn-primary mr-2">Mettre à jour</button>
+            <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
             {{ form_end(form) }}
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById('objectif-form').addEventListener('submit', function(event) {
+        var libelleInput = document.getElementById('objectif_libelle');
+        if (!libelleInput.value) {
+            alert('Veuillez saisir un libellé.');
+            event.preventDefault();
+        }
+        
+        var checkboxes = document.querySelectorAll('.form-check-input.custom-checkbox');
+        var checked = false;
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                checked = true;
+            }
+        });
+        if (!checked) {
+            alert('Veuillez sélectionner au moins un critère.');
+            event.preventDefault();
+        }
+    });
+});
+</script>
+
 <style>
-  .custom-checkbox {
-      width: 20px; /* Ajustez la largeur selon vos préférences */
-      height: 20px; /* Ajustez la hauteur selon vos préférences */
-  }
+    .custom-checkbox {
+        width: 20px; /* Ajustez la largeur selon vos préférences */
+        height: 20px; /* Ajustez la hauteur selon vos préférences */
+    }
+    .btn {
+        /* Styles normaux des boutons */
+        background-color: #56ab2f;
+        border-color: #56ab2f;
+        color: #ffffff; /* Couleur du texte */
+        transition: background-color 0.3s; /* Transition fluide pour la couleur de fond */
+    }
+    .btn:hover {
+        background-color: #72c22f; /* Nouvelle couleur de fond */
+    }
 </style>
 {% endblock %}
