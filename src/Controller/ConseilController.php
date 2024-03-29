@@ -19,12 +19,18 @@ class ConseilController extends AbstractController
     public function getAll(ConseilRepository $repo, PaginatorInterface $paginator, Request $request): Response
     {
         $statut = $request->query->get('statut');
+        $note = $request->query->get('note');
 
         $queryBuilder = $repo->createQueryBuilder('a');
 
         if ($statut !== null && $statut !== 'Tous') {
             $queryBuilder->where('a.statut = :statut')
                 ->setParameter('statut', $statut);
+        }
+
+        if ($note !== null && $note !== '') {
+            $queryBuilder->andWhere('a.note = :note')
+                ->setParameter('note', $note);
         }
 
         $pagination = $paginator->paginate(

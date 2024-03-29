@@ -35,14 +35,23 @@
 					<div class="card">
 						<div class="card-body">
 							<form method="GET" action="{{ path('conseil_listDB') }}" class="mb-4">
-								<label class="input-group" for="statut" style="font-size:15px;">Filtrer par statut :</label>
-								<div class="input-group-append" style="width:220px;">
+								<div class="input-group" style="width:600px;">
+									<label class="input-group-append" for="statut" style="font-size:15px;color:black;margin-right:10px;">Filtrer par statut :</label>
 									<select name="statut" id="statut" class="form-control">
 										<option value="Tous">Tous</option>
 										<option value="en attente">En attente</option>
 										<option value="terminé">Terminé</option>
 									</select>
-									<div class="input-group-append" style="margin-left:10px;" >
+									<label class="input-group-append" for="note" style="font-size:15px; margin-left:10px;color:black;margin-right:10px;">Filtrer par note :</label>
+									<select name="note" id="note" class="form-control">
+										<option value="">Toutes</option>
+										<option value="1">1</option>
+										<option value="2">2</option>
+										<option value="3">3</option>
+										<option value="4">4</option>
+										<option value="5">5</option>
+									</select>
+									<div class="input-group-append" style="margin-left:10px;">
 										<button type="submit" class="btn btn-success">Filtrer</button>
 									</div>
 								</div>
