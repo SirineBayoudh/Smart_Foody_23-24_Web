@@ -73,7 +73,7 @@ class ConseilFrontController extends AbstractController
     }
 
     #[Route('/updateNoteConseil/{id_conseil}', name: 'conseil_note_update')]
-    public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id_conseil, CalorieNinjasService $calorieNinjasService, Request $request): Response
+    public function update(Request $req, ManagerRegistry $manager, ConseilRepository $repo, $id_conseil, CalorieNinjasService $calorieNinjasService, Request $request, QuotableService $quotableService): Response
     {
         $conseil = $repo->find($id_conseil);
         $form = $this->createForm(ConseilUpdateType::class, $conseil);
@@ -94,10 +94,14 @@ class ConseilFrontController extends AbstractController
             $calories = $calorieNinjasService->getCaloriesForFood($food);
         }
 
+        $randomQuote = $quotableService->getRandomQuote();
+
         return $this->renderForm('conseil_front/update.html.twig', [
             'conseils' => $conseils,
             'food' => $food,
-            'fUpdate' => $form
+            'randomQuote' => $randomQuote,
+            'fUpdate' => $form,
+            'calories' => $calories
         ]);
     }
 }
