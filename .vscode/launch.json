@@ -1,0 +1,14 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open addobjectif.html.twig",
+            "file": "c:\\Users\\sirin\\OneDrive\\Bureau\\SmartFoody_symfony\\Smart_Foody_23-24_Web\\templates\\objectif_dash\\addobjectif.html.twig"
+        }
+    ]
+}

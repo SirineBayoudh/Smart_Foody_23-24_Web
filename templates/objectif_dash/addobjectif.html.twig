@@ -3,136 +3,37 @@
 {% block title %}Add Product{% endblock %}
 
 {% block body %}
-<style>
-  /* CSS pour les checkboxes */
-  .custom-checkbox {
-    margin-bottom: 10px;
-  }
-  
-  .custom-checkbox input[type="checkbox"] {
-    display: none;
-  }
-  
-  .custom-checkbox label {
-    display: inline-block;
-    cursor: pointer;
-    position: relative;
-    padding-left: 25px;
-  }
-  
-  .custom-checkbox label::before {
-    content: '';
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    margin-right: 10px;
-    position: absolute;
-    left: 0;
-    bottom: 1px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-  }
-  
-  .custom-checkbox input[type="checkbox"]:checked + label::before {
-    background-color: #fff;
-    border-color: #28a745;
-  }
-  
-  .custom-checkbox input[type="checkbox"]:checked + label::after {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 12px;
-    border: solid #28a745;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    position: absolute;
-    left: 5px;
-    bottom: 3px;
-  }
-  
-  .custom-checkbox input[type="checkbox"]:checked + label {
-    font-weight: bold;
-  }
-</style>
-
-  <div class="col-10 grid-margin stretch-card">
+<div class="col-10 grid-margin stretch-card">
     <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">Ajouter un objectif</h4>
-        <p class="card-description">Veuillez ajouter les informations de l'objectif ci-dessous.</p>
-        <form class="forms-sample" method="POST" enctype="multipart/form-data" id="objectifForm">
-          <div class="form-group">
-            <label for="objectif">Objectif :</label>
-            <select class="form-control" name="objectif" id="objectif">
-              <option value="Bien être">Bien être</option>
-              <option value="Perte de poids">Perte de poids</option>
-              <option value="Prise de poids">Prise de poids</option>
-              <option value="Prise de masse musculaire">Prise de masse musculaire</option>
-            </select>
-          </div>
-          <div class="form-group" id="listeCritere">
-            <label for="critere">Critères :</label>
-            <!-- Options statiques -->
-            <div class="custom-checkbox">
-              <input type="checkbox" name="listCritereConcatenated[]" id="Sans_glucose" value="Sans_glucose">
-              <label for="Sans_glucose">Sans glucose</label>
+        <div class="card-body">
+            <h4 class="card-title">Ajouter un objectif</h4>
+            <p class="card-description">Veuillez ajouter les informations de l'objectif ci-dessous.</p>
+            {{ form_start(form) }}
+            <div class="form-group">
+                {{ form_label(form.libelle, 'Libelle') }}
+                {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Libelle'}}) }}
             </div>
-            <div class="custom-checkbox">
-              <input type="checkbox" name="listCritereConcatenated[]" id="Sans_gluten" value="Sans_gluten">
-              <label for="Sans_gluten">Sans gluten</label>
+            <div class="form-group">
+                {{ form_label(form.listCritere, 'Critères') }}
+                {% for choice in form.listCritere %}
+                <div class="form-check critere-item">
+                  <div style="display: flex; align-items: center;"> <!-- Div pour aligner les éléments -->
+                    {{ form_widget(choice, { 'attr': {'class': 'form-check-input custom-checkbox'} }) }}
+                    <label class="form-check-label" style="margin-left: 10px; font-weight: bold;">{{ choice.vars.label }}</label>
+                  </div>
+              </div>
+                {% endfor %}
             </div>
-            <div class="custom-checkbox">
-              <input type="checkbox" name="listCritereConcatenated[]" id="Sans_lactose" value="Sans_lactose">
-              <label for="Sans_lactose">Sans lactose</label>
-            </div>
-            <div class="custom-checkbox">
-              <input type="checkbox" name="listCritereConcatenated[]" id="Protein" value="Protein">
-              <label for="Protein">Protein</label>
-            </div>
-          </div>
-          <!-- Champ pour ajouter un nouveau critère -->
-          <div class="form-group" id="autreCritereDiv" style="display: none;">
-            <label for="autreCritere">Autre Critère :</label>
-            <input type="text" class="form-control" name="autreCritere" id="autreCritere">
-          </div>
-          <button type="button" class="btn btn-success" id="ajouterAutreCritere">Ajouter Autre Critère</button>
-          <br><br>
-          <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
-        </form>
-      </div>
+            <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
+            {{ form_end(form) }}
+        </div>
     </div>
-  </div>
+</div>
 
-  <script>
-    document.getElementById("ajouterAutreCritere").addEventListener("click", function() {
-      document.getElementById("autreCritereDiv").style.display = "block";
-      
-      var listeCritereDiv = document.getElementById("listeCritere");
-      var autreCritereInput = document.getElementById("autreCritere").value.trim();
-      
-      if (autreCritereInput !== "") {
-        var input = document.createElement("input");
-        input.type = "checkbox";
-        input.name = "listCritereConcatenated[]";
-        input.value = autreCritereInput;
-        input.id = autreCritereInput; // Définir l'ID de la nouvelle case à cocher
-        
-        var label = document.createElement("label");
-        label.htmlFor = autreCritereInput;
-        label.textContent = autreCritereInput;
-        label.className = "custom-checkbox"; // Ajouter la classe custom-checkbox
-        
-        var div = document.createElement("div");
-        div.className = "custom-checkbox"; // Ajouter également la classe custom-checkbox au div parent
-        div.appendChild(input);
-        div.appendChild(label);
-        
-        listeCritereDiv.appendChild(div);
-      }
-    });
-  </script>
-  
-  
-
+<style>
+    .custom-checkbox {
+        width: 20px; /* Ajustez la largeur selon vos préférences */
+        height: 20px; /* Ajustez la hauteur selon vos préférences */
+    }
+</style>
 {% endblock %}

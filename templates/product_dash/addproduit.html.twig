@@ -1,4 +1,3 @@
-
 {% extends 'base_back.html.twig' %}
 
 {% block title %}Add Product{% endblock %}
@@ -37,6 +36,32 @@
                         </span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="exampleSelectCriteria">Critère :</label>
+                    <select class="form-control" name="critere" id="exampleSelectCriteria">
+                        <option value="">Sélectionnez un critère</option>
+                        {% set critereSet = [] %}
+                        {% for critere in criteres %}
+                            {% set critereList = critere.listCritere|split(',') %}
+                            {% for crit in critereList %}
+                                {% set critTrimmed = crit|trim %}
+                                {% if critTrimmed not in critereSet %}
+                                    {% set isDuplicate = false %}
+                                    {% for existingCrit in critereSet %}
+                                        {% if critTrimmed|lower == existingCrit|lower %}
+                                            {% set isDuplicate = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if not isDuplicate %}
+                                        {% set _ = critereSet|merge([critTrimmed]) %}
+                                        <option value="{{ critTrimmed }}">{{ critTrimmed }}</option>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                </div>
+                               
                 <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
             </form>
         </div>

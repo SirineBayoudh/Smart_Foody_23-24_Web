@@ -3,135 +3,34 @@
 {% block title %}Modifier Objectif{% endblock %}
 
 {% block body %}
-<style>
-  /* CSS pour les checkboxes */
-  .custom-checkbox {
-    margin-bottom: 10px;
-  }
-  
-  .custom-checkbox input[type="checkbox"] {
-    display: none;
-  }
-  
-  .custom-checkbox label {
-    display: inline-block;
-    cursor: pointer;
-    position: relative;
-    padding-left: 25px;
-  }
-  
-  .custom-checkbox label::before {
-    content: '';
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    margin-right: 10px;
-    position: absolute;
-    left: 0;
-    bottom: 1px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-  }
-  
-  .custom-checkbox input[type="checkbox"]:checked + label::before {
-    background-color: #fff;
-    border-color: #28a745;
-  }
-  
-  .custom-checkbox input[type="checkbox"]:checked + label::after {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 12px;
-    border: solid #28a745;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    position: absolute;
-    left: 5px;
-    bottom: 3px;
-  }
-  
-  .custom-checkbox input[type="checkbox"]:checked + label {
-    font-weight: bold;
-  }
-</style>
-
 <div class="col-10 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
             <h4 class="card-title">Modifier un objectif</h4>
             <p class="card-description">Veuillez mettre à jour les informations de l'objectif ci-dessous.</p>
-            <form method="POST">
-                <div class="form-group">
-                    <label for="libelle">Libellé :</label>
-                    <select id="libelle" name="libelle" class="form-control">
-                        {% for libelle in libelles %}
-                            <option value="{{ libelle }}" {% if objectif.libelle == libelle %} selected {% endif %}>{{ libelle }}</option>
-                        {% endfor %}
-                    </select>
+            {{ form_start(form) }}
+            <div class="form-group">
+                {{ form_label(form.libelle, 'Libellé :') }}
+                {{ form_widget(form.libelle, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.listCritere, 'Critères :') }}
+                {% for choice in form.listCritere %}
+                <div class="form-check critere-item">
+                    {{ form_widget(choice, { 'attr': {'class': 'form-check-input custom-checkbox'} }) }}
+                    <label class="form-check-label">{{ choice.vars.label }}</label>
                 </div>
-                <div class="form-group" id="listeCritere">
-                    <label for="critere">Critères :</label><br>
-                    {% for critere in criteres %}
-                        <div class="custom-checkbox">
-                            <input type="checkbox" id="{{ critere }}" name="criteres[]" value="{{ critere }}" {% if critere in objectif.getListCritereArray() %} checked {% endif %}>
-                            <label for="{{ critere }}">{{ critere }}</label>
-                        </div>
-                    {% endfor %}
-                </div>
-                
-                <!-- Champ pour ajouter un nouveau critère -->
-                <div class="form-group" id="nouveauCritere" style="display: none;">
-                    <label for="nouveauCritere">Nouveau Critère :</label>
-                    <input type="text" class="form-control" name="nouveauCritere" id="nouveauCritereInput">
-                </div>
-                <button type="button" class="btn btn-success" id="ajouterCritereBtn">Ajouter un critère</button>
-                <br><br>
-                <!-- Autres champs du formulaire -->
-                <button type="submit" class="btn btn-primary mr-2" name="submit">Mettre à jour</button>
-            </form>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary mr-2">Mettre à jour</button>
+            {{ form_end(form) }}
         </div>
     </div>
 </div>
-
-<script>
-    document.getElementById("ajouterCritereBtn").addEventListener("click", function() {
-        var nouveauCritereInput = document.getElementById("nouveauCritere");
-        if (nouveauCritereInput.style.display === "none") {
-            nouveauCritereInput.style.display = "block";
-            nouveauCritereInput.focus();
-        } else {
-            var critereValue = document.getElementById("nouveauCritereInput").value.trim();
-            if (critereValue !== "") {
-                var listeCritereDiv = document.getElementById("listeCritere");
-                
-                // Créer une div pour envelopper la nouvelle case à cocher
-                var div = document.createElement("div");
-                div.className = "custom-checkbox";
-                
-                var input = document.createElement("input");
-                input.type = "checkbox";
-                input.name = "criteres[]";
-                input.value = critereValue;
-                input.id = critereValue.replace(/\s/g, '_');
-                
-                var label = document.createElement("label");
-                label.htmlFor = input.id;
-                label.textContent = critereValue;
-                label.className = "custom-checkbox";
-                
-                // Ajouter la case à cocher et l'étiquette dans la div
-                div.appendChild(input);
-                div.appendChild(label);
-                
-                // Ajouter la div à la liste des critères
-                listeCritereDiv.appendChild(div);
-                
-                document.getElementById("nouveauCritereInput").value = ""; // Effacer le champ après avoir ajouté le critère
-                document.getElementById("nouveauCritereInput").focus(); // Focus sur le champ pour faciliter l'ajout multiple
-            }
-        }
-    });
-</script>
-
+<style>
+  .custom-checkbox {
+      width: 20px; /* Ajustez la largeur selon vos préférences */
+      height: 20px; /* Ajustez la hauteur selon vos préférences */
+  }
+</style>
 {% endblock %}

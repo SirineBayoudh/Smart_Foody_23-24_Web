@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class ObjectifType extends AbstractType
 {
@@ -16,25 +17,29 @@ class ObjectifType extends AbstractType
     {
         $builder
         ->add('libelle', ChoiceType::class, [
-            'label' => 'Libellé',
             'choices' => [
                 'Bien être' => 'Bien être',
                 'Perte de poids' => 'Perte de poids',
                 'Prise de poids' => 'Prise de poids',
                 'Prise de masse musculaire' => 'Prise de masse musculaire',
-                // Ajoutez ici d'autres options selon vos besoins
             ],
-            'attr' => ['class' => 'form-control']
+            'label' => 'Objectif :',
+            'required' => true,
+            'placeholder' => 'Choisir un objectif',
         ])
-        
-        ->add('listCritere', CheckboxType::class, [
-            'label' => 'Critères',
+        ->add('listCritere', ChoiceType::class, [
+            'label' => 'Critères :',
+            'required' => false,
+            'mapped' => false, // Ne mappe pas directement cette propriété à une entité
             'choices' => [
-                'Sans_lactose' => in_array('Sans_lactose', $options['selected_options']),
-                'Protein' => in_array('Protein', $options['selected_options']),
-                // Ajoutez d'autres options ici
+                'Sans Lactose' => 'sans_lactose',
+                'Sans Gluten' => 'sans_gluten',
+                'Sans Glucose' => 'sans_glucose',
+                'Protein' => 'protein',
             ],
-            'mapped' => false, // Ne pas mapper ce champ à l'entité, car il est géré manuellement
+            'multiple' => true, // Permet de sélectionner plusieurs critères
+            'expanded' => true, // Affiche les choix sous forme de cases à cocher
+            
         ]);
     }
 

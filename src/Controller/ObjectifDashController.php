@@ -31,32 +31,38 @@ class ObjectifDashController extends AbstractController
 }
 
 #[Route('/addobject', name: 'add_object')]
-public function addProduct(ManagerRegistry $manager, Request $request): Response
+public function addProduct(Request $request): Response
 {
-    if ($request->isMethod('POST')) {
+    $objectif = new Objectif();
+    $form = $this->createForm(ObjectifType::class, $objectif);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
         // Récupérer les données du formulaire
-        $libelle = $request->request->get('objectif');
-        $selectedCriteres = $request->request->get('listCritereConcatenated');
+        $libelle = $form->get('libelle')->getData();
+        $selectedCriteres = $form->get('listCritere')->getData();
         
-        // Concaténer les valeurs sélectionnées avec une virgule
+        // Convertir le tableau de choix en une chaîne de caractères séparée par des virgules
         $listCritereConcatenated = implode(",", $selectedCriteres);
+        
+        // Assigner la chaîne de caractères à la propriété listCritere
+        $objectif->setListCritere($listCritereConcatenated);
                 
         // Enregistrement des données dans la base de données
-        $obj = new Objectif();
-        $obj->setLibelle($libelle);
-        $obj->setListCritere($listCritereConcatenated);
-
-        $em = $manager->getManager();
-        $em->persist($obj);
-        $em->flush();
-
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($objectif);
+        $entityManager->flush();
+    
         // Redirection vers la page 'objectif_all'
         return $this->redirectToRoute('objectif_all');
     }
 
     // Affichage du formulaire d'ajout
-    return $this->render('objectif_dash/addobjectif.html.twig');
+    return $this->render('objectif_dash/addobjectif.html.twig', [
+        'form' => $form->createView(),
+    ]);
 }
+
 
 #[Route('/editobjectif/{id}', name: 'edit_objectif')]
 public function editObjectif(int $id, Request $request): Response
@@ -68,32 +74,33 @@ public function editObjectif(int $id, Request $request): Response
         throw $this->createNotFoundException('Objectif non trouvé pour l\'id '.$id);
     }
 
-    // Définir les libellés prédéfinis
-    $libelles = ['Bien-être', 'Perte de poids', 'Prise de poids', 'Prise de masse musculaire'];
+    // Récupérer la chaîne de critères de l'objet Objectif
+    $listeCritereString = $objectif->getListCritere();
 
-    $criteres = explode(',', $objectif->getListCritere());
+    // Transformer la chaîne en tableau de critères
+    $selectedCriteres = explode(',', $listeCritereString);
 
-    // Vérifier si le formulaire a été soumis
-    if ($request->isMethod('POST')) {
-        // Récupérer les données du formulaire
-        $libelle = $request->request->get('libelle');
-        $criteresSelectionnes = $request->request->get('criteres');
+    $form = $this->createForm(ObjectifType::class, $objectif);
 
-        // Mettre à jour les propriétés de l'objectif
-        $objectif->setLibelle($libelle);
-        $objectif->setListCritere(implode(',', $criteresSelectionnes));
+    // Pré-cocher les cases à cocher dans le formulaire avec les valeurs sélectionnées
+    $form->get('listCritere')->setData($selectedCriteres);
 
-        // Enregistrer les modifications dans la base de données
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Mettre à jour la chaîne de critères avec les nouvelles valeurs sélectionnées
+        $listeCritereString = implode(',', $form->get('listCritere')->getData());
+        $objectif->setListCritere($listeCritereString);
+
         $entityManager->flush();
 
-        // Rediriger vers une autre page après la mise à jour
+        // Redirection après la mise à jour
         return $this->redirectToRoute('objectif_all');
     }
 
+    // Affichage du formulaire de modification
     return $this->render('objectif_dash/editobjectif.html.twig', [
-        'objectif' => $objectif,
-        'libelles' => $libelles,
-        'criteres' => $criteres,
+        'form' => $form->createView(),
     ]);
 }
 
