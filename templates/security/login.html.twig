@@ -36,12 +36,16 @@
 							<div class="row w-100 mx-0">
 								<div class="col-lg-4 mx-auto">
 									<div class="auth-form-light text-left py-5 px-4 px-sm-5">
-										<div class="brand-logo">
+										<div class="brand-logo" style="text-align:center; margin-top:-10px">
 											<img src="../../images/trans_logo.png" alt="logo">
 										</div>
-										<h4>Hello! let's get started</h4>
-										<h6 class="font-weight-light">Sign in to continue.</h6>
-										<form class="pt-3" method="post" >
+										<div style="display: flex; justify-content:center; margin-top:-20px">
+											<p style="margin-right: 80px; color:#56ab2f; font-weight:bold; text-decoration:underline">
+												Se connecter</p>
+											<p style="font-weight:bold;">
+												S'inscrire</p>
+										</div>
+										<form class="pt-3" method="post">
 											<div class="form-group">
 												<input type="email" name="email" class="form-control form-control-lg" value="{{last_username}}" id="exampleInputEmail1" placeholder="Email" required autofocus>
 											</div>
@@ -49,26 +53,31 @@
 												<input type="password" name="password" class="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password" required>
 											</div>
 											<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-											<button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit" value="submit">
-												SIGN IN
+											<button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit" value="submit" style="background-color:#56ab2f; border-color:#56ab2f">
+												Connexion
 											</button>
 											<div class="my-2 d-flex justify-content-between align-items-center">
-												<div class="form-check">
+												<a href="#" class="auth-link text-black" style="color:#56ab2f;">Mot de passe oublié?</a>
+												<div class="form-check form-check-success">
 													<label class="form-check-label text-muted">
 														<input type="checkbox" class="form-check-input">
-														Keep me signed in
+														Restez connecté
 													</label>
 												</div>
-												<a href="#" class="auth-link text-black">Forgot password?</a>
+											</div>
+											<div style="display: flex; align-items: center; justify-content:center;">
+												<hr style="width:100px; margin-right: 10px;">
+												<p style="margin: 0;">OU</p>
+												<hr style="width:100px; margin-left: 10px;">
 											</div>
 											<div class="mb-2">
-												<button type="button" class="btn btn-block btn-facebook auth-form-btn">
-													<i class="ti-facebook mr-2"></i>Connect using facebook
+												<button type="button" class="btn btn-block btn-google auth-form-btn">
+													<i class="ti-google mr-2"></i>Se connecter avec Google
 												</button>
 											</div>
 											<div class="text-center mt-4 font-weight-light">
-												Don't have an account?
-												<a href="signup" class="text-primary">Create</a>
+												Vous n'avez pas de compte?
+												<a href="signup" style="color:#56ab2f;">S'inscrire</a>
 											</div>
 										</form>
 									</div>

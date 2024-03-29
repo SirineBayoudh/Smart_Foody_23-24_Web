@@ -6,6 +6,7 @@ use App\Entity\Objectif;
 use App\Entity\Utilisateur;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,7 +18,13 @@ class UtilisateurType extends AbstractType
         $builder
             ->add('nom')
             ->add('prenom')
-            ->add('genre')
+            ->add('genre', ChoiceType::class, [
+                'choices' => 
+                [
+                    'Femme' => 'Femme',
+                    'Homme' => 'Homme',
+                ]
+            ])
             ->add('email')
             ->add('motDePasse')
             ->add('numTel')
@@ -25,7 +32,12 @@ class UtilisateurType extends AbstractType
             ->add('matricule')
             ->add('attestation')
             ->add('adresse')
-            ->add('objectif')
+            ->add('objectif', EntityType::class, [
+                'class' => Objectif::class,
+                'choice_label' => 'libelle', 
+                'placeholder' => 'Sélectionnez un objectif',
+                'required' => true,
+            ])
             ->add('tentative')
             ->add('taille')
             ->add('poids')

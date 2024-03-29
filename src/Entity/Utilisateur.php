@@ -60,7 +60,7 @@ class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
     private $adresse;
 
     #[ORM\Column(type: "integer", name: "tentative")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    
     private $tentative;
 
     #[ORM\Column(type: "float", name: "taille")]
