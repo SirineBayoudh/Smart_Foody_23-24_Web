@@ -23,6 +23,10 @@ class Alerte
     #[ORM\Column]
     private ?bool $Type = null;
 
+    #[ORM\ManyToOne(inversedBy: 'id_stock')]
+    #[ORM\JoinColumn(name: "id_stock", referencedColumnName: "id_s")]
+    private ?Stock $id_stock = null;
+
     public function getId_alerte(): ?int
     {
         return $this->id_alerte;
@@ -60,6 +64,18 @@ class Alerte
     public function setType(bool $Type): static
     {
         $this->Type = $Type;
+
+        return $this;
+    }
+
+    public function getId_Stock(): ?Stock
+    {
+        return $this->id_stock;
+    }
+
+    public function setId_Stock(?Stock $id_stock): static
+    {
+        $this->id_stock = $id_stock;
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\StockRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -41,6 +43,14 @@ class Stock
     #[ORM\ManyToOne(inversedBy: 'ref_produit')]
     #[ORM\JoinColumn(name: "ref_produit", referencedColumnName: "ref")]
     private ?Produit $ref_produit = null;
+
+    #[ORM\OneToMany(mappedBy: 'id_stock', targetEntity: Alerte::class)]
+    private Collection $id_stock;
+
+    public function __construct()
+    {
+        $this->id_stock = new ArrayCollection();
+    }
 
     public function getId_s(): ?int
     {
@@ -158,6 +168,36 @@ class Stock
     public function setImage($image)
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, alerte>
+     */
+    public function getIdStock(): Collection
+    {
+        return $this->id_stock;
+    }
+
+    public function addIdStock(alerte $idStock): static
+    {
+        if (!$this->id_stock->contains($idStock)) {
+            $this->id_stock->add($idStock);
+            $idStock->setId_Stock($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdStock(alerte $idStock): static
+    {
+        if ($this->id_stock->removeElement($idStock)) {
+            // set the owning side to null (unless already changed)
+            if ($idStock->getId_Stock() === $this) {
+                $idStock->setId_Stock(null);
+            }
+        }
 
         return $this;
     }

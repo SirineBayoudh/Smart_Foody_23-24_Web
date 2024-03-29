@@ -84,11 +84,16 @@ class StockController extends AbstractController
         ProduitRepository $produitRepo,
         EntityManagerInterface $entityManager,
         FlashBagInterface $flashBag,
-        SmsGenerator $smsGenerator
+        SmsGenerator $smsGenerator,
+        Request $request
     ): Response {
 
-        // Récupérez les données de la table Stock et Produit
-        $stocks = $stockRepo->findExistantStocks();
+
+        // Utilisez la méthode findExistantStocks avec ou sans terme de recherche
+        $searchTerm = $request->query->get('search');
+
+        // Utilisez la méthode findExistantStocks avec ou sans terme de recherche
+        $stocks = $stockRepo->findExistantStocks($searchTerm);
         $produits = $produitRepo->findAll();
 
         $alertMessages = []; // Tableau pour stocker les alertes temporaires
@@ -103,21 +108,23 @@ class StockController extends AbstractController
 
             // Vérifiez si nbVendu est égal à quantite - 5
             if ($stock->getNbvendu() === $stock->getQuantite() - 5) {
-
-
                 // Créez une nouvelle instance d'Alerte
                 $alerte = new Alerte();
                 $alerte->setDescription_alerte('Le stock ' . $stock->getNom() . ' est bientôt en rupture.');
                 $alerte->setDateAlerte(new \DateTime()); // Date actuelle
                 $alerte->setType(false); // Mettez le type d'alerte à faux
 
-                // Persistez l'entité Alerte
-                $entityManager->persist($alerte);
-
-                // Ajoutez la description de l'alerte au tableau des messages
-                $alertMessages[] = $alerte->getDescription_alerte();
+                // Récupérez l'objet Stock correspondant à partir de l'ID
+                $alerteStock = $stockRepo->find($stock->getId_s());
+                if ($alerteStock) {
+                    // Associez le stock à l'alerte
+                    $alerte->setId_Stock($alerteStock);
+                    // Persistez l'entité Alerte
+                    $entityManager->persist($alerte);
+                    // Ajoutez la description de l'alerte au tableau des messages
+                    $alertMessages[] = $alerte->getDescription_alerte();
+                }
             }
-
             // Vérifiez si nbVendu est égal à quantite
             if ($stock->getNbvendu() === $stock->getQuantite()) {
                 $phoneNumber = '+21627674746'; // Remplacez ceci par le numéro de téléphone approprié

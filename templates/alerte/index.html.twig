@@ -1,11 +1,18 @@
 {% extends 'base_back.html.twig' %}
 
     {% block body %}
-
+     
         <div class="col-lg-20 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title"> Table Alerte </h4>
+                {% for type, messages in app.flashes %}
+                  {% for message in messages %}
+                      <div class="alert alert-{{ type }}" role="alert">
+                          {{ message }}
+                      </div>
+                  {% endfor %}
+              {% endfor %}
                 <div class="table-responsive">
         
                   <table class="table table-hover" style="margin:auto">
@@ -15,6 +22,7 @@
                             <th>Id alerte</th>
                             <th>Description</th>
                             <th>Type</th>
+                            <th>Actions</th>
                          
                         </tr>
                       </tr>
@@ -25,6 +33,13 @@
                             <td>{{ a.id_alerte }}</td>
                             <td>{{ a.description_alerte }}</td>
                             <td>{{ a.isType() ? 'Lue' : 'Non lue' }}</td>
+                            <td>
+
+    <a href="{{ path('update_alert_type', {'id_alerte': a.id_alerte}) }}" class="alert-link"><button type="button" class="btn btn-warning">Modifier</button></a>
+</td>
+             <td>   
+              <a href="{{ path('delete_read_alerts', {'alertId': a.id_alerte}) }}" class="alert-link"><button type="button" class="btn btn-danger"> Supprimer</button></a>
+          </td>     </td>
                         </tr>
                     {% endfor %}
                    
@@ -37,7 +52,7 @@
           </div>
        
         
-        
+      
   
 </div>
 
