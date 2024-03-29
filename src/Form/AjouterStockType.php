@@ -38,7 +38,9 @@ class AjouterStockType extends AbstractType
             ])
             ->add('quantite')
             ->add('date_arrivage')
-            ->add('submit', SubmitType::class);
+            ->add('submit', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary mr-2'],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

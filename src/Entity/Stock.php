@@ -20,28 +20,33 @@ class Stock
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Le champ est obligatoire")]
-    #[Assert\NotBlank(message: "Le champ ne peut pas être vide")]
     #[Assert\Positive(message: "La quantité doit être positive")]
     private ?int $quantite;
 
     #[ORM\Column(nullable: true)]
+
     private ?int $nbVendu = null;
 
     #[ORM\Column(nullable: true)]
     private ?float $cout = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le champ ne peut pas être vide")]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le champ ne peut pas être vide")]
     private ?string $marque = null;
     #[ORM\Column(length: 255, nullable: true)]
+
     private ?string $image = null;
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\NotBlank(message: "Le champ ne peut pas être vide")]
     private ?\DateTimeInterface $date_arrivage = null;
 
     #[ORM\ManyToOne(inversedBy: 'ref_produit')]
     #[ORM\JoinColumn(name: "ref_produit", referencedColumnName: "ref")]
+    #[Assert\NotBlank(message: "Le champ ne peut pas être vide")]
     private ?Produit $ref_produit = null;
 
     #[ORM\OneToMany(mappedBy: 'id_stock', targetEntity: Alerte::class)]

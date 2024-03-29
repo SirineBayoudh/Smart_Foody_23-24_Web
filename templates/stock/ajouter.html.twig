@@ -40,10 +40,7 @@
                     {% endif %}
                 </div>
             {% endif %}
-                {# <div class="form-group">
-                    {{ form_label(form.ref_produit) }} <!-- Label pour le champ ref_produit -->
-                    {{ form_widget(form.ref_produit, {'attr': {'class': 'form-control form-control-lg'}}) }} <!-- Champ ref_produit -->
-                </div> #}
+              
                 <div class="form-group">
                     {{ form_label(form.marque) }} <!-- Label pour le champ marque -->
                     {{ form_widget(form.marque, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.marque) ? ' is-invalid' : '')}}) }}
@@ -71,15 +68,7 @@
                         </div>
                     {% endif %}
                 </div>
-                {# <div class="form-group">
-                    {{ form_label(form.img) }} <!-- Label pour le champ img -->
-                    {{ form_widget(form.img, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.img) ? ' is-invalid' : '')}}) }}
-                    {% if form_errors(form.img) %}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.img) }}
-                        </div>
-                    {% endif %}
-                </div> #}
+             
                 <div class="form-group">
                     <label>File upload</label>
                     <input type="file" name="img[]" class="file-upload-default" id="fileInput">
@@ -91,8 +80,9 @@
                     </div>
                 </div>
                 {{ form_end(form) }} <!-- Fin du formulaire --><br><br>
-                <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                <button class="btn btn-light">Cancel</button>
+   
+                <button class="btn btn-light" onclick="window.history.back();">Cancel</button>
+
             
        
       </div>
