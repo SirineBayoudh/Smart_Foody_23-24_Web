@@ -18,7 +18,15 @@ class ConseilController extends AbstractController
     #[Route('/conseil_dash', name: 'conseil_listDB')]
     public function getAll(ConseilRepository $repo, PaginatorInterface $paginator, Request $request): Response
     {
+        $statut = $request->query->get('statut');
+
         $queryBuilder = $repo->createQueryBuilder('a');
+
+        if ($statut !== null && $statut !== 'Tous') {
+            $queryBuilder->where('a.statut = :statut')
+                ->setParameter('statut', $statut);
+        }
+
         $pagination = $paginator->paginate(
             $queryBuilder->getQuery(),
             $request->query->getInt('page', 1),
