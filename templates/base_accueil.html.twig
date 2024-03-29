@@ -52,7 +52,7 @@
     </div>
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
 	    <div class="container">
-	      <a class="navbar-brand" href="index.html">Vegefoods</a>
+	      <a class="navbar-brand" href="index.html">SmartFoody</a>
 	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
 	        <span class="oi oi-menu"></span> Menu
 	      </button>
@@ -73,7 +73,15 @@
 	          <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
 	          <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
 	          <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
-{# Dans base.html.twig #}
+	{# j'ai ajouter ici l icon avec le compteur j'ai créer un autre twig pour recupérer le nombre et l'afficher  #}	       
+<li class="nav-item cta cta-colored">
+    <a href="{{ path('voir_panier') }}" class="nav-link">
+        {{ render(controller('App\\Controller\\PanierController::compteur')) }}
+    </a>
+</li>
+
+
+
 
 
 
@@ -82,10 +90,11 @@
 	    </div>
 	  </nav>
     <!-- END nav -->
-
+{% block header_image %}
     <section id="home-section" class="hero">
 		  <div class="home-slider owl-carousel">
-	      <div class="slider-item" style="background-image: url(images/bg_1.jpg);">
+	     
+        <div class="slider-item" style="background-image: url('{{ asset('images/bg_1.jpg') }}');">
 	      	<div class="overlay"></div>
 	        <div class="container">
 	          <div class="row slider-text justify-content-center align-items-center" data-scrollax-parent="true">
@@ -100,7 +109,7 @@
 	        </div>
 	      </div>
 
-	      <div class="slider-item" style="background-image: url(images/bg_2.jpg);">
+	    <div class="slider-item" style="background-image: url('{{ asset('images/bg_2.jpg') }}');">
 	      	<div class="overlay"></div>
 	        <div class="container">
 	          <div class="row slider-text justify-content-center align-items-center" data-scrollax-parent="true">
@@ -116,6 +125,7 @@
 	      </div>
 	    </div>
     </section>
+    {% endblock %}
 
 
 		
