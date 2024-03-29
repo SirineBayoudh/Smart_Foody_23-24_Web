@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Utilisateur;
 use App\Form\ConseillerType;
+use App\Form\ProfilConseillerType;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -83,7 +84,7 @@ class BackUserController extends AbstractController
     {
 
         $user = $repo->find($id);
-        $form = $this->createForm(ConseillerType::class, $user);
+        $form = $this->createForm(ProfilConseillerType::class, $user);
 
         $em = $manager->getManager();
 
@@ -97,7 +98,8 @@ class BackUserController extends AbstractController
         return $this->renderform('back_user/modifierConseiller.html.twig', ['f' => $form]);
     }
 
-    
+    /* Supprimer un Conseiller */
+
     #[Route('/supprimerConseiller/{id}', name: 'conseiller_delete')]
     public function deleteConseiller(ManagerRegistry $manager, UtilisateurRepository $repo, $id): Response
     {

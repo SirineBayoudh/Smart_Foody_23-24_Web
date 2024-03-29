@@ -74,8 +74,27 @@ class UserController extends AbstractController
 
     /** Profil Client */
 
-    #[Route('/modifierClient/{id}', name: 'client_update')]
+    #[Route('/profilClient/{id}', name: 'client_update')]
     public function updateClient(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $idUtilisateur): Response
+    {
+
+        $user = $repo->find($idUtilisateur);
+        $form = $this->createForm(ProfilClientType::class, $user);
+
+        $em = $manager->getManager();
+
+        $form->handleRequest($req);
+        if ($form->isSubmitted()) {
+
+            $em->persist($user);
+            $em->flush();
+            return $this->redirectToRoute("accueil");
+        }
+        return $this->renderform('user/profilClient.html.twig', ['f' => $form]);
+    }
+
+    #[Route('/profilClientMDP/{id}', name: 'client_update')]
+    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $idUtilisateur): Response
     {
 
         $user = $repo->find($idUtilisateur);
