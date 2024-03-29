@@ -49,7 +49,7 @@ class ConseilRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
-
+    
     public function getCountByStatut(string $statut): int
     {
         return $this->createQueryBuilder('c')

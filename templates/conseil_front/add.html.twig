@@ -106,8 +106,22 @@
 				</div>
 			</div>
 		</div><br><br><br>
-		<div class="container">
-			<div class="row justify-content-center mb-5 pb-3">
+		<div class="container" style="margin-top:-70px;">
+			<div class="bg-white row justify-content-center mb-5 pb-3" style="margin-top:40px;">
+				<div class="col-md-7 heading-section ftco-animate text-center" style="margin-top:20px;">
+					<h2 class="mb-4">ChatBot</h2>
+				</div>
+			</div>
+			<div class="row bg-white d-flex justify-content-center py-5" style="margin-top:-100px;text-align:center;">
+				<div class="col-md-6" id="chatArea" style="color:black;"></div>
+				<div class="col-md-6 d-flex align-items-center">
+					<div class="form-group d-flex">
+						<input type="text" class="form-control" id="userMessage" placeholder="Message">
+						<button class="btn btn-primary py-3 px-5" id="sendBtn" style="margin-left: 5px;">Envoyer</button>
+					</div>
+				</div>
+			</div>
+			<div class="row justify-content-center mb-5 pb-3" style="margin-top:50px;">
 				<div class="col-md-7 heading-section ftco-animate text-center">
 					<h2 class="mb-4">Questions les plus fréquentes</h2>
 				</div>
@@ -128,5 +142,44 @@
 					</div>
 				</div>
 			</div>
-		</section>
-	{% endblock %}
+		</div>
+	</section>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () {
+$('#sendBtn').click(function () {
+var userMessage = $('#userMessage').val();
+
+$.ajax({
+url: 'https://api.openai.com/v1/chat/completions',
+type: 'POST',
+headers: {
+'Authorization': 'Bearer ', // Remplacez par votre propre clé API
+'Content-Type': 'application/json'
+},
+data: JSON.stringify(
+{
+model: 'gpt-3.5-turbo',
+messages: [
+{
+role: 'user',
+content: userMessage
+}
+]
+}
+),
+success: function (response) {
+var gptResponse = response.choices[0].message.content;
+$('#chatArea').empty();
+$('#chatArea').append('<div>Moi: ' + userMessage + '</div>');
+$('#chatArea').append('<div>AI BOT: ' + gptResponse + '</div>');
+$('#userMessage').val('');
+},
+error: function (xhr, status, error) {
+console.error(error);
+}
+});
+});
+});
+	</script>
+{% endblock %}
