@@ -2,7 +2,7 @@
 {% block body %}
 	<div class="main-panel">
 		<div class="content-wrapper" style="width: 2200px;">
-			<div class="row" style="width: 500px;">
+			<div class="row" style="width: 500px;margin-left:20px;">
 				<div class="col-md-6 grid-margin stretch-card">
 					<div class="card card-tale" style="background-color: #56AB2F;">
 						<div class="card-body text text-center">
@@ -30,7 +30,25 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
+			<div class="row" style="width:800px;margin-top:-20px;text-align:center;margin-left:100px;">
+				<div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card">
+					<div class="card">
+						<div class="card-body">
+							<h4 class="card-title">Conseils Par Statut</h4>
+							<canvas id="pieChart" width="300" height="200"></canvas>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card">
+					<div class="card">
+						<div class="card-body">
+							<h4 class="card-title">Distribution Des Notes</h4>
+							<canvas id="barChart" width="300" height="200"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" style="margin-top:20px;text-align:center;">
 				<div class="col-lg-6 grid-margin stretch-card">
 					<div class="card">
 						<div class="card-body">
@@ -113,8 +131,75 @@
 			</div>
 		</div>
 	</div>
-
 	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		var ctx = document.getElementById('pieChart').getContext('2d');
+var pieChart = new Chart(ctx, {
+type: 'pie',
+data: {
+labels: [
+'En attente', 'Terminé'
+],
+datasets: [
+{
+label: 'Conseils',
+data: [
+{{ conseilsEnAttente }}, {{ conseilsTermines }}
+],
+backgroundColor: ['#56AB2F', '#cce5c0',]
+}
+]
+},
+options: {
+responsive: false,
+maintainAspectRatio: false
+}
+});
+	</script>
+	<script>
+		var ctx = document.getElementById('barChart').getContext('2d');
+var barChart = new Chart(ctx, {
+type: 'bar',
+data: {
+labels: [
+'1',
+'2',
+'3',
+'4',
+'5'
+], // Notes
+datasets: [
+{
+label: 'Nombre de conseils',
+data: [
+{{ notesCount[1] ?? 0 }},
+{{ notesCount[2] ?? 0 }},
+{{ notesCount[3] ?? 0 }},
+{{ notesCount[4] ?? 0 }},
+{{ notesCount[5] ?? 0 }}
+],
+backgroundColor: 'rgba(54, 162, 235, 0.5)', // Blue color for bars
+borderColor: 'rgba(54, 162, 235, 1)',
+borderWidth: 1
+}
+]
+},
+options: {
+responsive: false,
+maintainAspectRatio: false,
+scales: {
+yAxes: [
+{
+ticks: {
+beginAtZero: true
+}
+}
+]
+}
+}
+});
+	</script>
 	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
 	<style>
 		.ajs-message.ajs-success {

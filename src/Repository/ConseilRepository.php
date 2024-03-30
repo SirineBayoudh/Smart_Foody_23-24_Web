@@ -60,6 +60,23 @@ class ConseilRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function getNotesCount(): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->select('c.note, COUNT(c.id_conseil) as count')
+            ->groupBy('c.note')
+            ->getQuery();
+
+        $results = $qb->getResult();
+        $notesCount = [];
+
+        foreach ($results as $result) {
+            $notesCount[$result['note']] = $result['count'];
+        }
+
+        return $notesCount;
+    }
+
 //    /**
 //     * @return Conseil[] Returns an array of Conseil objects
 //     */

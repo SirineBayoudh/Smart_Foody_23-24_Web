@@ -43,12 +43,14 @@ class ConseilController extends AbstractController
         $totalConseils = $repo->getTotalConseils();
         $conseilsEnAttente = $repo->getCountByStatut('en attente');
         $conseilsTermines = $repo->getCountByStatut('terminé');
+        $notesCount = $repo->getNotesCount();
 
         return $this->render('conseil/index.html.twig', [
             'conseils' => $pagination,
             'totalConseils' => $totalConseils,
             'conseilsEnAttente' => $conseilsEnAttente,
             'conseilsTermines' => $conseilsTermines,
+            'notesCount' => $notesCount,
             'averageRating' => $averageRating
         ]);
     }
