@@ -88,6 +88,7 @@ class StockController extends AbstractController
         Request $request
     ): Response {
 
+        $futureStocks = $stockRepo->findFutureStocks();
 
         // Utilisez la méthode findExistantStocks avec ou sans terme de recherche
         $searchTerm = $request->query->get('search');
@@ -175,6 +176,7 @@ class StockController extends AbstractController
         // Passez les stocks à la vue
         return $this->render('stock/index.html.twig', [
             'stocks' => $stocks,
+            'futureStocks' => $futureStocks,
         ]);
     }
 
@@ -279,4 +281,22 @@ class StockController extends AbstractController
             'futureStocks' => $futureStocks,
         ]);
     }
+
+    // #[Route('/afficher-calendrier', name: 'afficher_calendrier')]
+    // public function afficherCalendrier(StockRepository $stockRepo,  Request $request): Response
+    // {
+    //     $futureStocks = $stockRepo->findFutureStocks();
+
+    //     // Utilisez la méthode findExistantStocks avec ou sans terme de recherche
+    //     $searchTerm = $request->query->get('search');
+
+    //     // Utilisez la méthode findExistantStocks avec ou sans terme de recherche
+    //     $stocks = $stockRepo->findExistantStocks($searchTerm);
+    //     return $this->render('stock/calendar.html.twig', [
+    //         'stocks' => $stocks,
+    //         'futureStocks' => $futureStocks,
+    //     ]);
+    // }
+
+
 }
