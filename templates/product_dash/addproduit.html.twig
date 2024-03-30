@@ -1,6 +1,6 @@
 {% extends 'base_back.html.twig' %}
 
-{% block title %}Add Product{% endblock %}
+{% block title %}Ajouter un produit{% endblock %}
 
 {% block body %}
 <div class="col-10 grid-margin stretch-card">
@@ -8,70 +8,37 @@
         <div class="card-body">
             <h4 class="card-title">Ajouter un produit</h4>
             <p class="card-description">Please fill out the form below to add a new product.</p>
-            <form class="forms-sample" method="POST" enctype="multipart/form-data">
+            {{ form_start(form, {'attr': {'class': 'forms-sample', 'enctype': 'multipart/form-data'}}) }}
                 <div class="form-group">
-                    <label for="exampleInputName1">Marque : </label>
-                    <input type="text" name="marque" class="form-control" id="exampleInputName1" placeholder="Marque">
+                    {{ form_label(form.marque) }}
+                    {{ form_widget(form.marque, {'attr': {'class': 'form-control', 'placeholder': 'Marque'}}) }}
                 </div>
                 <div class="form-group">
-                    <label for="exampleSelectGender">Catégorie : </label>
-                    <select class="form-control" name="categorie" id="exampleSelectGender">
-                        <option>Fruit</option>
-                        <option>Legume</option>
-                        <option>Laitier</option>
-                        <option>Grain</option>
-                    </select>
+                    {{ form_label(form.categorie) }}
+                    {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputName1">Prix : </label>
-                    <input type="text" name="prix" class="form-control" id="exampleInputName1" placeholder="Prix">
+                    {{ form_label(form.prix) }}
+                    {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix'}}) }}
                 </div>
                 <div class="form-group">
-                    <label>File upload</label>
-                    <input type="file" name="img[]" class="file-upload-default" id="fileInput">
-                    <div class="input-group col-xs-12">
-                        <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" id="imageName">
-                        <span class="input-group-append">
-                            <button class="file-upload-browse btn btn-primary" type="button" onclick="document.getElementById('fileInput').click()">Upload</button>
-                        </span>
+                    {{ form_label(form.image) }}
+                    <div class="custom-file">
+                        {{ form_widget(form.image, {'attr': {'class': 'custom-file-input', 'id': 'customFile'}}) }}
+                        <label class="custom-file-label" for="customFile">Choisir un fichier</label>
                     </div>
-                </div>
+                </div> 
                 <div class="form-group">
-                    <label for="exampleSelectCriteria">Critère :</label>
-                    <select class="form-control" name="critere" id="exampleSelectCriteria">
-                        <option value="">Sélectionnez un critère</option>
-                        {% set critereSet = [] %}
-                        {% for critere in criteres %}
-                            {% set critereList = critere.listCritere|split(',') %}
-                            {% for crit in critereList %}
-                                {% set critTrimmed = crit|trim %}
-                                {% if critTrimmed not in critereSet %}
-                                    {% set isDuplicate = false %}
-                                    {% for existingCrit in critereSet %}
-                                        {% if critTrimmed|lower == existingCrit|lower %}
-                                            {% set isDuplicate = true %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% if not isDuplicate %}
-                                        {% set _ = critereSet|merge([critTrimmed]) %}
-                                        <option value="{{ critTrimmed }}">{{ critTrimmed }}</option>
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </select>
-                </div>
-                               
+                    {{ form_label(form.critere) }}
+                    {{ form_widget(form.critere, {'attr': {'class': 'form-control'}}) }}
+                </div>                          
                 <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
-            </form>
+            {{ form_end(form) }}
         </div>
     </div>
 </div>
 
-<script>
-    document.getElementById('fileInput').addEventListener('change', function() {
-        var fileName = this.files[0].name;
-        document.getElementById('imageName').value = fileName;
-    });
-</script>
+
+
+
 {% endblock %}

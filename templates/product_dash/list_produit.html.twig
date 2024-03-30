@@ -42,7 +42,13 @@
                             <td><img src="{{ asset('images/' ~ product.image) }}" alt="Image"></td>
                             <td>{{ product.marque }}</td>
                             <td>{{ product.categorie }}</td>
-                            <td>{{ product.critere }}</td>
+                            <td>
+                              {% if product.critere is not null %}
+                                  {{ product.critere.listCritere }}
+                              {% else %}
+                                  Aucun critère disponible
+                              {% endif %}
+                          </td>
                             <td>{{ product.prix }}</td>
                             <!-- Ajoutez d'autres cellules pour d'autres attributs -->
                             <td>

@@ -32,10 +32,10 @@ class ObjectifType extends AbstractType
             'required' => false,
             'mapped' => false, // Ne mappe pas directement cette propriété à une entité
             'choices' => [
-                'Sans Lactose' => 'sans_lactose',
-                'Sans Gluten' => 'sans_gluten',
-                'Sans Glucose' => 'sans_glucose',
-                'Protein' => 'protein',
+                'sans_lactose' => 'sans_lactose',
+                'sans_gluten' => 'sans_gluten',
+                'sans_glucose' => 'sans_glucose',
+                'protein' => 'protein',
             ],
             'multiple' => true, // Permet de sélectionner plusieurs critères
             'expanded' => true, // Affiche les choix sous forme de cases à cocher

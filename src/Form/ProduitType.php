@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Form;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Objectif;
 
 use App\Entity\Produit;
 use Symfony\Component\Form\AbstractType;
@@ -10,11 +12,35 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use App\Repository\ObjectifRepository;
+
 
 class ProduitType extends AbstractType
 {
+    private $objectifRepository;
+
+    public function __construct(ObjectifRepository $objectifRepository)
+    {
+        $this->objectifRepository = $objectifRepository;
+    }
+    
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $criteres = $this->objectifRepository->findAll();
+
+    // Initialisez un tableau pour stocker les choix de critères
+    $choices = [];
+
+    // Vérifiez si des critères ont été récupérés
+    if (!empty($criteres)) {
+        // Créez un tableau avec les libellés de tous les critères
+        foreach ($criteres as $critere) {
+            $choices[$critere->getId()] = $critere->getLibelle();
+        }
+    }
+
         $builder
         ->add('marque', TextType::class, [
             'label' => 'Marque : ',
@@ -34,9 +60,18 @@ class ProduitType extends AbstractType
             'label' => 'Prix : ',
             'attr' => ['placeholder' => 'Prix']
         ])
-        ->add('listCritere', TextType::class, [
-            'label' => 'Liste des critères (séparés par des virgules)',
-            // Autres options de configuration
+        ->add('image', FileType::class, [
+            'label' => 'Image',
+            'mapped' => true, // Ne pas mapper à une propriété de l'entité
+            'required' => false, // Champ non obligatoire
+        ])
+        ->add('critere', EntityType::class, [
+            'class' => Objectif::class,
+            'choice_label' => 'listCritere', // ou tout autre attribut pour l'affichage
+            'label' => 'Choisir un critère',
+            'placeholder' => 'Sélectionnez un critère',
+            'required' => false, // ou true selon vos besoins
+            // Autres options...
         ]);
         
     }

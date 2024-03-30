@@ -136,7 +136,14 @@ class Objectif
         return $this;
     }
     
-    
+    public function getCriteresList(): array
+    {
+        $criteres = $this->listCritere; // Assurez-vous que 'criteres' est le champ qui contient les critères dans votre entité
+        $criteresArray = explode(',', $criteres);
+        $criteresArray = array_map('trim', $criteresArray); // Supprimez les espaces en trop
+
+        return $criteresArray;
+    }
 
     
     

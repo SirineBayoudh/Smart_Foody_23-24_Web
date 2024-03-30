@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ProductDashController extends AbstractController
 {
@@ -33,74 +34,43 @@ class ProductDashController extends AbstractController
 #[Route('/addproduct', name: 'add_product')]
 public function addProduct(ManagerRegistry $manager, Request $request): Response
 {
-    // Tableau associatif pour stocker les numéros spécifiques des critères
-    $criteresNumerotes = [
-        'Protein' => 1,
-        'Sans_lactose' => 2,
-        'Sans_gluten' => 3,
-        'Sans_glucose' => 4,
-        'Sans_sels' => 5,
-        // Ajoutez d'autres critères ici avec leur numéro spécifique
-    ];
+    $produit = new Produit();
+    $form = $this->createForm(ProduitType::class, $produit);
 
-    // Récupérer le référentiel (repository) des critères
-    $criteriaRepository = $this->getDoctrine()->getRepository(Objectif::class);
+    $form->handleRequest($request);
 
-    // Récupérer la liste des critères depuis la base de données
-    $criteres = $criteriaRepository->findAll();
-
-    if ($request->isMethod('POST')) {
-        // Récupérer les données du formulaire
-        $marque = $request->request->get('marque');
-        $categorie = $request->request->get('categorie');
-        $prix = $request->request->get('prix');
-        $critereLibelle = $request->request->get('critere'); // Récupérer le libellé du critère sélectionné
-        $imageFile = $request->files->get('img')[0]; // Récupérer le fichier image
-
-        // Débogage : Afficher le libellé du critère récupéré
-        dump($critereLibelle);
-
-        // Vérifier si une image a été téléchargée
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Manipuler l'image
+        $imageFile = $form->get('image')->getData();
         if ($imageFile) {
-            // Récupérer le nom du fichier de l'image
-            $image = $imageFile->getClientOriginalName();
-            
-            // Débogage : Afficher le tableau des critères numérotés
-            dump($criteresNumerotes);
-
-            // Vérifier si le libellé du critère est dans le tableau des critères numérotés
-            if (isset($criteresNumerotes[$critereLibelle])) {
-                // Récupérer l'ID du critère à partir du tableau des critères numérotés
-                $critereId = $criteresNumerotes[$critereLibelle];
-
-                // Récupérer l'objet Objectif correspondant à l'ID du critère
-                $critere = $criteriaRepository->find($critereId);
-    
-                // Débogage : Afficher l'objet Objectif correspondant
-                dump($critere);
-
-                // Enregistrement des données dans la base de données
-                $produit = new Produit();
-                $produit->setMarque($marque);
-                $produit->setCategorie($categorie);
-                $produit->setPrix($prix);
-                $produit->setImage($image);
-                $produit->setCritere($critere); // Définir le critère
-    
-                // Persist et flush
-                $em = $manager->getManager();
-                $em->persist($produit);
-                $em->flush();
-    
-                // Redirection vers une autre page après l'ajout
-                return $this->redirectToRoute('product_all');
+            $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+            // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+            $newFilename = $originalFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+            // Déplace le fichier dans le répertoire où sont stockées les images
+            try {
+                $imageFile->move(
+                    $this->getParameter('images_directory'),
+                    $newFilename
+                );
+            } catch (FileException $e) {
+                // Gérer l'exception si le fichier ne peut pas être déplacé
             }
+            // Met à jour le nom de l'image dans l'entité Produit
+            $produit->setImage($newFilename);
         }
+
+        // Persister l'entité Produit
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($produit);
+        $entityManager->flush();
+
+        // Redirection vers une autre page après l'ajout
+        return $this->redirectToRoute('product_all');
     }
 
-    // Affichage du formulaire d'ajout avec la liste des critères
+    // Affichage du formulaire d'ajout
     return $this->render('product_dash/addproduit.html.twig', [
-        'criteres' => $criteres,
+        'form' => $form->createView(),
     ]);
 }
 
