@@ -7,9 +7,12 @@ use App\Repository\ProduitRepository;
 use App\Repository\StockRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class AjouterStockType extends AbstractType
 {
@@ -37,7 +40,10 @@ class AjouterStockType extends AbstractType
                 'placeholder' => 'Sélectionnez une marque', // Optionnel : affiche un placeholder
             ])
             ->add('quantite')
-            ->add('date_arrivage')
+            ->add('date_arrivage', DateTimeType::class, [
+                'date_widget' => 'single_text'
+            ])
+
             ->add('submit', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-primary mr-2'],
             ]);

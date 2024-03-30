@@ -1,102 +1,137 @@
-
 {% extends 'base_back.html.twig' %}
 
-    {% block body %}<div class="col-12 grid-margin stretch-card">
-        <div class="main-panel">        
-            <div class="content-wrapper">
-    <div class="card">
-      <div class="card-body">
-        <h4 id="form-title" class="card-title">
-            {% if app.request.query.get('mode') == 'ajouter' %}
-                Ajouter un stock
-            {% elseif app.request.query.get('mode') == 'modifier' %}
-                Modifier un stock
-            {% endif %}
-        </h4>
-        <p class="card-description">
+    {% block body %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.css" integrity="sha256-uq9PNlMzB+1h01Ij9cx7zeE2OR2pLAfRw3uUUOOPKdA=" crossorigin="anonymous">
         
-        </p>
-
- 
-        {{ form_start(form, {'attr': {'class': 'forms-sample',  'novalidate': 'novalidate','enctype': 'multipart/form-data'}}) }}
-            <!-- Début du formulaire -->
-            <div class="form-group">
-                {{ form_label(form.nom) }}
-                {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.nom) ? ' is-invalid' : '')}}) }}
-                {% if form_errors(form.nom) %}
-                    <div class="invalid-feedback">
-                        {{ form_errors(form.nom) }}
+        <div class="col-12 grid-margin stretch-card">
+            <div class="main-panel">        
+                <div class="content-wrapper">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 id="form-title" class="card-title">
+                                {% if app.request.query.get('mode') == 'ajouter' %}
+                                    Ajouter un stock
+                                {% elseif app.request.query.get('mode') == 'modifier' %}
+                                    Modifier un stock
+                                {% endif %}
+                            </h4>
+                            <p class="card-description"></p>
+    
+                            {{ form_start(form, {'attr': {'class': 'forms-sample',  'novalidate': 'novalidate','enctype': 'multipart/form-data'}}) }}
+                            <!-- Début du formulaire -->
+                            <div class="form-group">
+                                {{ form_label(form.nom) }}
+                                {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.nom) ? ' is-invalid' : '')}}) }}
+                                {% if form_errors(form.nom) %}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.nom) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% if app.request.query.get('mode') == 'ajouter' %}
+                                <div class="form-group">
+                                    {{ form_label(form.ref_produit) }}
+                                    {{ form_widget(form.ref_produit, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.ref_produit) ? ' is-invalid' : '')}}) }}
+                                    {% if form_errors(form.ref_produit) %}
+                                        <div class="invalid-feedback">
+                                            {{ form_errors(form.ref_produit) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="form-group">
+                                {{ form_label(form.marque) }}
+                                {{ form_widget(form.marque, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.marque) ? ' is-invalid' : '')}}) }}
+                                {% if form_errors(form.marque) %}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.marque) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(form.quantite) }}
+                                {{ form_widget(form.quantite, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.quantite ) ? ' is-invalid' : '')}}) }}
+                                {% if form_errors(form.quantite) %}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.quantite) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                {# {{ form_label(form.date_arrivage) }}
+                                {{ form_widget(form.date_arrivage, {
+                                    'attr': {
+                                        'class': 'form-control form-control-lg' ~ (form_errors(form.date_arrivage) ? ' is-invalid' : ''),
+                                      
+                                    }
+                                }) }} #}
+                                {% if form_errors(form.date_arrivage) %}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.date_arrivage) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                          
+                            
+                            <div class="form-group">
+                                <label>File upload</label>
+                                <input type="file" name="img[]" class="file-upload-default" id="fileInput">
+                                <div class="input-group col-xs-12">
+                                    <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" id="imageName">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button" onclick="document.getElementById('fileInput').click()">Upload</button>
+                                    </span>
+                                </div>
+                            </div>
+                            {{ form_end(form) }} <!-- Fin du formulaire -->
+                            <br><br>
+                            <button class="btn btn-light" onclick="window.history.back();">Cancel</button>
+                        </div>
                     </div>
-                {% endif %}
+                </div>
             </div>
-            {% if app.request.query.get('mode') == 'ajouter' %}
-                <div class="form-group">
-                    {{ form_label(form.ref_produit) }} <!-- Label pour le champ ref_produit -->
-                    {{ form_widget(form.ref_produit, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.ref_produit) ? ' is-invalid' : '')}}) }}
-                    {% if form_errors(form.ref_produit) %}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.ref_produit) }}
-                        </div>
-                    {% endif %}
-                </div>
-            {% endif %}
-              
-                <div class="form-group">
-                    {{ form_label(form.marque) }} <!-- Label pour le champ marque -->
-                    {{ form_widget(form.marque, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.marque) ? ' is-invalid' : '')}}) }}
-                    {% if form_errors(form.marque) %}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.marque) }}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.quantite) }} <!-- Label pour le champ quantite -->
-                    {{ form_widget(form.quantite, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.quantite ) ? ' is-invalid' : '')}}) }}
-                    {% if form_errors(form.quantite) %}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.quantite) }}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.date_arrivage) }} <!-- Label pour le champ date_arrivage -->
-                    {{ form_widget(form.date_arrivage, {'attr': {'class': 'form-control form-control-lg date-input' ~ (form_errors(form.date_arrivage ) ? ' is-invalid' : ''), 'placeholder': 'yyyy-mm-dd'}}) }}
-                    {% if form_errors(form.date_arrivage) %}
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.date_arrivage) }}
-                        </div>
-                    {% endif %}
-                </div>
-             
-                <div class="form-group">
-                    <label>File upload</label>
-                    <input type="file" name="img[]" class="file-upload-default" id="fileInput">
-                    <div class="input-group col-xs-12">
-                        <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" id="imageName">
-                        <span class="input-group-append">
-                            <button class="file-upload-browse btn btn-primary" type="button" onclick="document.getElementById('fileInput').click()">Upload</button>
-                        </span>
-                    </div>
-                </div>
-                {{ form_end(form) }} <!-- Fin du formulaire --><br><br>
+        </div>
+    </div> <!-- Fermeture de la div main-panel -->
+    </div> <!-- Fermeture de la div col-12 -->
+    </div> <!-- Fermeture de la div content-wrapper -->
+    
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.js"></script>
    
-                <button class="btn btn-light" onclick="window.history.back();">Cancel</button>
-
-            
-       
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-<script>
-    document.getElementById('fileInput').addEventListener('change', function() {
-        var fileName = this.files[0].name;
-        document.getElementById('imageName').value = fileName;
+   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            select: function(info) {
+                var selectedDate = info.startStr;
+                document.getElementById('date_arrivage').value = selectedDate;
+                calendarEl.style.display = 'none'; // Hide the calendar after selection
+            }
+        });
+    
+        // Show calendar when date input is clicked
+        document.getElementById('date_arrivage').addEventListener('click', function() {
+            calendarEl.style.display = 'block';
+            calendar.render(); // Render the calendar when it's displayed
+        });
+    
+        // Hide calendar when clicking outside of it
+        document.addEventListener('click', function(event) {
+            var targetElement = event.target; // Clicked element
+    
+            // Check if the clicked element is not the calendar or the date_arrivage input
+            if (targetElement.id !== 'calendar' && targetElement.id !== 'date_arrivage') {
+                calendarEl.style.display = 'none'; // Hide the calendar
+            }
+        });
+    
+        calendar.render();
     });
-</script>
+    </script>
     {% endblock %}
+    
+
     {% block javascripts %}
      
 
