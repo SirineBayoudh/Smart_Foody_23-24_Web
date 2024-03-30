@@ -11,59 +11,63 @@
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
+    <link href='fullcalendar/main.css' rel='stylesheet' />
+<script src='fullcalendar/main.js'></script>
+ 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek'
-    },
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek'
+                },
                 events: [
                     {% for s in stocks %}
-                        {
-                            id: '{{ s.id_s }}',
-                            title: '{{ s.nom }}',
-                            start: '{{ s.dateArrivage|date('Y-m-d') }}',
-                            display: 'background',
-                            color: '#F08080',
-                            
-                            
-                        },
+                    {
+                        id: '{{ s.id_s }}',
+                        title: '{{ s.nom }} (ID: {{ s.id_s }})',
+                        start: '{{ s.dateArrivage|date('Y-m-d') }}',
+                        color: '#F08080'
+                    },
                     {% endfor %}
                     {% for s in futureStocks %}
-                        {
-                            id: '{{ s.id_s }}',
-                            title: '{{ s.nom }}',
-                            start: '{{ s.dateArrivage|date('Y-m-d') }}',
-                            display: 'background'
-                        },
+                    {
+                        id: '{{ s.id_s }}',
+                        title: '{{ s.nom }} (ID: {{ s.id_s }})',
+                        start: '{{ s.dateArrivage|date('Y-m-d') }}'
+                    },
                     {% endfor %}
                 ],
-        
-    });
-            
+                editable: true,
+                eventDrop: function(info) {
+                    var eventId = info.event.id; // ID de l'événement
+                    var newDate = info.event.startStr; // Nouvelle date
+                    $.ajax({
+                        url: '{{ path('edit_date', {'id': ':id'}) }}'.replace(':id', eventId),
+                        method: 'POST',
+                        data: {
+                            newDate: newDate
+                        },
+                        success: function(response) {
+                            console.log('Événement édité avec succès');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(error);
+                        }
+                    });
+                }
+            });
+    
             calendar.render();
         });
     </script>
-    {% endblock %}
     
-    {% block stylesheets %}
-        <style>
-            .fc-toolbar .fc-button-prev,
-            .fc-toolbar .fc-button-next {
-                background-color: red; /* Couleur de fond pour les boutons précédent et suivant */
-                color: white; /* Couleur du texte des boutons */
-                border-color: red !important;; /* Couleur de la bordure des boutons */
-            }
-            
-        </style>
     {% endblock %}
-    
-
     
