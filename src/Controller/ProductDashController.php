@@ -5,12 +5,14 @@ namespace App\Controller;
 use App\Entity\Objectif;
 use App\Entity\Produit;
 use App\Form\ProduitType;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ProduitRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ProductDashController extends AbstractController
@@ -59,8 +61,19 @@ public function addProduct(ManagerRegistry $manager, Request $request): Response
             $produit->setImage($newFilename);
         }
 
+        // Récupérer l'EntityManager
+        $entityManager = $manager->getManager();
+
+        // Récupérer l'ID du critère sélectionné dans le formulaire
+        $critereId = $form->get('critere')->getData();
+
+        // Rechercher l'objet Objectif correspondant à l'ID
+        $objectif = $entityManager->getRepository(Objectif::class)->find($critereId);
+
+        // Affecter l'objet Objectif à la propriété critere de l'entité Produit
+        $produit->setCritere($objectif);
+
         // Persister l'entité Produit
-        $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($produit);
         $entityManager->flush();
 
@@ -75,21 +88,47 @@ public function addProduct(ManagerRegistry $manager, Request $request): Response
 }
 
 #[Route('/product/edit/{id}', name: 'edit_product')]
-public function editProduct($id, Request $request): Response
+public function editProduct(int $id, EntityManagerInterface $entityManager, Request $request): Response
 {
-    $entityManager = $this->getDoctrine()->getManager();
-    $product = $entityManager->getRepository(Produit::class)->find($id);
-
-    if (!$product) {
-        throw $this->createNotFoundException('Le produit avec l\'identifiant '.$id.' n\'existe pas.');
+    // Récupérer l'entité à modifier
+    $produit = $entityManager->getRepository(Produit::class)->find($id);
+    // Vérifier si l'entité existe
+    if (!$produit) {
+        throw $this->createNotFoundException('Le produit avec l\'ID ' . $id . ' n\'existe pas.');
     }
+    
 
-    $form = $this->createForm(ProduitType::class, $product);
+    // Créer le formulaire
+    $form = $this->createForm(ProduitType::class, $produit);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+        // Manipuler l'image
+        $imageFile = $form->get('image')->getData();
+
+        // Vérifier si un nouveau fichier a été téléchargé
+        if ($imageFile instanceof UploadedFile) {
+            // Générer un nom de fichier unique
+            $newFilename = uniqid().'.'.$imageFile->guessExtension();
+
+            // Déplacer le fichier vers le répertoire d'images
+            try {
+                $imageFile->move(
+                    $this->getParameter('images_directory'),
+                    $newFilename
+                );
+            } catch (FileException $e) {
+                // Gérer l'exception en conséquence
+            }
+
+            // Mettre à jour le nom du fichier dans l'entité
+            $produit->setImage($newFilename);
+        }
+
+        // Enregistrer les modifications dans la base de données
         $entityManager->flush();
 
+        // Rediriger vers une autre page après la modification
         return $this->redirectToRoute('product_all');
     }
 

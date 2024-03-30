@@ -1,30 +1,39 @@
 {% extends 'base_back.html.twig' %}
 
-{% block title %}Edit Product{% endblock %}
+{% block title %}Modifier un produit{% endblock %}
 
 {% block body %}
 <div class="col-10 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
             <h4 class="card-title">Modifier un produit</h4>
-            <p class="card-description">Please update the product information below.</p>
-            <form method="POST">
-                {{ form_start(form) }}
+            <p class="card-description">Veuillez remplir le formulaire ci-dessous pour modifier le produit.</p>
+            {{ form_start(form, {'attr': {'class': 'forms-sample', 'enctype': 'multipart/form-data'}}) }}
                 <div class="form-group">
-                    {{ form_label(form.marque, 'Marque : ') }}
-                    {{ form_widget(form.marque, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_label(form.marque) }}
+                    {{ form_widget(form.marque, {'attr': {'class': 'form-control', 'placeholder': 'Marque'}}) }}
                 </div>
                 <div class="form-group">
-                    {{ form_label(form.categorie, 'Catégorie : ') }}
+                    {{ form_label(form.categorie) }}
                     {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
                 </div>
                 <div class="form-group">
-                    {{ form_label(form.prix, 'Prix : ') }}
-                    {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_label(form.prix) }}
+                    {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix'}}) }}
                 </div>
-                <button type="submit" class="btn btn-primary mr-2">Update</button>
-                {{ form_end(form) }}
-            </form>
+                <div class="form-group">
+                    {{ form_label(form.image) }}
+                    <div class="custom-file">
+                        {{ form_widget(form.image, {'attr': {'class': 'custom-file-input', 'id': 'customFile'}}) }}
+                        <label class="custom-file-label" for="customFile">Choisir un fichier</label>
+                    </div>
+                </div> 
+                <div class="form-group">
+                    {{ form_label(form.critere) }}
+                    {{ form_widget(form.critere, {'attr': {'class': 'form-control'}}) }}
+                </div>                          
+                <button type="submit" class="btn btn-primary mr-2">Modifier</button>
+            {{ form_end(form) }}
         </div>
     </div>
 </div>

@@ -15,6 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use App\Repository\ObjectifRepository;
+use Doctrine\ORM\EntityRepository;
 
 
 class ProduitType extends AbstractType
@@ -30,14 +31,18 @@ class ProduitType extends AbstractType
     {
         $criteres = $this->objectifRepository->findAll();
 
-    // Initialisez un tableau pour stocker les choix de critères
     $choices = [];
 
     // Vérifiez si des critères ont été récupérés
     if (!empty($criteres)) {
-        // Créez un tableau avec les libellés de tous les critères
+        // Parcourir chaque critère
         foreach ($criteres as $critere) {
-            $choices[$critere->getId()] = $critere->getLibelle();
+            // Divisez la chaîne de critères en un tableau
+            $critereList = explode(',', $critere->getListCritere());
+            // Ajoutez chaque critère individuel au tableau des choix
+            foreach ($critereList as $singleCritere) {
+                $choices[$singleCritere] = $singleCritere;
+            }
         }
     }
 
@@ -62,16 +67,21 @@ class ProduitType extends AbstractType
         ])
         ->add('image', FileType::class, [
             'label' => 'Image',
-            'mapped' => true, // Ne pas mapper à une propriété de l'entité
-            'required' => false, // Champ non obligatoire
+            'mapped' => false,
+            'required' => false,
         ])
         ->add('critere', EntityType::class, [
             'class' => Objectif::class,
-            'choice_label' => 'listCritere', // ou tout autre attribut pour l'affichage
+            'choice_label' => 'listCritere', // Attribut à afficher dans la liste déroulante
             'label' => 'Choisir un critère',
             'placeholder' => 'Sélectionnez un critère',
-            'required' => false, // ou true selon vos besoins
-            // Autres options...
+            'required' => false,
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('o')
+                    ->select('o')
+                    ->distinct()
+                    ->orderBy('o.listCritere', 'ASC');
+            },
         ]);
         
     }
