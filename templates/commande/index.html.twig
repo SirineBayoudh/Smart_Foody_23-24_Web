@@ -1,20 +1,117 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_back.html.twig' %}
 
-{% block title %}Hello CommandeController!{% endblock %}
+{% block title %}Liste des Commandes{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/Users/INFOTEC/Desktop/Smart_Foody_23-24_Web/src/Controller/CommandeController.php'|file_link(0) }}">src/Controller/CommandeController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/Users/INFOTEC/Desktop/Smart_Foody_23-24_Web/templates/commande/index.html.twig'|file_link(0) }}">templates/commande/index.html.twig</a></code></li>
-    </ul>
-</div>
+<br>
+ <center> <h1>Espace Commandes</h1></center>
+ <br>
+<br>
+<button id="afficherStatistiques" class="btn btn-primary" >Afficher les Statistiques</button>
+<canvas id="chartClientsFideles" width="400" height="400" style="display:none;"></canvas>
+
+
+   <a href="{{ path('commandes_livre') }}" class="btn btn-primary">Commandes Livre</a>
+   <a href="{{ path('commandes_non_livre') }}" class="btn btn-primary">Commandes Non Livre</a>
+   <a href="{{ path('commandes_en_cours') }}" class="btn btn-primary">Commandes en cours</a>
+
+<br>
+<br>
+
+
+
+
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Nom  Client</th>
+            <th>Prenom  Client</th>
+            <th>Date Commande</th>
+         
+            <th>Totale Commande</th>
+            <th>Remise</th>
+            <th>État</th>
+            <th>Longitude</th>
+            <th>Latitude</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for commande in commandes %}
+            <tr>
+                  <td>{{ commande.utilisateur.nom }}</td>
+                 <td>{{ commande.utilisateur.prenom }}</td>
+                <td>{{ commande.dateCommande|date('Y-m-d') }}</td>
+             
+                <td>{{ commande.totaleCommande }}</td>
+                <td>{{ commande.remise }}</td>
+                <td>{{ commande.etat }}</td>
+                <td>{{ commande.longitude }}</td>
+                <td>{{ commande.latitude }}</td>
+                 <td>
+                    <a href="{{ path('commande_detail', {'id': commande.id}) }}" class="btn btn-primary">Afficher</a>
+
+
+                  
+
+                
+
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+  
+
+<a href="{{ path('commande_pdf_all') }}" class="btn btn-primary">PDF All Commande</a>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('afficherStatistiques').addEventListener('click', function() {
+            const canvas = document.getElementById('chartClientsFideles');
+            canvas.style.display = 'block'; // Rend le canevas visible
+            const ctx = canvas.getContext('2d');
+            
+            if (window.monGraphique) {
+                window.monGraphique.destroy();
+            }
+
+            window.monGraphique = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    // Utilisation de 'client.idClient' au lieu de 'client.id_client'
+                    labels: {{ clientsFideles|map(client => 'Client ' ~ client.idClient)|json_encode|raw }},
+                    datasets: [{
+                        label: 'Total des Commandes',
+                        data: {{ clientsFideles|map(client => client.totalCommande)|json_encode|raw }},
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Nombre de Commandes',
+                        data: {{ clientsFideles|map(client => client.nombreCommandes)|json_encode|raw }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
+
 {% endblock %}

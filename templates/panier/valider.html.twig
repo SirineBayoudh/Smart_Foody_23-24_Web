@@ -1,0 +1,56 @@
+{% extends 'base_accueil.html.twig' %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center">Validation de la Commande</h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Détails de la commande</h5>
+                    <p class="card-text"><strong> Nom Client :</strong> {{ commande.utilisateur.nom }}</p>
+                <p class="card-text"><strong> Prenom Client :</strong> {{ commande.utilisateur.prenom }}</p>
+
+                    <p class="card-text"><strong>Date Commande:</strong> {{ commande.dateCommande|date('Y-m-d') }}</p>
+                    <p class="card-text"><strong>Total Commande:</strong> {{ commande.totaleCommande }} TND </p>
+                      <p class="card-text"><strong>Remise:</strong> {{ commande.remise }}TND</p>
+
+{% set pourcentageRemise = ((commande.totaleCommande - prixTotalAvecRemise) / commande.totaleCommande) * 100 %}
+<p class="card-text"><strong>Pourcentage Remise:</strong> {{ pourcentageRemise }} %</p>
+
+
+                  <p class="card-text"><strong>Prix Total avec Remise:</strong> {{ prixTotalAvecRemise }} TND</p> <!-- Nouveau champ -->
+
+                    <p class="card-text"><strong>Total en Devise (EUR):</strong> {{ totalEnDevise }} €</p> <!-- Affiche le total en devise -->
+
+                  
+                    <p class="card-text"><strong>État:</strong> {{ commande.etat }}</p>
+                    <p class="card-text"><strong>Coordonnées:</strong> {{ commande.longitude }}, {{ commande.latitude }}</p>
+                    <!-- Bouton Ouvrir la carte -->
+                    <div class="mb-3">
+                        <a href="{{ path('routeMaps', {'id': commande.id}) }}" class="btn btn-outline-success">Ouvrir la carte</a>
+                    </div>
+                   
+
+               
+
+                    <form action="{{ path('payment', {'id': commande.id}) }}" method="post">
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="etatCommande" name="etatCommande" value="nonLivree" />
+                            <label class="form-check-label" for="etatCommande">Payer à la Livraison</label>
+                        </div>
+                          <a href="{{ path('cANU', {'id': commande.id}) }}" class="btn btn-primary">Anuuler la commande</a>
+                        <button type="submit" class="btn btn-primary">Valider la Commande</button>
+
+                    </form>
+                      
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
