@@ -15,11 +15,13 @@ use App\Repository\ConseilRepository;
 use App\Service\CalorieNinjasService;
 use App\Service\QuotableService;
 use App\Repository\ChatRepository;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 class ConseilFrontController extends AbstractController
 {
     #[Route('/conseil', name: 'conseil_app')]
-    public function addConseil(ChatRepository $repo,Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository, Request $request, CalorieNinjasService $calorieNinjasService, QuotableService $quotableService): Response
+    public function addConseil(MailerInterface $mailer, ChatRepository $repo, Request $req, ManagerRegistry $manager, ConseilRepository $conseilRepository, Request $request, CalorieNinjasService $calorieNinjasService, QuotableService $quotableService): Response
     {
         $conseil = new Conseil();
         $conseil->setStatut('en attente');
@@ -40,6 +42,32 @@ class ConseilFrontController extends AbstractController
         } else if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($conseil);
             $em->flush();
+            $demande = $conseil->getDemande();
+            $dateConseil = $conseil->getDateConseil()->format('Y-m-d H:i:s');
+
+            $emailContent = "
+            <html>
+                <body>
+                    <div style='width: 500px; background-color: #aad597; padding: 20px;'>
+                        <p style='color: darkgreen; font-size: 14px;'>Bonjour,</p>
+                        <p style='color: darkgreen; font-size: 18px;'>Une nouvelle demande a été reçue :</p>
+                        <p style='color: black; font-weight: bold; font-size: 16px;'>Objet: " . $demande . "</p>
+                        <p style='color: darkgreen; font-weight: bold; font-size: 16px;'>Date de réception: " . $dateConseil . "</p>
+                        <p style='font-weight: bold;'>Veuillez consulter l'application pour la traiter.</p>
+                        <p style='color: gray;'>Ceci est un message automatique. Merci de ne pas répondre.</p>
+                    </div>
+                </body>
+            </html>
+            ";
+
+            $email = (new Email())
+                ->from('smartfoody.2024@gmail.com')
+                ->to('yassiine.studies@gmail.com')
+                ->subject('Smart Foody : Nouvelle demande reçue')
+                ->html($emailContent);
+
+            $mailer->send($email);
+
             $success = true;
         } elseif ($form->isSubmitted()) {
             $emptySubmission = true;
