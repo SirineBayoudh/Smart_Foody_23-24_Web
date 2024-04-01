@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use App\Repository\ObjectifRepository;
 use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 
 class ProduitType extends AbstractType
@@ -49,7 +50,8 @@ class ProduitType extends AbstractType
         $builder
         ->add('marque', TextType::class, [
             'label' => 'Marque : ',
-            'attr' => ['placeholder' => 'Marque']
+            'attr' => ['placeholder' => 'Marque'],
+            'required' => false,
         ])
         ->add('categorie', ChoiceType::class, [
             'label' => 'Catégorie : ',
@@ -61,14 +63,14 @@ class ProduitType extends AbstractType
             ],
             'placeholder' => 'Choisir une catégorie'
         ])
-        ->add('prix', TextType::class, [
+        ->add('prix', NumberType::class, [
             'label' => 'Prix : ',
             'attr' => ['placeholder' => 'Prix']
         ])
         ->add('image', FileType::class, [
             'label' => 'Image',
             'mapped' => false,
-            'required' => false,
+            'required' => true,
         ])
         ->add('critere', EntityType::class, [
             'class' => Objectif::class,

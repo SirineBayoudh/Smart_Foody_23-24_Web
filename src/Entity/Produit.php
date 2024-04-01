@@ -6,6 +6,7 @@ use App\Repository\ProduitRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 class Produit
@@ -15,16 +16,28 @@ class Produit
     #[ORM\Column]
     private ?int $ref = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255 , nullable: true)]
+    #[Assert\NotBlank(message:'La marque est obligatoire')]
     private ?string $marque = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'La catégorie est obligatoire')]
     private ?string $categorie = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le prix est obligatoire')]
+    #[Assert\Regex(
+        pattern: '/^\d+(\.\d+)?$/',
+        message: 'Le prix doit être un nombre valide'
+    )]
+    #[Assert\Type(
+        type: 'float',
+        message: 'Le prix doit être un nombre'
+    )]
+    #[Assert\Range(min: 0.0, max: 9999.9, minMessage: 'Le prix ne peut pas être négatif')]
     private ?float $prix = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255,nullable: true)]
     private ?string $image = null;
 
 
@@ -39,6 +52,7 @@ class Produit
 
     #[ORM\ManyToOne(inversedBy: 'produits')]
     #[ORM\JoinColumn(name: "critere", referencedColumnName: "id_obj")]
+    #[Assert\NotBlank(message: 'Le critere est obligatoire')]
     private ?Objectif $critere = null;
 
     

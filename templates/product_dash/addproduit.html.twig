@@ -8,29 +8,34 @@
         <div class="card-body">
             <h4 class="card-title">Ajouter un produit</h4>
             <p class="card-description">Please fill out the form below to add a new product.</p>
-            {{ form_start(form, {'attr': {'class': 'forms-sample', 'enctype': 'multipart/form-data'}}) }}
+            {{ form_start(form,{'attr': {'novalidate': 'novalidate'}} ) }} 
                 <div class="form-group">
                     {{ form_label(form.marque) }}
                     {{ form_widget(form.marque, {'attr': {'class': 'form-control', 'placeholder': 'Marque'}}) }}
+                    {{ form_errors(form.marque) }}
                 </div>
                 <div class="form-group">
                     {{ form_label(form.categorie) }}
                     {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.categorie) }}
                 </div>
                 <div class="form-group">
                     {{ form_label(form.prix) }}
                     {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix'}}) }}
+                    {{ form_errors(form.prix) }}
                 </div>
                 <div class="form-group">
                     {{ form_label(form.image) }}
                     <div class="custom-file">
                         {{ form_widget(form.image, {'attr': {'class': 'custom-file-input', 'id': 'customFile'}}) }}
-                        <label class="custom-file-label" for="customFile">Choisir un fichier</label>
+                        <label class="custom-file-label" for="customFile" id="customFileLabel">Choisir un fichier</label>
                     </div>
-                </div> 
+                    {{ form_errors(form.image) }}
+                </div>
                 <div class="form-group">
                     {{ form_label(form.critere) }}
                     {{ form_widget(form.critere, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.critere) }}
                 </div>                          
                 <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
             {{ form_end(form) }}
@@ -38,7 +43,13 @@
     </div>
 </div>
 
-
+<script>
+    $('#customFile').on('change', function () {
+    console.log("Champ d'upload changé !");
+    var fileName = $(this).val().split('\\').pop();
+    $('#customFileLabel').text(fileName);
+});
+</script>
 
 
 {% endblock %}
