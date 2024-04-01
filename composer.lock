@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b5f5402577dceceae150056000527270",
+    "content-hash": "26ae8e846f0ba3edd660c4a16f1b5d00",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1405,6 +1405,65 @@
                 "source": "https://github.com/doctrine/sql-formatter/tree/1.2.0"
             },
             "time": "2023-08-16T21:49:04+00:00"
+        },
+        {
+            "name": "dynamsoftsamples/php-barcode-com-component",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dynamsoftsamples/php-barcode-com-component.git",
+                "reference": "181db39632f0902ad8256fc401751a54c0a95acb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dynamsoftsamples/php-barcode-com-component/zipball/181db39632f0902ad8256fc401751a54c0a95acb",
+                "reference": "181db39632f0902ad8256fc401751a54c0a95acb",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Dynamsoft Barcode Reader SDK",
+                    "homepage": "http://www.dynamsoft.com"
+                }
+            ],
+            "description": "Dynamsoft Barcode Reader SDK for PHP - Implement Barcode Recognition to Your App",
+            "homepage": "http://www.dynamsoft.com/Products/Dynamic-Barcode-Reader.aspx",
+            "keywords": [
+                "CODABAR",
+                "CODE 128",
+                "CODE 39",
+                "CODE 93",
+                "Code93",
+                "Data Matrix",
+                "EAN-13",
+                "EAN-8",
+                "Industrial 2 of 5",
+                "Interleaved 2 of 5",
+                "PDF 417",
+                "UPC-A",
+                "UPC-E",
+                "barcode",
+                "barcode reader",
+                "code128",
+                "code39",
+                "datamatrix",
+                "dynamsoft",
+                "pdf417",
+                "qr code",
+                "qrcode",
+                "sdk"
+            ],
+            "support": {
+                "issues": "https://github.com/dynamsoftsamples/php-barcode-com-component/issues",
+                "manual": "http://www.dynamsoft.com/help/Barcode-Reader/index.html",
+                "source": "https://github.com/dynamsoftsamples/php-barcode-com-component/tree/master"
+            },
+            "time": "2016-01-28T06:11:35+00:00"
         },
         {
             "name": "egulias/email-validator",

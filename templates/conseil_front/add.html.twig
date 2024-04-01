@@ -109,7 +109,21 @@
 		<div class="container" style="margin-top:-70px;">
 			<div class="bg-white row justify-content-center mb-5 pb-3" style="margin-top:40px;">
 				<div class="col-md-7 heading-section ftco-animate text-center" style="margin-top:20px;">
-					<h2 class="mb-4">ChatBot</h2>
+					<h3 class="mb-4">Insérer code à barres</h3>
+				</div>
+			</div>
+			<div class="row bg-white d-flex justify-content-center py-5" style="margin-top:-100px;text-align:center;">
+				<div class="col-md-6" id="results" style="color: black;"></div>
+				<div class="col-md-6 d-flex align-items-center">
+					<div class="form-group d-flex">
+						<input type="file" id="fileInput">
+						<button class="btn btn-primary py-2 px-3" onclick="readBarcode()">Insérer</button>
+					</div>
+				</div>
+			</div>
+			<div class="bg-white row justify-content-center mb-5 pb-3" style="margin-top:40px;">
+				<div class="col-md-7 heading-section ftco-animate text-center" style="margin-top:20px;">
+					<h3 class="mb-4">ChatBot</h3>
 				</div>
 			</div>
 			<div class="row bg-white d-flex justify-content-center py-5" style="margin-top:-100px;text-align:center;">
@@ -181,5 +195,55 @@ console.error(error);
 });
 });
 });
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@8.8.7/dist/dbr.js"></script>
+	<script>
+		Dynamsoft.License.LicenseManager.initLicense("");
+
+async function readBarcode() {
+const fileInput = document.getElementById('fileInput');
+const file = fileInput.files[0];
+
+if (! file) {
+alert('Please select a file.');
+return;
+}
+
+try {
+const dbr = await Dynamsoft.DBR.BarcodeReader.createInstance();
+const results = await dbr.decode(file);
+
+const resultsContainer = document.getElementById('results');
+resultsContainer.innerHTML = '';
+
+if (results.length > 0) {
+for (const result of results) {
+resultsContainer.innerHTML += `<p><strong>Code à barres scanné : </strong>${
+result.barcodeText
+}</p>`;
+const api_key = "";
+const url = "https://cors-anywhere.herokuapp.com/https://api.barcodelookup.com/v3/products?barcode=" + result.barcodeText + "&formatted=y&key=" + api_key;
+
+fetch(url).then(response => response.json()).then(data => {
+resultsContainer.innerHTML += `<p><strong>Produit : </strong>${
+data.products[0].title
+}</p>`;
+resultsContainer.innerHTML += `<p><strong>Marque : </strong>${
+data.products[0].brand
+}</p>`;
+resultsContainer.innerHTML += `<p><strong>Informations : </strong>${
+data.products[0].nutrition_facts
+}</p>`;
+}).catch(error => {
+console.error('Error fetching product information:', error);
+});
+}
+} else {
+resultsContainer.innerHTML = '<p>No barcode found.</p>';
+}
+} catch (error) {
+console.error('Error reading barcode:', error);
+}
+}
 	</script>
 {% endblock %}
