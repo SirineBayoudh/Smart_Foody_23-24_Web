@@ -21,6 +21,36 @@ class CommandeRepository extends ServiceEntityRepository
         parent::__construct($registry, Commande::class);
     }
 
+
+
+
+    public function countCommandesByClientId(int $clientId): int
+{
+    return $this->createQueryBuilder('c')
+        ->select('COUNT(c.id)')
+        // Utilisez 'c.utilisateur' pour accéder à l'entité Utilisateur associée
+        // Assurez-vous que la propriété dans Commande pointant vers Utilisateur est nommée 'utilisateur'
+        ->andWhere('c.utilisateur = :clientId')
+        ->setParameter('clientId', $clientId)
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
+public function trouverClientsFideles()
+{
+    $qb = $this->createQueryBuilder('c')
+        ->join('c.utilisateur', 'u') // Jointure avec l'entité Utilisateur
+        ->select('u.id_utilisateur AS idClient, SUM(c.totaleCommande) as totalCommande, COUNT(c.id) as nombreCommandes')
+        ->groupBy('u.id_utilisateur') // Groupe par ID de l'Utilisateur en utilisant 'id_utilisateur'
+        ->orderBy('totalCommande', 'DESC') // Ordonne par total des commandes décroissant
+        ->addOrderBy('nombreCommandes', 'DESC'); // Ensuite, ordonne par nombre de commandes décroissant
+    
+    return $qb->getQuery()->getArrayResult();
+}
+    
+
+
+
 //    /**
 //     * @return Commande[] Returns an array of Commande objects
 //     */
