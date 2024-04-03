@@ -74,11 +74,11 @@ class UserController extends AbstractController
 
     /** Profil Client */
 
-    #[Route('/profilClient/{id}', name: 'client_update')]
-    public function updateClient(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $idUtilisateur): Response
+    #[Route('/profilClient/{id}', name: 'client_profile')]
+    public function updateClient(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
     {
 
-        $user = $repo->find($idUtilisateur);
+        $user = $repo->find($id);
         $form = $this->createForm(ProfilClientType::class, $user);
 
         $em = $manager->getManager();
@@ -90,14 +90,17 @@ class UserController extends AbstractController
             $em->flush();
             return $this->redirectToRoute("accueil");
         }
-        return $this->renderform('user/profilClient.html.twig', ['f' => $form]);
+        return $this->renderform('user/profilClient.html.twig', [
+            'f' => $form,
+            'user' => $user,
+        ]);
     }
 
-    #[Route('/profilClientMDP/{id}', name: 'client_update')]
-    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $idUtilisateur): Response
+    #[Route('/profilClientMDP/{id}', name: 'client_profilMDP')]
+    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
     {
 
-        $user = $repo->find($idUtilisateur);
+        $user = $repo->find($id);
         $form = $this->createForm(ProfilClientType::class, $user);
 
         $em = $manager->getManager();

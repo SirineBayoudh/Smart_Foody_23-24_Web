@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="../../vendors/feather/feather.css">
 		<link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
 		<link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
+		<link rel="stylesheet" href="{{asset('css/vertical-layout-light/style.css')}}">
 		<!-- endinject -->
 		<!-- Plugin css for this page -->
 		<!-- End plugin css for this page -->
@@ -27,27 +28,103 @@
 					<div class="row w-100 mx-0">
 						<div class="col-lg-4 mx-auto">
 							<div class="auth-form-light text-left py-5 px-4 px-sm-5">
-								<div class="brand-logo">
+								<div class="brand-logo" style="text-align:center; margin-top:-10px">
 									<img src="../../images/trans_logo.png" alt="logo">
 								</div>
-								<h4>New here?</h4>
-								<h6 class="font-weight-light">Signing up is easy. It only takes a few steps</h6>
+								<div style="display: flex; justify-content:center; margin-top:-20px">
+									<p style="margin-right: 80px; font-weight:bold">
+										Se connecter</p>
+									<p style="color:#56ab2f; font-weight:bold; text-decoration:underline">
+										S'inscrire</p>
+								</div>
 								<div class="pt-3">
-									{{ form(f) }}
-									<div class="mb-4">
-										<div class="form-check">
-											<label class="form-check-label text-muted">
-												<input type="checkbox" class="form-check-input">
-												I agree to all Terms & Conditions
-											</label>
+									{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
+									<div class="register1" id="register1">
+										<div class="form-group">
+											<label for="exampleInputUsername1">{{ form_label(f.nom) }}</label>
+											{{ form_widget(f.nom, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+											{{ form_errors(f.nom) }}
+										</div>
+										<div class="form-group">
+											<label for="exampleInputEmail1">{{ form_label(f.prenom) }}</label>
+											{{ form_widget(f.prenom, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+											{{ form_errors(f.prenom) }}
+										</div>
+										<div class="form-group">
+											<label for="exampleInputEmail1">{{ form_label(f.email) }}</label>
+											{{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Email'}}) }}
+											{{ form_errors(f.email) }}
+										</div>
+										<div class="form-group">
+											<label for="exampleInputPassword1">{{ form_label(f.motDePasse) }}</label>
+											{{ form_widget(f.motDePasse, {'attr': {'class': 'form-control', 'id': 'exampleInputPassword1', 'placeholder': 'Mot de passe '}}) }}
+											{{ form_errors(f.motDePasse) }}
+										</div>
+										<div class="form-group">
+											<label for="exampleInputUsername1">{{ form_label(f.genre) }}</label>
+											{{ form_widget(f.genre, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Genre'}}) }}
+											{{ form_errors(f.genre) }}
+										</div>
+										<div class="form-group">
+											<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
+											{{ form_widget(f.numTel, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Numéro téléphone'}}) }}
+											{{ form_errors(f.numTel) }}
+										</div>
+										<div class="form-group">
+											<label for="exampleInputUsername1">{{ form_label(f.adresse) }}</label>
+											{{ form_widget(f.adresse, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Adresse'}}) }}
+											{{ form_errors(f.adresse) }}
+										</div>
+										<div class="form-group">
+											<label for="exampleInputUsername1">{{ form_label(f.objectif) }}</label>
+											{{ form_widget(f.objectif, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Objectif'}}) }}
+											{{ form_errors(f.objectif) }}
+										</div>
+										<div class="form-group">
+											<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
+											{{ form_widget(f.photo, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Photo'}}) }}
+											{{ form_errors(f.photo) }}
+										</div>
+										<div class="mb-4">
+											<div class="form-check form-check-success">
+												<label class="form-check-label text-muted">
+													<input type="checkbox" class="form-check-input">
+													I agree to all Terms & Conditions
+												</label>
+											</div>
+											<div class="mt-3">
+												<a class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" style="background-color:#56ab2f; border-color:#56ab2f;">Continuer</a>
+											</div>
+											<div class="text-center mt-4 font-weight-light">
+												Vous avez déjà un compte?
+												<a href="login"  style="color:#56ab2f;">Connexion</a>
+											</div>
 										</div>
 									</div>
-									<div class="mt-3">
-										<a class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" href="login">SIGN UP</a>
-									</div>
-									<div class="text-center mt-4 font-weight-light">
-										Already have an account?
-										<a href="login" class="text-primary">Login</a>
+									<div class="register IMC" id="registerIMC" style="display: none;">
+										<div class="row" style="margin-bottom:20px;">
+											<div class="col">
+												<img src="../../images/silhouette-de-corps-humain-debout.png" alt="logo" style="width:150px; height:150px; margin-left:25px;">
+											</div>
+											<div class="col">
+												<img src="../../images/balance.png" alt="logo"style="width:150px; height:150px; margin-left:25px;">
+											</div>
+										</div>
+										<div class="row">
+											<div class="col">
+												<div class="form-group">
+													{{ form_widget(f.taille, {'attr': {'class': 'form-control', 'id': 'exampleInputTaille1', 'placeholder': 'Taille', 'style': 'width: 200px;'}})}}
+													{{ form_errors(f.taille) }}
+												</div>
+											</div>
+											<div class="col">
+												<div class="form-group">
+													{{ form_widget(f.poids, {'attr': {'class': 'form-control', 'id': 'exampleInputPoids1', 'placeholder': 'Poids', 'style': 'width: 200px;'}}) }}
+													{{ form_errors(f.poids) }}
+												</div>
+											</div>
+										</div>
+										{{ form_end(f) }}
 									</div>
 								</div>
 							</div>
@@ -69,6 +146,19 @@
 		<script src="../../js/template.js"></script>
 		<script src="../../js/settings.js"></script>
 		<script src="../../js/todolist.js"></script>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+		<script>
+			$(document).ready(function () {
+$(".auth-form-btn").click(function () {
+$("#register1").hide();
+$("#registerIMC").show();
+});
+});
+		</script>
+
+
 		<!-- endinject -->
 	</body>
 

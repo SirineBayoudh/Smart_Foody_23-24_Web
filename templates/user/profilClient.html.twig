@@ -1,7 +1,102 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_accueil.html.twig' %}
 
-{% block title %}Profil{% endblock %}
+{% block title %}Profil
+{% endblock %}
+
+{% block stylesheets %}
+	<style>
+
+
+		.infos a,
+		.infos a:hover {
+			text-decoration: none;
+			color: black;
+		}
+	</style>
+{% endblock %}
 
 {% block body %}
-{{ form(f) }}
+	<div class="page">
+		<div classname="nn"></div>
+		<div class="cont" style="position: fixed; width: 380px; height: 1000px; margin: 50px; border-radius: 8px; overflow: hidden;">
+			<div class="infos" style="position: absolute; inset: 2px; border-radius: 8px; z-index: 10; padding: 50px 40px; display: flex; flex-direction: column;">
+				<h2 classname="name" style="margin-left: -2px;">
+					Bonjour
+					{{user.prenom}}
+				</h2>
+				<p>
+					{{user.email}}</p>
+				<br/><br/>
+				<div>
+					<a href="" style="text-decoration: none; color: black;">
+						Données personnelles et adresses</a>
+					<br/>
+					<a href="" style="text-decoration: none; color: black;">
+						Mot de passe</a>
+					<br/>
+					<a href="" style="text-decoration: none; color: black;">
+						Historique des commandes</a>
+				</div>
+				<br/><br/>
+				<a id="deconn" href="" style="font-weight: bold;">
+					Se déconnecter</a>
+			</div>
+
+
+		</div>
+		<div class="side" style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;">
+			<div class="col-md-6 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title">Accédez à votre compte</h4>
+
+						<div class="forms-sample">
+							{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
+							<div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f.nom) }}</label>
+								{{ form_widget(f.nom, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f.nom) }}
+							</div>
+							<div class="form-group">
+								<label for="exampleInputEmail1">{{ form_label(f.prenom) }}</label>
+								{{ form_widget(f.prenom, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+								{{ form_errors(f.prenom) }}
+							</div>
+							<div class="form-group">
+								<label for="exampleInputEmail1">{{ form_label(f.email) }}</label>
+								{{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+								{{ form_errors(f.email) }}
+							</div>
+                            <div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f.objectif) }}</label>
+								{{ form_widget(f.objectif, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f.objectif) }}
+							</div>
+							<div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f.genre) }}</label>
+								{{ form_widget(f.genre, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f.genre) }}
+							</div>
+							<div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
+								{{ form_widget(f.numTel, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f.numTel) }}
+							</div>
+							<div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f.adresse) }}</label>
+								{{ form_widget(f.adresse, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f.adresse) }}
+							</div>
+							<div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
+								{{ form_widget(f.photo, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f.photo) }}
+							</div>
+							{{ form_end(f) }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

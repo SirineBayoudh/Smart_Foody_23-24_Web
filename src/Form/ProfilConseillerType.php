@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,19 +16,21 @@ class ProfilConseillerType extends AbstractType
         $builder
             ->add('nom')
             ->add('prenom')
-            ->add('genre')
+            ->add('genre', ChoiceType::class, [
+                'choices' => 
+                [
+                    'Femme' => 'Femme',
+                    'Homme' => 'Homme',
+                ]
+            ])
             ->add('email')
-            ->add('mot_de_passe')
-            ->add('num_tel')
-            ->add('role')
+            ->add('numTel')
             ->add('matricule')
             ->add('attestation')
-            ->add('adresse')
-            ->add('tentative')
-            ->add('taille')
-            ->add('poids')
             ->add('photo')
-            ->add('objectif')
+            ->add('Modifier', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn', 'id' => 'submitBtn' ,'style' => 'background-color: #56ab2f; border-color:#56ab2f; width:130px']
+            ])
         ;
     }
 
@@ -34,6 +38,7 @@ class ProfilConseillerType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Utilisateur::class,
+            'validation_groups' => ['Conseiller']
         ]);
     }
 }
