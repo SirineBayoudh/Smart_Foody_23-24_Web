@@ -22,6 +22,7 @@ class Objectif
     private ?string $libelle = null;
 
     #[ORM\Column(length: 255)]
+    
     private ?string $listCritere = null;
 
     #[ORM\OneToMany(mappedBy: 'objectif', targetEntity: Utilisateur::class)]

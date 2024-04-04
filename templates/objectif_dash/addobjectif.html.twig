@@ -8,47 +8,39 @@
         <div class="card-body">
             <h4 class="card-title">Ajouter un objectif</h4>
             <p class="card-description">Veuillez ajouter les informations de l'objectif ci-dessous.</p>
+            {% if emptySubmission %}
+                {% set atLeastOneChecked = false %}
+                {% for choice in form.listCritere %}
+                    {% if choice.vars.checked %}
+                        {% set atLeastOneChecked = true %}
+                    {% endif %}
+                {% endfor %}
+                {% if not atLeastOneChecked %}
+                    <div class="alert alert-danger" role="alert">
+                        Veuillez sélectionner au moins un critère.
+                    </div>
+                {% endif %}
+            {% endif %}
             {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'objectif-form'}}) }}
             <div class="form-group">
                 {{ form_label(form.libelle, 'Libelle') }}
                 {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Libelle'}}) }}
                 {{ form_errors(form.libelle) }}
             </div>
-            <div class="form-group">
-                {{ form_label(form.listCritere, 'Critères') }}
-                {% for choice in form.listCritere %}
+            {% for choice in form.listCritere %}
                 <div class="form-check critere-item">
-                  <div style="display: flex; align-items: center;"> <!-- Div pour aligner les éléments -->
-                    {{ form_widget(choice, { 'attr': {'class': 'form-check-input custom-checkbox', 'required': 'required'} }) }}
-                    <label class="form-check-label" style="margin-left: 10px; font-weight: bold;">{{ choice.vars.label }}</label>
-                    
-                  </div>
-              </div>
-                {% endfor %}
-            </div>
+                    <div style="display: flex; align-items: center;">
+                        {{ form_widget(choice, { 'attr': {'class': 'form-check-input custom-checkbox'} }) }}
+                        <label class="form-check-label" style="margin-left: 10px; font-weight: bold;">{{ choice.vars.label }}</label>
+                    </div>
+                </div>
+            {% endfor %}
+            {{ form_errors(form.listCritere) }}
             <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
             {{ form_end(form) }}
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById('objectif-form').addEventListener('submit', function(event) {
-        var checkboxes = document.querySelectorAll('.form-check-input.custom-checkbox');
-        var checked = false;
-        checkboxes.forEach(function(checkbox) {
-            if (checkbox.checked) {
-                checked = true;
-            }
-        });
-        if (!checked) {
-            alert('Veuillez sélectionner au moins un critère.');
-            event.preventDefault();
-        }
-    });
-});
-</script>
 
 <style>
     .custom-checkbox {

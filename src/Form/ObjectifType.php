@@ -10,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ObjectifType extends AbstractType
 {
@@ -39,7 +41,9 @@ class ObjectifType extends AbstractType
             ],
             'multiple' => true, // Permet de sélectionner plusieurs critères
             'expanded' => true, // Affiche les choix sous forme de cases à cocher
-            
+            'constraints' => [
+                new Callback([$this, 'validateListCritere']),
+            ],
         ]);
     }
 
@@ -49,4 +53,12 @@ class ObjectifType extends AbstractType
             'data_class' => Objectif::class,
         ]);
     }
+    public function validateListCritere($value, ExecutionContextInterface $context)
+{
+    // Si $value est un tableau vide ou null, cela signifie que aucune case n'est cochée
+    if ($value === null || (is_array($value) && count($value) === 0)) {
+        $context->buildViolation('Veuillez sélectionner au moins un critère.')
+            ->addViolation();
+    }
+}
 }

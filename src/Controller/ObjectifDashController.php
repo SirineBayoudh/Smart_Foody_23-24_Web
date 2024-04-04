@@ -37,34 +37,44 @@ public function addProduct(Request $request): Response
     $form = $this->createForm(ObjectifType::class, $objectif);
     $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
+    $emptySubmission = false;
+
+    if ($form->isSubmitted()) {
         // Récupérer les données du formulaire
-    $libelle = $form->get('libelle')->getData();
-    $selectedCriteres = $form->get('listCritere')->getData();
-    
-    // Filtrer les valeurs pour ne conserver que celles qui sont cochées
-    $checkedCriteres = array_filter($selectedCriteres);
+        $selectedCriteres = $form->get('listCritere')->getData();
+        
+        // Vérifier si au moins un critère est sélectionné
+        if (empty($selectedCriteres)) {
+            $emptySubmission = true;
+        } elseif ($form->isValid()) {
+            // Filtrer les valeurs pour ne conserver que celles qui sont cochées
+            $checkedCriteres = array_filter($selectedCriteres);
 
-    // Concaténer les valeurs sélectionnées dans une chaîne séparée par des virgules
-    $listCritereConcatenated = implode(",", $checkedCriteres);
-    
-    // Assigner la chaîne de caractères à la propriété listCritere
-    $objectif->setListCritere($listCritereConcatenated);
+            // Concaténer les valeurs sélectionnées dans une chaîne séparée par des virgules
+            $listCritereConcatenated = implode(",", $checkedCriteres);
             
-    // Enregistrement des données dans la base de données
-    $entityManager = $this->getDoctrine()->getManager();
-    $entityManager->persist($objectif);
-    $entityManager->flush();
+            // Assigner la chaîne de caractères à la propriété listCritere
+            $objectif->setListCritere($listCritereConcatenated);
+            
+            // Enregistrement des données dans la base de données
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($objectif);
+            $entityManager->flush();
 
-    // Redirection vers la page 'objectif_all'
-    return $this->redirectToRoute('objectif_all');
+            // Redirection vers la page 'objectif_all'
+            return $this->redirectToRoute('objectif_all');
+        }
     }
 
     // Affichage du formulaire d'ajout
     return $this->render('objectif_dash/addobjectif.html.twig', [
         'form' => $form->createView(),
+        'emptySubmission' => $emptySubmission,
     ]);
 }
+
+
+
 
 
 #[Route('/editobjectif/{id}', name: 'edit_objectif')]

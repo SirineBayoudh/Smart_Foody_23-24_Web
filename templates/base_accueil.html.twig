@@ -225,8 +225,8 @@
 			  </div>
 			</div>   		
 			</div>
-			<div class="container">
-			<div class="row">
+			<div class="container" >
+			<div class="row" id="product-list">
 				{% for produit in pagination %}
 				<div class="col-md-6 col-lg-3 ftco-animate">
 					<div class="product">
@@ -259,10 +259,10 @@
 				{% endfor %}
 			</div>
 		</div>
-		<div class="d-flex justify-content-center">
-			{% do pagination.setPageRange(2) %}
-			{{ knp_pagination_render(pagination, 'pagination.html.twig') }}
-
+		<div class="text-center mt-4">
+			<div style="display: inline-block;">
+				{{ knp_pagination_render(pagination, 'pagination.html.twig') }}
+			</div>
 		</div>
 		
 		  
