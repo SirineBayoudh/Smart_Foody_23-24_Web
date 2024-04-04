@@ -11,28 +11,20 @@ use Symfony\Component\HttpFoundation\Request;
 class AccueilController extends AbstractController
 {
     #[Route('/accueil', name: 'app_test')]
-    public function index(): Response
+    public function index(Request $request, PaginatorInterface $paginator): Response
     {
-        
-        return $this->render('accueil/index.html.twig', [
-            'controller_name' => 'AccueilController',
-        ]);
-    }
-
-    #[Route('/produit/accueil', name: 'accueil_produit')]
-    public function afficherproduit(Request $request, PaginatorInterface $paginator): Response
-    {
-        // Récupérer les produits depuis la base de données
-    $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
+        $produits = $this->getDoctrine()->getRepository(Produit::class)->findAll();
     $pagination = $paginator->paginate(
         $produits, // Requête à paginer
         $request->query->getInt('page', 1), // Le numéro de page, 1 par défaut
         8 // Limite par page
     );
-
-    // Passer les données de la pagination à la vue
-    return $this->render('accueil/produit_accueil.html.twig', [
-        'pagination' => $pagination,
-    ]);
+        
+        return $this->render('accueil/index.html.twig', [
+            'controller_name' => 'AccueilController',
+            'pagination' => $pagination,
+        ]);
     }
+
+    
 }
