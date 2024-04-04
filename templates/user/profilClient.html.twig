@@ -18,8 +18,8 @@
 {% block body %}
 	<div class="page">
 		<div classname="nn"></div>
-		<div class="cont" style="position: fixed; width: 380px; height: 1000px; margin: 50px; border-radius: 8px; overflow: hidden;">
-			<div class="infos" style="position: absolute; inset: 2px; border-radius: 8px; z-index: 10; padding: 50px 40px; display: flex; flex-direction: column;">
+		<div class="cont" style="position: fixed; width: 380px; height: 500px; margin-left: 50px; border-radius: 8px;">
+			<div class="infos" style="position: relative; inset: 2px; border-radius: 8px; z-index: 10; padding: 50px 40px; display: flex; flex-direction: column;">
 				<h2 classname="name" style="margin-left: -2px;">
 					Bonjour
 					{{user.prenom}}
@@ -31,7 +31,7 @@
 					<a href="" style="text-decoration: none; color: black;">
 						Données personnelles et adresses</a>
 					<br/>
-					<a href="" style="text-decoration: none; color: black;">
+					<a href="" id="linkPassword" style="text-decoration: none; color: black;">
 						Mot de passe</a>
 					<br/>
 					<a href="" style="text-decoration: none; color: black;">
@@ -44,7 +44,7 @@
 
 
 		</div>
-		<div class="side" style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;">
+		<div class="side" id="donnéesClient"style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;display:block;">
 			<div class="col-md-6 grid-margin stretch-card">
 				<div class="card">
 					<div class="card-body">
@@ -92,11 +92,63 @@
 								{{ form_widget(f.photo, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
 								{{ form_errors(f.photo) }}
 							</div>
+							<div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f.taille) }}</label>
+								{{ form_widget(f.taille, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f.taille) }}
+							</div>
+							<div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f.poids) }}</label>
+								{{ form_widget(f.poids, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f.poids) }}
+							</div>
 							{{ form_end(f) }}
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div class="side" id="mdpClient"style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;display:none;">
+			<div class="col-md-6 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title">Modifier votre mot de passe</h4>
+
+						<div class="forms-sample">
+							{{ form_start(f2,{'attr':{'novalidate':'novalidate'}}) }}
+							<div class="form-group">
+								<label for="exampleInputUsername1">{{ form_label(f2.motDePasse) }}</label>
+								{{ form_widget(f2.motDePasse, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+								{{ form_errors(f2.motDePasse) }}
+							</div>
+							{{ form_end(f2) }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
+
+
+	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ciblez le lien "Mot de passe"
+            var linkPassword = document.getElementById('linkPassword');
+            // Ciblez les deux côtés
+            var donnéesClient = document.getElementById('donnéesClient');
+            var mdpClient = document.getElementById('mdpClient');
+
+            // Ajoutez un écouteur d'événements sur le lien "Mot de passe"
+            linkPassword.addEventListener('click', function(event) {
+                event.preventDefault(); // Empêchez le comportement par défaut du lien
+
+                // Rendez "donnéesClient" invisible et "mdpClient" visible
+                donnéesClient.style.display = 'none';
+                mdpClient.style.display = 'block';
+            });
+        });
+    </script>
 {% endblock %}
+
+
+

@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Entity\Utilisateur;
 use App\Form\ClientType;
 use App\Form\ConseillerType;
+use App\Form\MdpClientType;
+use App\Form\MdpConseillerType;
 use App\Form\ProfilClientType;
+use App\Form\ProfilConseillerType;
 use App\Form\UtilisateurType;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,6 +20,8 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Security\Core\Security;
 
 class UserController extends AbstractController
@@ -46,7 +51,7 @@ class UserController extends AbstractController
     /** Méthodes pour le client */
 
     #[Route('/signup', name: 'signup')]
-    public function addClient(ManagerRegistry $manager, Request $req): Response
+    public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer): Response
     {
         $user = new Utilisateur();
         $form = $this->createForm(ClientType::class, $user);
@@ -67,6 +72,15 @@ class UserController extends AbstractController
 
             $em->persist($user);
             $em->flush();
+
+           /* $email = (new Email())
+                ->from('smartfoody.2024@gmail.com')
+                ->to($user->getEmail())
+                ->subject('Bienvenue sur notre site')
+                ->html('<p>Bienvenue sur notre site!</p>');
+
+            $mailer->send($email);*/
+
             return $this->redirectToRoute("app_login");
         }
         return $this->renderform('user/register.html.twig', ['f' => $form]);
@@ -90,8 +104,22 @@ class UserController extends AbstractController
             $em->flush();
             return $this->redirectToRoute("accueil");
         }
+
+        $form2 = $this->createForm(MdpClientType::class, $user);
+
+        $em2 = $manager->getManager();
+
+        $form2->handleRequest($req);
+        if ($form2->isSubmitted()) {
+
+            $em2->persist($user);
+            $em2->flush();
+            return $this->redirectToRoute("accueil");
+        }
+
         return $this->renderform('user/profilClient.html.twig', [
             'f' => $form,
+            'f2' => $form2,
             'user' => $user,
         ]);
     }
@@ -101,7 +129,7 @@ class UserController extends AbstractController
     {
 
         $user = $repo->find($id);
-        $form = $this->createForm(ProfilClientType::class, $user);
+        $form = $this->createForm(MdpClientType::class, $user);
 
         $em = $manager->getManager();
 
@@ -112,21 +140,60 @@ class UserController extends AbstractController
             $em->flush();
             return $this->redirectToRoute("accueil");
         }
-        return $this->renderform('user/profilClient.html.twig', ['f' => $form]);
+        return $this->renderform('user/mdp.html.twig', [
+            'f2' => $form,
+            'user' => $user,
+        ]);
     }
 
     /** Méthodes pour le conseiller*/
 
 
-    
+    /* Profil Conseiller */
 
-    
+    #[Route('/profilConseiller/{id}', name: 'conseiller_profile')]
+    public function updateConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
+    {
 
-   
+        $user = $repo->find($id);
+        $form = $this->createForm(ProfilConseillerType::class, $user);
+
+        $em = $manager->getManager();
+
+        $form->handleRequest($req);
+        if ($form->isSubmitted()) {
+
+            $em->persist($user);
+            $em->flush();
+            return $this->redirectToRoute("accueil");
+        }
+
+        $form2 = $this->createForm(MdpConseillerType::class, $user);
+
+        $em2 = $manager->getManager();
+
+        $form2->handleRequest($req);
+        if ($form2->isSubmitted()) {
+
+            $em2->persist($user);
+            $em2->flush();
+            return $this->redirectToRoute("accueil");
+        }
+
+        return $this->renderform('user/profilConseiller.html.twig', [
+            'f' => $form,
+            'f2' => $form2,
+            'user' => $user,
+        ]);
+    }
 
 
 
-    
+
+
+
+
+
 
     /** Afficher un utilisateur selon l'id  */
 
