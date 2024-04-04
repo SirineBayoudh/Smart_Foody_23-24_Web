@@ -25,9 +25,17 @@ class BackUserController extends AbstractController
     /* Afficher la liste des utilisateurs  */
 
     #[Route('/listUsers', name: 'usersList')]
-    public function getAll(UtilisateurRepository $repo): Response
+    public function getAll(Request $request, UtilisateurRepository $repo): Response
     {
-        $list = $repo->findAll();
+
+        $roleFilter = $request->query->get('role');
+
+        if ($roleFilter) {
+            $list = $repo->findByRole($roleFilter);
+        } else {
+            $list = $repo->findAll();
+        }
+
         return $this->render('back_user/listUsers.html.twig', [
             'users' => $list
         ]);
@@ -112,6 +120,4 @@ class BackUserController extends AbstractController
         $em->flush();
         return $this->redirectToRoute("usersList");
     }
-    
-
 }

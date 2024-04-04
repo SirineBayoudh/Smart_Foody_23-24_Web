@@ -114,7 +114,7 @@ class UserController extends AbstractController
 
             $em2->persist($user);
             $em2->flush();
-            return $this->redirectToRoute("accueil");
+            return $this->redirectToRoute("app_login");
         }
 
         return $this->renderform('user/profilClient.html.twig', [
@@ -177,7 +177,7 @@ class UserController extends AbstractController
 
             $em2->persist($user);
             $em2->flush();
-            return $this->redirectToRoute("accueil");
+            return $this->redirectToRoute("app_login");
         }
 
         return $this->renderform('user/profilConseiller.html.twig', [
@@ -186,13 +186,6 @@ class UserController extends AbstractController
             'user' => $user,
         ]);
     }
-
-
-
-
-
-
-
 
 
     /** Afficher un utilisateur selon l'id  */
