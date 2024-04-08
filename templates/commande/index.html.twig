@@ -3,115 +3,91 @@
 {% block title %}Liste des Commandes{% endblock %}
 
 {% block body %}
+<div class="container-fluid">
+    <!-- Section for buttons -->
+    <div class="row">
+        <div class="col-md-3 mb-4 stretch-card transparent">
+            <div class="card card-tale">
+                <div class="card-body">
+                    <p class="mb-4">Afficher les Statistiques</p>
+                   <a  href="{{ path('statistiques') }}" class="btn btn-primary btn-block">Voir</a>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 stretch-card transparent">
+            <div class="card card-dark-blue">
+                <div class="card-body">
+                    <p class="mb-4">Commandes Livrées</p>
+                    <a href="{{ path('commandes_livre') }}" class="btn btn-primary btn-block">Voir</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 stretch-card transparent">
+            <div class="card card-light-blue">
+                <div class="card-body">
+                    <p class="mb-4">Commandes Non Livrées</p>
+                    <a href="{{ path('commandes_non_livre') }}" class="btn btn-primary btn-block">Voir</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 stretch-card transparent">
+            <div class="card card-light-danger">
+                <div class="card-body">
+                    <p class="mb-4">Commandes en cours</p>
+                    <a href="{{ path('commandes_en_cours') }}" class="btn btn-primary btn-block">Voir</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table section below buttons -->
+    <div class="row mt-4">
+        <div class="col-md-12" id="commandeTable">
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Nom Client</th>
+                        <th>Prénom Client</th>
+                        <th>Date Commande</th>
+                        <th>Total Commande</th>
+                        <th>Remise</th>
+                        <th>État</th>
+                        <th>Longitude</th>
+                        <th>Latitude</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for commande in commandes %}
+                    <tr>
+                        <td>{{ commande.utilisateur.nom }}</td>
+                        <td>{{ commande.utilisateur.prenom }}</td>
+                        <td>{{ commande.dateCommande|date('Y-m-d') }}</td>
+                        <td>{{ commande.totaleCommande }}</td>
+                        <td>{{ commande.remise }}</td>
+                        <td>{{ commande.etat }}</td>
+                        <td>{{ commande.longitude }}</td>
+                        <td>{{ commande.latitude }}</td>
+                        <td>
+                            <a href="{{ path('commande_detail', {'id': commande.id}) }}" class="btn btn-primary">Afficher</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- PDF All Commande button below the table -->
+            <a href="{{ path('commande_pdf_all') }}" class="btn btn-primary mt-3">PDF All Commande</a>
+        </div>
+    </div>
+
+    <!-- Container for the statistics chart -->
+    <div id="chartContainer" style="display: none;">
+        <canvas id="chartClientsFideles"></canvas>
+    </div>
+</div>
 
 
-<br>
- <center> <h1>Espace Commandes</h1></center>
- <br>
-<br>
-<button id="afficherStatistiques" class="btn btn-primary" >Afficher les Statistiques</button>
-<canvas id="chartClientsFideles" width="400" height="400" style="display:none;"></canvas>
-
-
-   <a href="{{ path('commandes_livre') }}" class="btn btn-primary">Commandes Livre</a>
-   <a href="{{ path('commandes_non_livre') }}" class="btn btn-primary">Commandes Non Livre</a>
-   <a href="{{ path('commandes_en_cours') }}" class="btn btn-primary">Commandes en cours</a>
-
-<br>
-<br>
-
-
-
-
-<table class="table table-striped">
-    <thead class="thead-dark">
-        <tr>
-            <th>Nom  Client</th>
-            <th>Prenom  Client</th>
-            <th>Date Commande</th>
-         
-            <th>Totale Commande</th>
-            <th>Remise</th>
-            <th>État</th>
-            <th>Longitude</th>
-            <th>Latitude</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for commande in commandes %}
-            <tr>
-                  <td>{{ commande.utilisateur.nom }}</td>
-                 <td>{{ commande.utilisateur.prenom }}</td>
-                <td>{{ commande.dateCommande|date('Y-m-d') }}</td>
-             
-                <td>{{ commande.totaleCommande }}</td>
-                <td>{{ commande.remise }}</td>
-                <td>{{ commande.etat }}</td>
-                <td>{{ commande.longitude }}</td>
-                <td>{{ commande.latitude }}</td>
-                 <td>
-                    <a href="{{ path('commande_detail', {'id': commande.id}) }}" class="btn btn-primary">Afficher</a>
-
-
-                  
-
-                
-
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-
-</table>
-
-  
-
-<a href="{{ path('commande_pdf_all') }}" class="btn btn-primary">PDF All Commande</a>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('afficherStatistiques').addEventListener('click', function() {
-            const canvas = document.getElementById('chartClientsFideles');
-            canvas.style.display = 'block'; // Rend le canevas visible
-            const ctx = canvas.getContext('2d');
-            
-            if (window.monGraphique) {
-                window.monGraphique.destroy();
-            }
-
-            window.monGraphique = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    // Utilisation de 'client.idClient' au lieu de 'client.id_client'
-                    labels: {{ clientsFideles|map(client => 'Client ' ~ client.idClient)|json_encode|raw }},
-                    datasets: [{
-                        label: 'Total des Commandes',
-                        data: {{ clientsFideles|map(client => client.totalCommande)|json_encode|raw }},
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: 'Nombre de Commandes',
-                        data: {{ clientsFideles|map(client => client.nombreCommandes)|json_encode|raw }},
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
-    });
-</script>
 
 {% endblock %}
