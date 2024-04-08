@@ -1,0 +1,126 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}Détails de la Commande{% endblock %}
+
+{% block body %}
+<style>
+    .billing-heading {
+        color: #4CAF50; /* Vert */
+    }
+    .form-control {
+        border: 1px solid #8BC34A; /* Vert clair */
+    }
+    .btn-primary {
+        background-color: #388E3C; /* Vert foncé */
+        border-color: #2E7D32;
+    }
+    .table thead {
+        background-color: #4CAF50; /* Vert */
+    }
+    .table .total {
+        color: #81C784; /* Vert pastel */
+    }
+</style>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 ftco-animate">
+            <div class="billing-form">
+                <h3 class="mb-4 billing-heading">Détails de la Commande</h3>
+                <div class="row align-items-end">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="firstname">Nom du Client</label>
+                            <input type="text" class="form-control" placeholder="{{ commande.utilisateur.nom }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="lastname">Prénom du Client</label>
+                            <input type="text" class="form-control" placeholder="{{ commande.utilisateur.prenom }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="date">Date Commande</label>
+                            <input type="text" class="form-control" placeholder="{{ commande.dateCommande|date('Y-m-d') }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="total">Total Commande</label>
+                            <input type="text" class="form-control" placeholder="{{ commande.totaleCommande }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="remise">Remise</label>
+                            <input type="text" class="form-control" placeholder="{{ commande.remise }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="etat">État</label>
+                            <input type="text" class="form-control" placeholder="{{ commande.etat }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="latitude">addresse de livraison</label>
+                            <input type="text" class="form-control" placeholder="{{ commande.address }}" readonly>
+                        </div>
+                    </div>
+                     <div class="col-md-6">
+                        <div class="form-group">
+                         
+                        </div>
+                    </div>
+                  <div class="form-group">
+    <a href="{{ path('commande_pdf', {'id': commande.id}) }}" class="btn btn-primary btn-icon-append">
+        Télécharger PDF <i class="ti-printer"></i>
+    </a>
+</div>
+ <div class="col-md-12">
+            <div class="form-group">
+                <label for="etat">État actuel : {{ commande.etat }}</label>
+      <form action="{{ path('changer_etat_commande', {'id': commande.id}) }}" method="post">
+    <button type="submit" class="btn btn-primary">Changer l'état</button>
+</form>
+
+            </div>
+        </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 ftco-animate">
+            <div class="cart-list">
+                <table class="table">
+                    <thead class="thead-primary">
+                        <tr class="text-center">
+                            <th>&nbsp;</th>
+                            <th>Produit</th>
+                            <th>Prix</th>
+                            <th>Quantité</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ligneCommande in commande.getLignesCommande() %}
+                            <tr class="text-center">
+                                <td class="image-prod">
+                                    <div class="img" style="background-image:url('{{ asset(ligneCommande.produit.image) }}');"></div>
+                                </td>
+                                <td class="product-name">{{ ligneCommande.produit.marque }}</td>
+                                <td class="price">{{ ligneCommande.produit.prix }} TND</td>
+                                <td class="quantity">{{ ligneCommande.quantite }}</td>
+                                <td class="total">{{ ligneCommande.quantite * ligneCommande.produit.prix }} TND</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
