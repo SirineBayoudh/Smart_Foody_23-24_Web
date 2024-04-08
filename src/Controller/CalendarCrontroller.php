@@ -51,8 +51,8 @@ class CalendarController extends AbstractController
 
         // Enregistrer les changements dans la base de données
         $entityManager->flush();
-
+        return $this->redirectToRoute('stock_get');
         // Retourner une réponse JSON indiquant le succès de l'opération
-        return new JsonResponse(['success' => true, 'message' => 'Stock date updated successfully']);
+        // return new JsonResponse(['success' => true, 'message' => 'Stock date updated successfully']);
     }
 }

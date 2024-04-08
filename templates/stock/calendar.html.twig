@@ -56,8 +56,10 @@
                             newDate: newDate
                         },
                         success: function(response) {
-                            console.log('Événement édité avec succès');
-                        },
+            console.log('Événement édité avec succès');
+            // Redirection vers la route stock_get après le succès de l'édition
+            window.location.href = '{{ path('stock_venir') }}';
+        },
                         error: function(xhr, status, error) {
                             console.error(error);
                         }

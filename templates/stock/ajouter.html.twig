@@ -1,8 +1,8 @@
 {% extends 'base_back.html.twig' %}
 
     {% block body %}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.css" integrity="sha256-uq9PNlMzB+1h01Ij9cx7zeE2OR2pLAfRw3uUUOOPKdA=" crossorigin="anonymous">
-        
+        {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.css" integrity="sha256-uq9PNlMzB+1h01Ij9cx7zeE2OR2pLAfRw3uUUOOPKdA=" crossorigin="anonymous">
+         #}
         <div class="col-12 grid-margin stretch-card">
             <div class="main-panel">        
                 <div class="content-wrapper">
@@ -17,7 +17,7 @@
                             </h4>
                             <p class="card-description"></p>
     
-                            {{ form_start(form, {'attr': {'class': 'forms-sample',  'novalidate': 'novalidate','enctype': 'multipart/form-data'}}) }}
+                            {{ form_start(form, {'attr': {'id': 'yourFormId', 'class': 'forms-sample', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
                             <!-- Début du formulaire -->
                             <div class="form-group">
                                 {{ form_label(form.nom) }}
@@ -83,9 +83,13 @@
                                     </span>
                                 </div>
                             </div>
-                            {{ form_end(form) }} <!-- Fin du formulaire -->
+                       <!-- Fin du formulaire -->
                             <br><br>
-                            <button class="btn btn-light" onclick="window.history.back();">Cancel</button>
+                            {# <button class="btn btn-light" onclick="window.history.back();">Cancel</button>
+                             #}
+                             {{ form_end(form) }}
+                            <button class="btn btn-primary mr-2" id="saveButton">Save</button>
+
                         </div>
                     </div>
                 </div>
@@ -95,9 +99,9 @@
     </div> <!-- Fermeture de la div col-12 -->
     </div> <!-- Fermeture de la div content-wrapper -->
     
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.js"></script>
+    {# <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.js"></script> #}
    
-   <script>
+   {# <script>
     document.addEventListener("DOMContentLoaded", function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -128,26 +132,36 @@
     
         calendar.render();
     });
-    </script>
-    {% endblock %}
-    
-
-    {% block javascripts %}
-     
-
+    </script> #}
+   
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
     <script>
-
-    document.addEventListener("DOMContentLoaded", function() {
-        var mode = new URLSearchParams(window.location.search).get('mode');
-        var formTitle = document.querySelector("#form-title");
-
-        if (mode === 'ajouter') {
-            formTitle.textContent = "Ajouter un stock";
-        } else if (mode === 'modifier') {
-            formTitle.textContent = "Modifier un stock";
-        }
-    });
-</script>
+        document.getElementById('saveButton').addEventListener('click', function() {
+            Swal.fire({
+                title: "Vous êtes prêt à Sauvegarder ",
+                showDenyButton: true,
+                // showCancelButton: true,
+                confirmButtonText: "Sauvegarder",
+                denyButtonText: `ne sauvegarde pas`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Soumettre le formulaire si l'utilisateur choisit de sauvegarder
+                    document.getElementById('yourFormId').submit(); // Soumettre le formulaire avec JavaScript
+                } else if (result.isDenied) {
+                    Swal.fire({
+                        title: "Les modifications ne sont pas enregistrées",
+                        icon: "info",
+                        showConfirmButton: false,
+                        time:1
+                    }).then(() => {
+                        // Retourner à la page précédente
+                        window.history.back();
+                    });
+                }
+            });
+        });
+    </script>
+    
 {% endblock %}
 
    

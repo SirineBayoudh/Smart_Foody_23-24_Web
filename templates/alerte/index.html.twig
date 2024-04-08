@@ -20,6 +20,7 @@
                       <tr>
                         <tr>
                             <th>Id alerte</th>
+                            <th>Stock</th>
                             <th>Description</th>
                             <th>Type</th>
                             <th>Actions</th>
@@ -31,6 +32,7 @@
                         {% for a in alerts  %}
                         <tr class="{% if a.isType() == false %}alert-unread{% else %}alert-read{% endif %}">
                             <td>{{ a.id_alerte }}</td>
+                            <td>{{ a.getId_Stock().getNom() }}</td>
                             <td>{{ a.description_alerte }}</td>
                             <td>{{ a.isType() ? 'Lue' : 'Non lue' }}</td>
                             <td>

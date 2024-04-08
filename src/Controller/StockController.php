@@ -143,32 +143,8 @@ class StockController extends AbstractController
         }
 
         // Parcourez les stocks pour calculer et mettre à jour le coût pour chaque stock
-        foreach ($stocks as $stock) {
-            // Récupérez la marque et la quantité du stock actuel
-            $stockMarque = $stock->getMarque();
-            $quantite = $stock->getQuantite();
+        $this->calculerCoutStocks($stocks, $produits, $entityManager);
 
-            // Recherchez le produit correspondant dans la table Produit
-            foreach ($produits as $produit) {
-                // Si la marque du stock correspond à la marque du produit
-                if ($produit->getMarque() === $stockMarque) {
-                    // Récupérez le prix du produit
-                    $prix = $produit->getPrix();
-
-                    // Calculez le coût en multipliant la quantité par le prix
-                    $cout = $quantite * $prix;
-
-                    // Mettez à jour le coût dans l'entité Stock
-                    $stock->setCout($cout);
-
-                    // Enregistrez les modifications dans la base de données
-                    $entityManager->flush();
-
-                    // Sortez de la boucle car nous avons trouvé le produit correspondant
-                    break;
-                }
-            }
-        }
 
         // Flush toutes les entités persistées
         $entityManager->flush();
@@ -180,7 +156,23 @@ class StockController extends AbstractController
         ]);
     }
 
+    private function calculerCoutStocks(array $stocks, array $produits, EntityManagerInterface $entityManager): void
+    {
+        foreach ($stocks as $stock) {
+            $stockMarque = $stock->getMarque();
+            $quantite = $stock->getQuantite();
 
+            foreach ($produits as $produit) {
+                if ($produit->getMarque() === $stockMarque) {
+                    $prix = $produit->getPrix();
+                    $cout = $quantite * $prix;
+                    $stock->setCout($cout);
+                    $entityManager->flush();
+                    break;
+                }
+            }
+        }
+    }
 
     #[Route('/deleteStock/{id}', name: 'stock_delete')]
     public function deleteStock(ManagerRegistry $manager, $id, StockRepository $repo): Response
@@ -201,7 +193,7 @@ class StockController extends AbstractController
             ->add('marque', TextType::class, ['disabled' => true]) // Rend le champ 'marque' non éditable
             ->add('quantite') // Champ quantite reste éditable
             ->add('date_arrivage') // Champ quantite reste éditable
-            ->add('submit', SubmitType::class)
+
             ->getForm();
         $form->handleRequest($req);
         $em = $manager->getManager();
@@ -276,7 +268,13 @@ class StockController extends AbstractController
     {
         // Récupérer les stocks à venir depuis le repository
         $futureStocks = $stockRepository->findFutureStocks();
-
+        foreach ($futureStocks as $stock) {
+            // Vérifiez si nbVendu est nul
+            if ($stock->getNbvendu() === null) {
+                // Affectez la valeur 0 à nbVendu
+                $stock->setNbvendu(0);
+            }
+        }
         return $this->render('stock/future_stocks.html.twig', [
             'futureStocks' => $futureStocks,
         ]);
