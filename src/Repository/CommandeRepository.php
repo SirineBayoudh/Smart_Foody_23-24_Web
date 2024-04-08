@@ -36,6 +36,7 @@ class CommandeRepository extends ServiceEntityRepository
         ->getSingleScalarResult();
 }
 
+
 public function trouverClientsFideles()
 {
     $qb = $this->createQueryBuilder('c')
