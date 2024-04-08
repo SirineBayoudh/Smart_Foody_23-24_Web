@@ -111,7 +111,10 @@ public function setUtilisateur(?Utilisateur $utilisateur): self
 
       return $this;
   }
-
+  public function getLignesCommande(): Collection
+    {
+        return $this->lignesCommande;
+    }
 
   public function getIdCommande(): ?int
   {
@@ -161,12 +164,12 @@ public function setUtilisateur(?Utilisateur $utilisateur): self
         return $this->etat;
     }
 
+ 
     public function setEtat(string $etat): static
-    {
-        $this->etat = $etat;
-
-        return $this;
-    }
+{
+    $this->etat = $etat;
+    return $this;
+}
 
     public function getLongitude(): ?float
     {

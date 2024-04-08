@@ -22,6 +22,38 @@ class CommandeRepository extends ServiceEntityRepository
     }
 
 
+// Dans CommandeRepository.php
+
+
+public function countLivreCommandes(): int
+{
+    return $this->createQueryBuilder('c')
+        ->select('count(c.id)')
+        ->where('c.etat = :etat')
+        ->setParameter('etat', 'livré')
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
+public function countNonLivreCommandes(): int
+{
+    return $this->createQueryBuilder('c')
+        ->select('count(c.id)')
+        ->where('c.etat = :etat')
+        ->setParameter('etat', 'non livré')
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
+public function countEnCoursCommandes(): int
+{
+    return $this->createQueryBuilder('c')
+        ->select('count(c.id)')
+        ->where('c.etat = :etat')
+        ->setParameter('etat', 'en cours')
+        ->getQuery()
+        ->getSingleScalarResult();
+}
 
 
     public function countCommandesByClientId(int $clientId): int
