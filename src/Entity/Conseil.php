@@ -69,7 +69,7 @@ class Conseil
         return $this->reponse;
     }
 
-    public function setReponse(string $reponse): static
+    public function setReponse(?string $reponse): static
     {
         $this->reponse = $reponse;
 

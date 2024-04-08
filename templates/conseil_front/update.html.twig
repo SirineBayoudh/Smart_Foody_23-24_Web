@@ -64,14 +64,14 @@
 					</form>
 				</div>
 			</div>
-			<h1 style="margin-top:30px;">Liste des conseils</h1>
+			<h1 style="margin-top:30px;">Mes demandes</h1>
 			<div style="overflow: auto; max-height: 400px;">
 				<table class="table">
 					<thead class="thead-primary">
 						<tr class="text-center">
-							<th>Statut</th>
 							<th>Demande</th>
 							<th>Réponse</th>
+							<th>Statut</th>							
 							<th>Note</th>
 							<th>Date</th>
 							<th>Actions</th>
@@ -80,9 +80,9 @@
 					<tbody>
 						{% for conseil in conseils|sort((a, b) => b.dateConseil <=> a.dateConseil) %}
 							<tr class="text-center">
-								<td class="product-name">{{ conseil.statut }}</td>
 								<td class="price">{{ conseil.demande }}</td>
 								<td class="quantity">{{ conseil.reponse }}</td>
+								<td class="product-name">{{ conseil.statut }}</td>								
 								<td class="total">{{ conseil.note }}</td>
 								<td class="total">{{ conseil.dateConseil|date("d/m/Y") }}</td>
 								<td>

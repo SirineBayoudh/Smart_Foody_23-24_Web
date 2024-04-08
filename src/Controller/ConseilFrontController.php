@@ -67,8 +67,9 @@ class ConseilFrontController extends AbstractController
                 ->html($emailContent);
 
             $mailer->send($email);
+            $this->addFlash('success', 'Demande ajoutée avec succès!');
 
-            $success = true;
+            return $this->redirectToRoute('conseil_app'); 
         } elseif ($form->isSubmitted()) {
             $emptySubmission = true;
         }

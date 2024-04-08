@@ -57,10 +57,12 @@
 												<td class="text-success">
 													{{ a.reponse }}</td>
 												<td>
-													<a href="{{ path('chat_delete', {'id': a.idChat}) }}" class="btn btn-danger btn-rounded btn-fw delete-button" data-id="{{ a.idChat }}">Supprimer</a>
-													<button type="button" class="btn btn-danger btn-rounded btn-fw">
-														<a href="{{ path('chat_update', {'id': a.idChat}) }}" style="color: white;">Modifier</a>
-													</button>
+													<a href="{{ path('chat_delete', {'id': a.idChat}) }}" class="btn btn-danger btn-sm delete-button" data-id="{{ a.idChat }}" title="Supprimer" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;" onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+														<i class="ti-trash"></i>
+													</a>
+													<a href="{{ path('chat_update', {'id': a.idChat}) }}" class="btn btn-warning btn-sm" title="Modifier" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;" onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+														<i class="ti-pencil-alt"></i>
+													</a>
 												</td>
 											</tr>
 										{% endfor %}
@@ -68,7 +70,8 @@
 								</table>
 							</div>
 							<div class="d-flex justify-content-center">
-								{{ knp_pagination_render(chats) }}
+								{% do chats.setPageRange(2) %}
+								{{ knp_pagination_render(chats, 'pagination.html.twig') }}
 							</div>
 						</div>
 					</div>

@@ -12,8 +12,13 @@
 									{{ message }}
 								</div>
 							{% endfor %}
+							{% if emptySubmission %}
+								<div class="alert alert-danger" role="alert">
+									Veuillez remplir tous les champs.
+								</div>
+							{% endif %}
 							<div class="form-group">
-								{{ form_start(fUpdate) }}
+								{{ form_start(fUpdate,{'attr':{'novalidate':'novalidate'}})}}
 								{{ form_label(fUpdate.question, 'Question') }}
 								{{ form_widget(fUpdate.question, {'attr': {'class': 'form-control'}}) }}
 								{{ form_errors(fUpdate.question) }}
@@ -50,14 +55,18 @@
 												<td>{{ a.question }}</td>
 												<td>{{ a.reponse }}</td>
 												<td>
-													<button type="button" class="btn btn-danger btn-rounded btn-fw">
-														<a href="{{ path('chat_update', {'id': a.idChat}) }}" style="color: white;">Modifier</a>
-													</button>
+													<a href="{{ path('chat_update', {'id': a.idChat}) }}" class="btn btn-warning btn-sm" title="Modifier" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;" onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+														<i class="ti-pencil-alt"></i>
+													</a>
 												</td>
 											</tr>
 										{% endfor %}
 									</tbody>
 								</table>
+							</div>
+							<div class="d-flex justify-content-center">
+								{% do chats.setPageRange(2) %}
+								{{ knp_pagination_render(chats, 'pagination.html.twig') }}
 							</div>
 						</div>
 					</div>

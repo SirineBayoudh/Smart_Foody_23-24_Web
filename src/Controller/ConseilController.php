@@ -21,10 +21,11 @@ class ConseilController extends AbstractController
         $statut = $request->query->get('statut');
         $note = $request->query->get('note');
 
-        $queryBuilder = $repo->createQueryBuilder('a');
+        $queryBuilder = $repo->createQueryBuilder('a')
+            ->orderBy('a.id_conseil', 'DESC');
 
         if ($statut !== null && $statut !== 'Tous') {
-            $queryBuilder->where('a.statut = :statut')
+            $queryBuilder->andWhere('a.statut = :statut')
                 ->setParameter('statut', $statut);
         }
 
@@ -55,6 +56,7 @@ class ConseilController extends AbstractController
         ]);
     }
 
+
     #[Route('/deleteConseil/{id}', name: 'conseil_delete')]
     public function deleteConseil(ManagerRegistry $manager, ConseilRepository $repo, $id): Response
     {
@@ -74,15 +76,18 @@ class ConseilController extends AbstractController
         $form->handleRequest($req);
 
         $em = $manager->getManager();
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() & empty($form->get('reponse')->getData())) {
+            $emptySubmission = true;
+        } elseif ($form->isSubmitted() && $form->isValid()) {
             $conseil->setStatut('terminé');
             $em->persist($conseil);
             $em->flush();
-            //$twilioService->sendSMS('+21651600246', 'Conseil a été mis à jour avec succès', '+16562282121');
+            //$twilioService->sendSMS('+21651600246', 'Conseil a été mis à jour avec succès.', '+16562282121');
             $this->addFlash('success', 'Demande mis à jour avec succès.');
         }
 
-        $queryBuilder = $repo->createQueryBuilder('a');
+        $queryBuilder = $repo->createQueryBuilder('a')
+            ->orderBy('a.id_conseil', 'DESC');
         $pagination = $paginator->paginate(
             $queryBuilder->getQuery(),
             $request->query->getInt('page', 1),
@@ -91,6 +96,7 @@ class ConseilController extends AbstractController
 
         return $this->renderForm('conseil/update.html.twig', [
             'fUpdate' => $form,
+            'emptySubmission' => $emptySubmission ?? false,
             'conseils' => $pagination
         ]);
     }

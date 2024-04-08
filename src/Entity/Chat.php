@@ -32,7 +32,7 @@ class Chat
         return $this->question;
     }
 
-    public function setQuestion(string $question): static
+    public function setQuestion(?string $question): static
     {
         $this->question = $question;
 
@@ -44,7 +44,7 @@ class Chat
         return $this->reponse;
     }
 
-    public function setReponse(string $reponse): static
+    public function setReponse(?string $reponse): static
     {
         $this->reponse = $reponse;
 
