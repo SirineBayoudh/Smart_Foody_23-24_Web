@@ -20,7 +20,11 @@
                             <th>Quantités</th>
                             <th>Nombre vendus</th>
                             <th>Cout</th>
-                            <th>Date arrivage</th>
+                            {% if app.request.attributes.get('_route') == 'stock_get' %}
+                                <th>Date </th>
+                            {% elseif app.request.attributes.get('_route') == 'stock_venir' %}
+                                <th>Date d'Arrivage </th>
+                            {% endif %}
                             <th>Image</th>
                             <th>Action</th>
                         </tr>
