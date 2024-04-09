@@ -6,6 +6,14 @@
             <div class="card-body">
                 
               <h4 class="card-title"> Table Stock </h4>
+              <div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="barChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+           
               <div class="row mb-4">
                 <div class="col text-right mb-4">
                     <a id="addButton" href="{{ path('app_ajouter_stock') }}?mode=ajouter"class="btn btn-primary hover-effect" style="background-color: #56ab2f; border-color: #56ab2f;" 
@@ -163,6 +171,77 @@
     }
 </script>
 
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Récupération des données depuis Twig
+        const dataFromTwig = {
+            stocks: [
+                {% for stock in stocks %}
+                    {
+                        id: {{ stock.id_s }},
+                        nom: "{{ stock.nom }}",
+                        nbvendu: {{ stock.nbvendu }}
+                    },
+                {% endfor %}
+            ]
+        };
+        
+        // Générer des couleurs aléatoires pour chaque barre
+        function generateRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgba(${r}, ${g}, ${b}, 0.5)`;
+        }
+
+        // Créer un tableau de couleurs aléatoires pour chaque barre
+        const colors = Array.from({ length: dataFromTwig.stocks.length }, () => generateRandomColor());
+
+        // Création du bar chart
+        var ctx = document.getElementById('barChart').getContext('2d');
+        var barChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dataFromTwig.stocks.map(stock => stock.nom), // Utiliser les noms des stocks comme étiquettes sur l'axe x
+                datasets: [{
+                    label: 'Nombre vendu',
+                    data: dataFromTwig.stocks.map(stock => stock.nbvendu), // Utiliser les nombres vendus comme valeurs sur l'axe y
+                    backgroundColor: colors, // Utiliser les couleurs aléatoires générées
+                    borderColor: 'rgba(255,255,255,1)',
+                    borderWidth: 1 // Épaisseur de la bordure
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Stock' // Titre de l'axe des abscisses
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Nombre vendu par stock'
+                        },
+                        ticks: {
+                            stepSize: 10 // Définir l'intervalle de 10 sur l'axe y
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Nombre vendus par stock', // Titre du graphique à barres
+                    font: {
+                        size: 18 // Taille de la police du titre
+                    }
+                }
+            }
+        });
+    });
+</script>
 
 
 

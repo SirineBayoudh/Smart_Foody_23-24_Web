@@ -297,4 +297,18 @@ class StockController extends AbstractController
     // }
 
 
+    #[Route('/scatter-chart', name: 'scatter_chart')]
+    public function scatterChart(StockRepository $stockRepository): Response
+    {
+        // Récupérer les données depuis la base de données
+        $stocks = $stockRepository->findAll();
+
+        // Formater les données pour Twig
+        $dataForTwig = [
+            'stocks' => $stocks
+        ];
+
+        // Rendre le template avec les données
+        return $this->render('stock/index.html.twig', $dataForTwig);
+    }
 }
