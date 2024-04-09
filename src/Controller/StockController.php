@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Alerte;
+use App\Entity\LigneCommande;
 use App\Entity\Produit;
 use App\Entity\Stock;
 use App\Form\AjouterStockType;
@@ -87,6 +88,7 @@ class StockController extends AbstractController
         SmsGenerator $smsGenerator,
         Request $request
     ): Response {
+        $this->updateStockFromCommande($entityManager);
 
         $futureStocks = $stockRepo->findFutureStocks();
 
@@ -297,18 +299,61 @@ class StockController extends AbstractController
     // }
 
 
-    #[Route('/scatter-chart', name: 'scatter_chart')]
-    public function scatterChart(StockRepository $stockRepository): Response
+    // #[Route('/scatter-chart', name: 'scatter_chart')]
+    // public function scatterChart(StockRepository $stockRepository): Response
+    // {
+    //     // Récupérer les données depuis la base de données
+    //     $stocks = $stockRepository->findAll();
+
+    //     // Formater les données pour Twig
+    //     $dataForTwig = [
+    //         'stocks' => $stocks
+    //     ];
+
+    //     // Rendre le template avec les données
+    //     return $this->render('stock/index.html.twig', $dataForTwig);
+    // }
+    #[Route('/update-stock-from-commande', name: 'update_stock_from_commande')]
+    public function updateStockFromCommande(EntityManagerInterface $entityManager): Response
     {
-        // Récupérer les données depuis la base de données
-        $stocks = $stockRepository->findAll();
+        // Récupérer toutes les lignes de commande
+        $ligneCommandes = $entityManager->getRepository(LigneCommande::class)->findAll();
 
-        // Formater les données pour Twig
-        $dataForTwig = [
-            'stocks' => $stocks
-        ];
+        // Créer un tableau pour stocker les quantités vendues par référence de produit
+        $quantitesParRefProduit = [];
 
-        // Rendre le template avec les données
-        return $this->render('stock/index.html.twig', $dataForTwig);
+        // Parcourir chaque ligne de commande
+        foreach ($ligneCommandes as $ligneCommande) {
+            // Récupérer la référence du produit de la ligne de commande
+            $refProduit = $ligneCommande->getRefProduit();
+
+            // Récupérer la quantité de la ligne de commande
+            $quantite = $ligneCommande->getQuantite();
+
+            // Si la référence de produit existe déjà dans le tableau, ajouter la quantité
+            if (array_key_exists($refProduit->getRef(), $quantitesParRefProduit)) {
+                $quantitesParRefProduit[$refProduit->getRef()] += $quantite;
+            } else { // Sinon, initialiser la quantité
+                $quantitesParRefProduit[$refProduit->getRef()] = $quantite;
+            }
+        }
+
+        // Mettre à jour les stocks avec les quantités vendues calculées
+        foreach ($quantitesParRefProduit as $refProduitId => $quantite) {
+            // Récupérer le stock correspondant à la référence du produit
+            $stock = $entityManager->getRepository(Stock::class)->findOneBy(['ref_produit' => $refProduitId]);
+
+            // Si un stock est trouvé, mettre à jour la quantité vendue
+            if ($stock) {
+                $stock->setNbVendu($quantite);
+                $entityManager->persist($stock);
+            }
+        }
+
+        // Enregistrer les modifications
+        $entityManager->flush();
+
+        // Redirection vers une autre route après la mise à jour des stocks
+        return $this->redirectToRoute('stock_get');
     }
 }

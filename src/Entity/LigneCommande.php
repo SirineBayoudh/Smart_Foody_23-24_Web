@@ -18,11 +18,11 @@ class LigneCommande
 
     #[ORM\ManyToOne(inversedBy: 'ligneCommandes')]
     #[ORM\JoinColumn(name: "id_commande", referencedColumnName: "id_commande")]
-    private ?commande $id_commande = null;
+    private ?Commande $id_commande = null;
 
     #[ORM\ManyToOne(inversedBy: 'ligneCommandes')]
     #[ORM\JoinColumn(name: "id_panier", referencedColumnName: "id_panier")]
-    private ?panier $id_panier = null;
+    private ?Panier $id_panier = null;
 
     #[ORM\ManyToOne(inversedBy: 'ligneCommandes')]
     #[ORM\JoinColumn(name: "ref_produit", referencedColumnName: "ref")]

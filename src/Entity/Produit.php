@@ -34,8 +34,8 @@ class Produit
     #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: Avis::class)]
     private Collection $avis;
 
-    // #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: LigneCommande::class)]
-    // private Collection $ligneCommandes;
+    #[ORM\OneToMany(mappedBy: 'ref_produit', targetEntity: LigneCommande::class)]
+    private Collection $ligneCommandes;
 
     #[ORM\ManyToOne(inversedBy: 'produits')]
     #[ORM\JoinColumn(name: "critere", referencedColumnName: "id_obj")]
@@ -168,32 +168,32 @@ class Produit
     /**
      * @return Collection<int, LigneCommande>
      */
-    // public function getLigneCommandes(): Collection
-    // {
-    //     return $this->ligneCommandes;
-    // }
+    public function getLigneCommandes(): Collection
+    {
+        return $this->ligneCommandes;
+    }
 
-    // public function addLigneCommande(LigneCommande $ligneCommande): static
-    // {
-    //     if (!$this->ligneCommandes->contains($ligneCommande)) {
-    //         $this->ligneCommandes->add($ligneCommande);
-    //         $ligneCommande->setRefProduit($this);
-    //     }
+    public function addLigneCommande(LigneCommande $ligneCommande): static
+    {
+        if (!$this->ligneCommandes->contains($ligneCommande)) {
+            $this->ligneCommandes->add($ligneCommande);
+            $ligneCommande->setRefProduit($this);
+        }
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
-    // public function removeLigneCommande(LigneCommande $ligneCommande): static
-    // {
-    //     if ($this->ligneCommandes->removeElement($ligneCommande)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($ligneCommande->getRefProduit() === $this) {
-    //             $ligneCommande->setRefProduit(null);
-    //         }
-    //     }
+    public function removeLigneCommande(LigneCommande $ligneCommande): static
+    {
+        if ($this->ligneCommandes->removeElement($ligneCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($ligneCommande->getRefProduit() === $this) {
+                $ligneCommande->setRefProduit(null);
+            }
+        }
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
     public function getCritere(): ?Objectif
     {
