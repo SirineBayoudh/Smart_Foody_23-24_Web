@@ -7,8 +7,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Commande>
- *
  * @method Commande|null find($id, $lockMode = null, $lockVersion = null)
  * @method Commande|null findOneBy(array $criteria, array $orderBy = null)
  * @method Commande[]    findAll()
@@ -21,91 +19,70 @@ class CommandeRepository extends ServiceEntityRepository
         parent::__construct($registry, Commande::class);
     }
 
+    // Compte le nombre de commandes livrées
+    public function countLivreCommandes(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->where('c.etat = :etat')
+            ->setParameter('etat', 'livré') // Assurez-vous que l'état 'livrée' correspond à ce qui est dans votre base de données
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-// Dans CommandeRepository.php
+    // Compte le nombre de commandes non livrées
+    public function countNonLivreCommandes(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->where('c.etat = :etat')
+            ->setParameter('etat', 'non livrée') // Assurez-vous que l'état 'non livré' correspond à ce qui est dans votre base de données
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    //recherche 
+    public function searchCommandes($query)
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.utilisateur', 'u')
+            ->andWhere('u.nom LIKE :query OR u.prenom LIKE :query OR c.dateCommande LIKE :query')
+            ->setParameter('query', '%'.$query.'%')
+            ->getQuery()
+            ->getResult();
+    }
 
+    // Compte le nombre de commandes en cours
+    public function countEnCoursCommandes(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->where('c.etat = :etat')
+            ->setParameter('etat', 'en cours') // Assurez-vous que l'état 'en cours' correspond à ce qui est dans votre base de données
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-public function countLivreCommandes(): int
-{
-    return $this->createQueryBuilder('c')
-        ->select('count(c.id)')
-        ->where('c.etat = :etat')
-        ->setParameter('etat', 'livré')
-        ->getQuery()
-        ->getSingleScalarResult();
-}
-
-public function countNonLivreCommandes(): int
-{
-    return $this->createQueryBuilder('c')
-        ->select('count(c.id)')
-        ->where('c.etat = :etat')
-        ->setParameter('etat', 'non livré')
-        ->getQuery()
-        ->getSingleScalarResult();
-}
-
-public function countEnCoursCommandes(): int
-{
-    return $this->createQueryBuilder('c')
-        ->select('count(c.id)')
-        ->where('c.etat = :etat')
-        ->setParameter('etat', 'en cours')
-        ->getQuery()
-        ->getSingleScalarResult();
-}
-
-
+    // Compte le nombre de commandes par ID client
     public function countCommandesByClientId(int $clientId): int
-{
-    return $this->createQueryBuilder('c')
-        ->select('COUNT(c.id)')
-        // Utilisez 'c.utilisateur' pour accéder à l'entité Utilisateur associée
-        // Assurez-vous que la propriété dans Commande pointant vers Utilisateur est nommée 'utilisateur'
-        ->andWhere('c.utilisateur = :clientId')
-        ->setParameter('clientId', $clientId)
-        ->getQuery()
-        ->getSingleScalarResult();
-}
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->andWhere('c.utilisateur = :clientId')
+            ->setParameter('clientId', $clientId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-
-public function trouverClientsFideles()
-{
-    $qb = $this->createQueryBuilder('c')
-        ->join('c.utilisateur', 'u') // Jointure avec l'entité Utilisateur
-        ->select('u.id_utilisateur AS idClient, SUM(c.totaleCommande) as totalCommande, COUNT(c.id) as nombreCommandes')
-        ->groupBy('u.id_utilisateur') // Groupe par ID de l'Utilisateur en utilisant 'id_utilisateur'
-        ->orderBy('totalCommande', 'DESC') // Ordonne par total des commandes décroissant
-        ->addOrderBy('nombreCommandes', 'DESC'); // Ensuite, ordonne par nombre de commandes décroissant
-    
-    return $qb->getQuery()->getArrayResult();
-}
-    
-
-
-
-//    /**
-//     * @return Commande[] Returns an array of Commande objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Commande
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    // Trouve les clients fidèles basés sur le total des commandes et le nombre de commandes
+    public function trouverClientsFideles()
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.utilisateur', 'u')
+            ->select('u.id_utilisateur AS idClient, SUM(c.totaleCommande) as totalCommande, COUNT(c.id) as nombreCommandes')
+            ->groupBy('u.id_utilisateur')
+            ->orderBy('totalCommande', 'DESC')
+            ->addOrderBy('nombreCommandes', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

@@ -8,6 +8,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\CommandeRepository;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 
 
@@ -29,6 +31,7 @@ class CommandeController extends AbstractController
         return $this->render('commande/index.html.twig', [
           'clientsFideles' => $clientsFideles,
             'commandes' => $commandes, 
+            
         ]);
     }
     
@@ -82,18 +85,64 @@ class CommandeController extends AbstractController
 
         return $this->redirectToRoute('commande_detail', ['id' => $commande->getId()]);
     }
+    //recherche 
+    #[Route('/commandes/search', name: 'app_commandes_search')]
+    public function search(CommandeRepository $commandeRepository, Request $request): Response
+    {
+        $searchQuery = $request->query->get('q');
+    
+        if ($searchQuery) {
+            $commandes = $commandeRepository->searchCommandes($searchQuery);
+        } else {
+            $commandes = $commandeRepository->findByEtat('Non livrée');
+        }
+    
+        return $this->render('commande/index.html.twig', [
+            'commandes' => $commandes,
+            'searchQuery' => $searchQuery,
+        ]);
+    }
     
     #[Route('/commandes', name: 'app_commandes')]
-    public function index(CommandeRepository $commandeRepository): Response
+    public function index(CommandeRepository $commandeRepository,PaginatorInterface $paginator, Request $request): Response
     {
         $commandes = $commandeRepository->findByEtat('Non livrée');
+        $commandes1 = $commandeRepository->findByEtat('livré');
+        $commandes2 = $commandeRepository->findByEtat('en cours');
+        $pagination = $paginator->paginate(
+            $commandes, // Query à paginer
+            $request->query->getInt('page', 1), // Numéro de page par défaut
+            5 // Nombre d'éléments par page
+        );
 
         return $this->render('commande/index.html.twig', [
             'commandes' => $commandes,
+            
+            'pagination' => $pagination,
         ]);
     }
+    public function compteur(CommandeRepository $commandeRepository, string $type): Response
+    {
+        $nombre = 0;
+        switch ($type) {
+            case 'livré':
+                $nombre = count($commandeRepository->findBy(['etat' => 'livré']));
+                break;
+            case 'non livrée':
+                $nombre = count($commandeRepository->findBy(['etat' => 'non livrée']));
+                break;
+            case 'en cours':
+                $nombre = count($commandeRepository->findBy(['etat' => 'en cours']));
+                break;
+        }
 
-
+        return $this->render('commande/compteur_commandes.html.twig', [
+            'type' => $type,
+            'nombreLivre' => $nombre,
+            'nombreNonLivre' => $nombre,
+            'nombreEnCours' => $nombre,
+        ]);
+    }
 
 
 #[Route('/commande/pdf', name: 'commande_pdf_all')]
@@ -207,28 +256,37 @@ public function commandeDetails($id, CommandeRepository $commandeRepository)
   
 
 
-
     #[Route('/livre', name: 'commandes_livre')]
     public function livre(CommandeRepository $commandeRepository): Response
     {
         $commandes = $commandeRepository->findByEtat('livré');
         $clientsFideles = $commandeRepository->trouverClientsFideles();
+     
+
 
         return $this->render('commande/index.html.twig', [
             'commandes' => $commandes,
+           
+            
             'clientsFideles' => $clientsFideles,
         ]);
     }
 
     #[Route('/nonlivre', name: 'commandes_non_livre')]
-    public function nonLivre(CommandeRepository $commandeRepository): Response
+    public function nonLivre(CommandeRepository $commandeRepository/*,PaginatorInterface $paginator, Request $request*/): Response
     {
         $commandes = $commandeRepository->findByEtat('Non livrée');
         $clientsFideles = $commandeRepository->trouverClientsFideles();
+        /*$pagination = $paginator->paginate(
+            $commandes, // Query à paginer
+            $request->query->getInt('page', 1), // Numéro de page par défaut
+            5 // Nombre d'éléments par page
+        );*/
 
         return $this->render('commande/index.html.twig', [
             'commandes' => $commandes,
             'clientsFideles' => $clientsFideles,
+            //'pagination' => $pagination,
         ]);
     }
 
@@ -238,10 +296,12 @@ public function commandeDetails($id, CommandeRepository $commandeRepository)
     {
         $commandes = $commandeRepository->findByEtat('en cours');
         $clientsFideles = $commandeRepository->trouverClientsFideles();
+     
 
         return $this->render('commande/index.html.twig', [
             'commandes' => $commandes,
             'clientsFideles' => $clientsFideles,
+         
         ]);
     }
 

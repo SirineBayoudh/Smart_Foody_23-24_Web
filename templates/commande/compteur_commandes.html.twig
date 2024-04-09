@@ -1,0 +1,9 @@
+{# templates/partials/compteur_commandes.html.twig #}
+
+{% if type == 'livré' %}
+    {{ nombreLivre }}
+{% elseif type == 'non livrée' %}
+   {{ nombreNonLivre }}
+{% elseif type == 'en cours' %}
+   {{ nombreEnCours }}
+{% endif %}

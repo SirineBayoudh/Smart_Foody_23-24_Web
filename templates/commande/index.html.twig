@@ -3,87 +3,202 @@
 {% block title %}Liste des Commandes{% endblock %}
 
 {% block body %}
-<style>.thead-green {
-  background-color:#28a740 ; /* Change this to your desired green color */
-  color: white;  /* Optional: Set text color to white for better contrast */
-}
+<style>
+    .card-clickable {
+        cursor: pointer;
+        transition: transform 0.2s;
+        height: 160px;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+    .btn-warning:hover {
+        background-color: #388E3C;
+    }
+    .btn-primary, .btn-warning {
+        background-color: #4CAF50;
+        color: white;
+        border-color: #388E3C;
+        animation: slideInUp 1s ease forwards;
+    }
+    .card-clickable:hover {
+        transform: scale(1.05);
+    }
+    .card-tale {
+        background-color: #77bb58 !important;
+    }
+    .card-dark-blue {
+        background-color: #008000 !important;
+    }
+    .card-light-blue {
+        background-color: #77bb58 !important;
+    }
+    .card-light-danger {
+        background-color: #008000 !important;
+    }
+    .card {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+    }
+    .card-title {
+        font-size: 18px;
+        color: white !important ;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .card-count {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .card-info {
+        font-size: 14px;
+        color: #666;
+    }
+    .thead-green {
+        background-color: #77bb58;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    .table-container {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .table-frame {
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        overflow: auto;
+    }
+    .table-frame table {
+        width: 100%;
+    }
 </style>
 
-<div class="container-fluid mt-4">  <div class="row">
-    <div class="col-md-3 mb-4 stretch-card transparent cursor-pointer" style="height: 150px;" onclick="window.location.href='{{ path('statistiques') }}'">
-      <div class="card card-tale" style="background-color: #9BCCA5;">
-        <div class="card-body text-center d-flex align-items-center justify-content-center">
-          <a href="{{ path('statistiques') }}">Afficher les Statistiques</a>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-3 mb-4 stretch-card card-clickable" onclick="window.location.href='{{ path('statistiques') }}'">
+            <div class="card card-tale">
+                <p class="card-title">Afficher les Statistiques</p>
+                <p class="card-count">{{ render(controller('App\\Controller\\CommandeController::compteur', {'type': 'statistiques'})) }}</p>
+                <p class="card-count"></p>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-4 stretch-card transparent cursor-pointer" style="height: 150px;" onclick="window.location.href='{{ path('commandes_livre') }}'">
-      <div class="card card-dark-blue" style="background-color: #ADD8E6;">
-        <div class="card-body text-center d-flex align-items-center justify-content-center">
-          <a href="{{ path('commandes_livre') }}">Commandes Livrées</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-4 stretch-card transparent cursor-pointer" style="height: 150px;" onclick="window.location.href='{{ path('commandes_non_livre') }}'">
-      <div class="card card-light-blue" style="background-color: #BFEAFF;">
-        <div class="card-body text-center d-flex align-items-center justify-content-center">
-          <a href="{{ path('commandes_non_livre') }}">Commandes Non Livrées</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-4 stretch-card transparent cursor-pointer" style="height: 150px;" onclick="window.location.href='{{ path('commandes_en_cours') }}'">
-      <div class="card card-light-danger" style="background-color: #D3ECFF;">
-        <div class="card-body text-center d-flex align-items-center justify-content-center">
-          <a href="{{ path('commandes_en_cours') }}">Commandes en cours</a>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="row mt-4">
-    <div class="col-md-12" id="commandeTable">
-      <table class="table table-hover">
-        <thead class="thead-success thead-green">
-          <tr>
-            <th>Nom Client</th>
-            <th>Prénom Client</th>
-            <th>Date Commande</th>
-            <th>Total Commande</th>
-            <th>Remise</th>
-            <th>État</th>
-            <th>Longitude</th>
-            <th>Latitude</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for commande in commandes %}
-          <tr>
-            <td>{{ commande.utilisateur.nom }}</td>
-            <td>{{ commande.utilisateur.prenom }}</td>
-            <td>{{ commande.dateCommande|date('Y-m-d') }}</td>
-            <td>{{ commande.totaleCommande }}</td>
-            <td>{{ commande.remise }}</td>
-            <td>{{ commande.etat }}</td>
-            <td>{{ commande.longitude }}</td>
-            <td>{{ commande.latitude }}</td>
-            <td>
-              <a href="{{ path('commande_detail', {'id': commande.id}) }}" class="btn btn-success">Afficher</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <div class="col-md-3 mb-4 stretch-card card-clickable" onclick="window.location.href='{{ path('commandes_livre') }}'">
+            <div class="card card-dark-blue">
+                <p class="card-title">Commandes Livrées</p>
+                <p class="card-count">{{ render(controller('App\\Controller\\CommandeController::compteur', {'type': 'livré'})) }}</p>
+            </div>
+        </div>
 
-      <a href="{{ path('commande_pdf_all') }}" class="btn btn-success mt-3">PDF All Commande</a>
+        <div class="col-md-3 mb-4 stretch-card card-clickable" onclick="window.location.href='{{ path('commandes_non_livre') }}'">
+            <div class="card card-light-blue">
+                <p class="card-title">Commandes Non Livrées</p>
+                <p class="card-count">{{ render(controller('App\\Controller\\CommandeController::compteur', {'type': 'non livrée'})) }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4 stretch-card card-clickable" onclick="window.location.href='{{ path('commandes_en_cours') }}'">
+            <div class="card card-light-danger">
+                <p class="card-title">Commandes en cours</p>
+                <p class="card-count">{{ render(controller('App\\Controller\\CommandeController::compteur', {'type': 'en cours'})) }}</p>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div id="chartContainer" style="display: none;">
-    <canvas id="chartClientsFideles"></canvas>
-  </div>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <!-- Formulaire de recherche -->
+                 <form id="searchForm" action="{{ path('app_commandes_search') }}" method="GET">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend hover-cursor" id="navbar-search-icon">
+                        <span class="input-group-text" id="search">
+                            <i class="icon-search"></i>
+                        </span>
+                    </div>
+                    <input type="text" class="form-control" name="q" id="navbar-search-input" placeholder="Rechercher maintenant (YYYY-MM-DD)" aria-label="search" aria-describedby="search" pattern="\d{4}-\d{2}-\d{2}" title="Veuillez saisir une date au format YYYY-MM-DD ou une chaîne de caractères valide." required>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">Rechercher</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12" id="commandeTable">
+            <div class="table-frame">
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead class="thead-success thead-green">
+                            <tr>
+                                <th>Nom Client</th>
+                                <th>Prénom Client</th>
+                                <th>Date Commande</th>
+                                <th>Total Commande</th>
+                                <th>Remise</th>
+                                <th>État</th>
+                                <th>Adresse de livraison</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if commandes is defined %}
+                                {% for commande in commandes %}
+                                    <tr>
+                                        <td>{{ commande.utilisateur.nom }}</td>
+                                        <td>{{ commande.utilisateur.prenom }}</td>
+                                        <td>{{ commande.dateCommande|date('Y-m-d') }}</td>
+                                        <td>{{ commande.totaleCommande }}</td>
+                                        <td>{{ commande.remise }}</td>
+                                        <td>{{ commande.etat }}</td>
+                                        <td>{{ commande.address }}</td>
+                                        <td>
+                                            <a href="{{ path('commande_detail', {'id': commande.id}) }}" class="btn btn-success">Afficher</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <a href="{{ path('commande_pdf_all') }}" class="btn btn-warning btn-icon-text" >PDF Toutes les Commandes</a>
+        </div>
+    </div>
+
+    <div id="chartContainer" style="display: none;">
+        <canvas id="chartClientsFideles"></canvas>
+    </div>
 </div>
 
+<script>
+    // JavaScript pour synchroniser le défilement horizontal entre l'en-tête et le corps de la table
+    const table = document.querySelector('.table-container table');
+    const thead = document.querySelector('.thead-green');
 
+    table.addEventListener('scroll', function() {
+        thead.style.transform = `translateY(${this.scrollTop}px)`;
+    });
+      // Validation du formulaire de recherche
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        const searchInput = document.getElementById('navbar-search-input');
+        const searchValue = searchInput.value.trim();
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        const stringRegex = /^[a-zA-Z\s]*$/;
+
+        if (!searchValue.match(dateRegex) && !searchValue.match(stringRegex)) {
+            alert('Veuillez saisir une date au format YYYY-MM-DD ou une chaîne de caractères valide.');
+            event.preventDefault();
+        }
+    });
+</script>
 
 {% endblock %}
