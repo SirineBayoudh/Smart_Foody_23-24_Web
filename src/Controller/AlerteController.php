@@ -68,17 +68,12 @@ class AlerteController extends AbstractController
         return $this->redirectToRoute('alerte_get');
     }
 
+
     #[Route('/delete-read-alerts/{alertId}', name: 'delete_read_alerts')]
     public function deleteReadAlerts($alertId, EntityManagerInterface $entityManager, FlashBagInterface $flashBag): Response
     {
         // Récupérer l'alerte à partir de son ID
         $alert = $entityManager->getRepository(Alerte::class)->find($alertId);
-
-        // if (!$alert) {
-        //     // Si l'alerte n'est pas trouvée, afficher un message d'erreur
-        //     $flashBag->add('error', 'L\'alerte sélectionnée n\'existe pas.');
-        //     return $this->redirectToRoute('alerte_get');
-        // }
 
         // Date limite pour la suppression des alertes lues après 2 jours
         $limitDate = new \DateTime('-2 days');
@@ -93,7 +88,17 @@ class AlerteController extends AbstractController
             $flashBag->add('success', 'L\'alerte a été supprimée avec succès.');
         } else {
             // Si une condition n'est pas vérifiée, afficher un message d'avertissement
-            $flashBag->add('warning', 'Cette alerte ne peut pas être supprimée.');
+
+
+            // Afficher un message spécifique si l'alerte est non lue
+            if (!$alert->isType()) {
+                $flashBag->add('warning', 'Il faut lire cette alerte avant de pouvoir la supprimer.');
+            }
+
+            // Afficher un message spécifique si la date de l'alerte est récente
+            if ($alert->getDateAlerte() > $limitDate) {
+                $flashBag->add('warning', 'Il faut attendre au moins 2 jours avant de pouvoir supprimer cette alerte.');
+            }
         }
 
         // Rediriger vers une page appropriée

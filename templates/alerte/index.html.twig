@@ -36,13 +36,30 @@
                             <td>{{ a.description_alerte }}</td>
                             <td>{{ a.isType() ? 'Lue' : 'Non lue' }}</td>
                             <td>
+                              <a  href="{{ path('update_alert_type', {'id_alerte': a.id_alerte}) }}"  class="btn btn-danger btn-sm" title="Modifier" onclick="return confirmSwal();" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
+                              onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
+                              onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+                              <i class="ti-eye"></i>
+                           </a> 
+                          </td>
+                            {# <td>
 
     <a href="{{ path('update_alert_type', {'id_alerte': a.id_alerte}) }}" class="alert-link"><button type="button" class="btn btn-warning">Modifier</button></a>
 </td>
-             <td>   
-              <a href="{{ path('delete_read_alerts', {'alertId': a.id_alerte}) }}" class="alert-link"><button type="button" class="btn btn-danger"> Supprimer</button></a>
-          </td>     </td>
-                        </tr>
+             #} <td>
+    <a href="#" class="btn btn-danger btn-sm" title="Supprimer" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
+    onclick="confirmSwal(event, {{ a.id_alerte }})">
+    <i class="ti-trash"></i>
+</a>
+</td>
+
+             {# <td>
+              <a href="{{ path('delete_read_alerts', {'alertId': a.id_alerte}) }}" class="btn btn-danger btn-sm" title="Supprimer" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
+                  onclick="confirmSwal(event)">
+                  <i class="ti-trash"></i>
+              </a>
+          </td> #}
+                </tr>
                     {% endfor %}
                    
                     </tbody>
@@ -57,6 +74,41 @@
       
   
 </div>
+<script>
+    function confirmSwal(event, alertId) {
+        event.preventDefault(); // Empêcher le comportement par défaut du lien
+        
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: false
+        });
+
+        swalWithBootstrapButtons.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si l'utilisateur confirme la suppression, naviguer vers l'URL de suppression
+                window.location.href = "{{ path('delete_read_alerts', {'alertId': 'ALERT_ID'}) }}".replace('ALERT_ID', alertId);
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire({
+                    title: "Cancelled",
+                    text: "Your imaginary file is safe :)",
+                    icon: "error"
+                });
+            }
+        });
+    }
+</script>
+
 
     {% endblock %}
     
