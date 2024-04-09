@@ -13,6 +13,7 @@ use App\Service\SmsGenerator;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,61 +24,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class StockController extends AbstractController
 {
-    // #[Route('/stock', name: 'stock_get')]
-    // public function getStock(StockRepository $stockRepo, ProduitRepository $produitRepo, EntityManagerInterface $entityManager, FlashBagInterface $flashBag): Response
-    // {
-    //     // Récupérez les données de la table Stock et Produit
-    //     $stocks = $stockRepo->findAll();
-    //     $produits = $produitRepo->findAll();
-
-    //     // Parcourez les stocks pour effectuer la vérification et afficher une alerte si nécessaire
-    //     foreach ($stocks as $stock) {
-    //         // Vérifiez si nbVendu est nul
-    //         if ($stock->getNbvendu() === null) {
-    //             // Affectez la valeur 0 à nbVendu
-    //             $stock->setNbvendu(0);
-    //         }
-
-    //         // Vérifiez si nbVendu est égal à quantite
-    //         if ($stock->getNbvendu() === $stock->getQuantite()) {
-    //             // Ajoutez un message flash avec une classe pour l'alerte rouge
-    //             $flashBag->add('danger', 'La quantité vendue est égale à la quantité en stock pour le produit ' . $stock->getNom());
-    //         }
-    //     }
-
-    //     // Parcourez les stocks pour calculer et mettre à jour le coût pour chaque stock
-    //     foreach ($stocks as $stock) {
-    //         // Récupérez la marque et la quantité du stock actuel
-    //         $stockMarque = $stock->getMarque();
-    //         $quantite = $stock->getQuantite();
-
-    //         // Recherchez le produit correspondant dans la table Produit
-    //         foreach ($produits as $produit) {
-    //             // Si la marque du stock correspond à la marque du produit
-    //             if ($produit->getMarque() === $stockMarque) {
-    //                 // Récupérez le prix du produit
-    //                 $prix = $produit->getPrix();
-
-    //                 // Calculez le coût en multipliant la quantité par le prix
-    //                 $cout = $quantite * $prix;
-
-    //                 // Mettez à jour le coût dans l'entité Stock
-    //                 $stock->setCout($cout);
-
-    //                 // Enregistrez les modifications dans la base de données
-    //                 $entityManager->flush();
-
-    //                 // Sortez de la boucle car nous avons trouvé le produit correspondant
-    //                 break;
-    //             }
-    //         }
-    //     }
-
-    //     // Passez les stocks à la vue
-    //     return $this->render('stock/index.html.twig', [
-    //         'stocks' => $stocks,
-    //     ]);
-    // }
 
     #[Route('/stock', name: 'stock_get')]
     public function getStock(
@@ -86,10 +32,19 @@ class StockController extends AbstractController
         EntityManagerInterface $entityManager,
         FlashBagInterface $flashBag,
         SmsGenerator $smsGenerator,
-        Request $request
+        Request $request,
+        PaginatorInterface $paginator
     ): Response {
         $this->updateStockFromCommande($entityManager);
+        $queryBuilder = $stockRepo->createQueryBuilder('s');
 
+        $pagination = $paginator->paginate(
+            $queryBuilder->where('s.date_arrivage <= :date')
+                ->setParameter('date', new \DateTime())
+                ->getQuery(),
+            $request->query->getInt('page', 1),
+            2
+        );
         $futureStocks = $stockRepo->findFutureStocks();
 
         // Utilisez la méthode findExistantStocks avec ou sans terme de recherche
@@ -153,6 +108,7 @@ class StockController extends AbstractController
 
         // Passez les stocks à la vue
         return $this->render('stock/index.html.twig', [
+            'pagination' => $pagination,
             'stocks' => $stocks,
             'futureStocks' => $futureStocks,
         ]);
@@ -266,10 +222,19 @@ class StockController extends AbstractController
 
 
     #[Route('/stock_venir', name: 'stock_venir')]
-    public function getFutureStocks(StockRepository $stockRepository): Response
+    public function getFutureStocks(StockRepository $stockRepository,  PaginatorInterface $paginator, Request $request): Response
     {
         // Récupérer les stocks à venir depuis le repository
         $futureStocks = $stockRepository->findFutureStocks();
+        $queryBuilder = $stockRepository->createQueryBuilder('s');
+
+        $pagination = $paginator->paginate(
+            $queryBuilder->where('s.date_arrivage > :date')
+                ->setParameter('date', new \DateTime())
+                ->getQuery(),
+            $request->query->getInt('page', 1),
+            10
+        );
         foreach ($futureStocks as $stock) {
             // Vérifiez si nbVendu est nul
             if ($stock->getNbvendu() === null) {
@@ -279,6 +244,7 @@ class StockController extends AbstractController
         }
         return $this->render('stock/future_stocks.html.twig', [
             'futureStocks' => $futureStocks,
+            'pagination' => $pagination,
         ]);
     }
 
