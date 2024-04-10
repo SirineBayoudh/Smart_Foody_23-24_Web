@@ -1,0 +1,44 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}Reclamations{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/reclamationCss/reclamation.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div>
+        <br>
+        <div class="table-responsive"></div>
+                <h1 class="card-title">Liste des réclamations</h1>
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Id Reclamation</th>
+                            <th>Id Client</th>
+                            <th>Description</th>
+                            <th>Titre</th>
+                            <th>Statut</th>
+                            <th>Type</th>
+                            <th>Date Reclamation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reclamation in reclamations %}
+                            <tr class="text-center">
+                                <td>{{ reclamation.id }}</td>
+                                <td>{{ reclamation.idClient.nom }}</td>
+                                <td>{{ reclamation.description }}</td>
+                                <td>{{ reclamation.titre }}</td>
+                                <td>{{ reclamation.statut }}</td>
+                                <td>{{ reclamation.type }}</td>
+                                <td>{{ reclamation.dateReclamation|date('Y-m-d') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>    
+    </div>
+{% endblock %}
+

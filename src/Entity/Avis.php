@@ -2,6 +2,11 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert; //Pour le controlle de saisie
+
+use App\Entity\Utilisateur;
+use App\Entity\Produit;
+
 use App\Repository\AvisRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,16 +20,23 @@ class Avis
     private ?int $id_avis = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le champ obligatoire")]
+    #[Assert\Range(
+        min: 1,
+        max: 5,
+        notInRangeMessage: "La valeur doit être comprise entre {{ min }} et {{ max }}"
+    )]
     private ?int $nb_etoiles = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"champs obligatoire")]
     private ?string $commentaire = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date_avis = null;
+    private ?\DateTimeInterface $date_avis;
 
     #[ORM\Column]
-    private ?int $signaler = null;
+    private ?int $signaler = 0;
 
     #[ORM\ManyToOne(inversedBy: 'avis')]
     #[ORM\JoinColumn(name: "id_client", referencedColumnName: "id_utilisateur")]
@@ -33,6 +45,12 @@ class Avis
     #[ORM\ManyToOne(inversedBy: 'avis')]
     #[ORM\JoinColumn(name: "ref_produit", referencedColumnName: "ref")]
     private ?Produit $ref_produit = null;
+
+
+    public function __construct()
+    {
+        $this->date_avis = new \DateTime(); // Valeur par défaut pour la date de l'avis
+    }
 
     public function getId(): ?int
     {
@@ -47,7 +65,6 @@ class Avis
     public function setNbEtoiles(int $nb_etoiles): static
     {
         $this->nb_etoiles = $nb_etoiles;
-
         return $this;
     }
 
@@ -59,7 +76,6 @@ class Avis
     public function setCommentaire(string $commentaire): static
     {
         $this->commentaire = $commentaire;
-
         return $this;
     }
 
@@ -71,7 +87,6 @@ class Avis
     public function setDateAvis(\DateTimeInterface $date_avis): static
     {
         $this->date_avis = $date_avis;
-
         return $this;
     }
 
@@ -83,7 +98,6 @@ class Avis
     public function setSignaler(int $signaler): static
     {
         $this->signaler = $signaler;
-
         return $this;
     }
 
@@ -95,7 +109,6 @@ class Avis
     public function setIdClient(?Utilisateur $id_client): static
     {
         $this->id_client = $id_client;
-
         return $this;
     }
 
@@ -107,7 +120,6 @@ class Avis
     public function setRefProduit(?Produit $ref_produit): static
     {
         $this->ref_produit = $ref_produit;
-
         return $this;
     }
 }

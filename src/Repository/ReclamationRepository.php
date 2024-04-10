@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Reclamation;
+use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Repository\UtilisateurRepository; // Importation du repository UtilisateurRepository
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,29 +22,22 @@ class ReclamationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Reclamation::class);
     }
+   
+    // Méthode personnalisée pour trouver les réclamations avec un état spécifique.
+    public function findByArchive($val)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.archive = :val')
+            ->setParameter('val', $val)
+            ->getQuery()
+            ->getResult();
+    }
 
-//    /**
-//     * @return Reclamation[] Returns an array of Reclamation objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function prepareReclamationFormForUser7(int $userId, UtilisateurRepository $utilisateurRepository)
+        {
+            // Correction ici : Fetch the user with the provided ID
+            $user = $utilisateurRepository->find($userId);
 
-//    public function findOneBySomeField($value): ?Reclamation
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+            return $user;
+        }
 }

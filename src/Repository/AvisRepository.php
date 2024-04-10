@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Avis;
+use App\Entity\Utilisateur;
+use App\Entity\Produit;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,6 +23,35 @@ class AvisRepository extends ServiceEntityRepository
         parent::__construct($registry, Avis::class);
     }
 
+    public function prepareReclamationFormForUser7(int $userId, UtilisateurRepository $utilisateurRepository)
+    {
+        // Fetch the user with the provided ID
+        $user = $utilisateurRepository->find($userId);
+    
+        return $user;
+    }
+
+    public function prepareReclamationFormProduit(int $refProduit, ProduitRepository $produitRepository)
+    {
+        // Fetch the user with the provided ID
+        $ref = $produitRepository->find($refProduit);
+    
+        return $ref;
+    }
+
+    // Méthode personnalisée pour trouver les avis avec pour un produit spécifique.
+        public function findByproduit($val)
+        {
+            return $this->createQueryBuilder('r')
+                ->andWhere('r.ref_produit = :val')
+                ->setParameter('val', $val)
+                ->orderBy('r.date_avis', 'DESC')
+                ->setMaxResults(4)
+                ->getQuery()
+                ->getResult();
+        }
+
+    
 //    /**
 //     * @return Avis[] Returns an array of Avis objects
 //     */

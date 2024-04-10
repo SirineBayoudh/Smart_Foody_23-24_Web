@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Soumettre une réclamation{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reclamationCss/ajoutRec.css') }}">
+{% endblock %}
+
+{% block body %}
+
+      {{ include('reclamation/form.html.twig') }}
+
+     
+{% endblock %}
