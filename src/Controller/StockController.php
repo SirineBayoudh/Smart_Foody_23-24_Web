@@ -14,6 +14,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Component\Pager\PaginatorInterface;
+use PHPExcel;
+use PHPExcel_IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +25,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 
 class StockController extends AbstractController
 {
@@ -321,5 +329,60 @@ class StockController extends AbstractController
 
         // Redirection vers une autre route après la mise à jour des stocks
         return $this->redirectToRoute('stock_get');
+    }
+
+    #[Route('/pdf', name: 'export_pdf')]
+    public function exportPdf(StockRepository $stockRepo): Response
+    {
+        // Récupérer les données à exporter depuis la base de données
+        // $data = $this->getDoctrine()->getRepository(Stock::class)->findExistantStocks();
+        $data = $stockRepo->findExistantStocks();
+        // Créer une instance de Dompdf avec des options
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Générer le contenu HTML pour le PDF à partir des données
+        $html = $this->renderView('stock/pdf_template.html.twig', ['data' => $data]);
+
+        // Charger le contenu HTML dans Dompdf
+        $dompdf->loadHtml($html);
+
+        // Générer le PDF
+        $dompdf->render();
+
+        // Renvoyer le PDF en tant que réponse HTTP
+        $response = new Response($dompdf->output());
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="export.pdf"');
+
+        return $response;
+    }
+    #[Route('/pdf_venir', name: 'export_pdffuture')]
+    public function exportPdf_venir(StockRepository $stockRepo): Response
+    {
+        // Récupérer les données à exporter depuis la base de données
+        // $data = $this->getDoctrine()->getRepository(Stock::class)->findExistantStocks();
+        $data = $stockRepo->findFutureStocks();
+        // Créer une instance de Dompdf avec des options
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Générer le contenu HTML pour le PDF à partir des données
+        $html = $this->renderView('stock/pdf_template.html.twig', ['data' => $data]);
+
+        // Charger le contenu HTML dans Dompdf
+        $dompdf->loadHtml($html);
+
+        // Générer le PDF
+        $dompdf->render();
+
+        // Renvoyer le PDF en tant que réponse HTTP
+        $response = new Response($dompdf->output());
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="export.pdf"');
+
+        return $response;
     }
 }

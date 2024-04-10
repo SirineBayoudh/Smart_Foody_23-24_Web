@@ -74,6 +74,11 @@
                     </tbody>
                   </table>
                 </div>
+                <td>
+                    <a href="{{ path('export_pdffuture') }}" class="export-btn">
+                        <button type="button" class="btn btn-secondary">Export PDF</button>
+                    </a>
+        </td>
                 <div class="d-flex justify-content-center">
                     {% do pagination.setPageRange(2) %}
                     {{ knp_pagination_render(pagination, 'pagination.html.twig') }}
@@ -90,7 +95,8 @@
               </div>
             </div>
           </div>
-       
+      
+
     
     {% for flash_message in app.session.flashbag.get('danger') %}
         <div class="alert alert-danger" role="alert">
