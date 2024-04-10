@@ -61,7 +61,24 @@ class CommandeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
-
+/**
+ * Trouve la dernière commande en cours pour un utilisateur donné.
+ *
+ * @param int $idUtilisateur L'identifiant de l'utilisateur.
+ * @return Commande|null La dernière commande en cours si trouvée, sinon null.
+ */
+public function findDerniereCommandeEnCoursParUtilisateur(int $idUtilisateur): ?Commande
+{
+    return $this->createQueryBuilder('c')
+        ->where('c.utilisateur = :idUtilisateur')
+        ->andWhere('c.etat = :etat')
+        ->setParameter('idUtilisateur', $idUtilisateur)
+        ->setParameter('etat', 'non validé')
+        ->orderBy('c.dateCommande', 'DESC') // Assure le tri des commandes par date, la plus récente d'abord
+        ->setMaxResults(1) // Limite à la commande la plus récente
+        ->getQuery()
+        ->getOneOrNullResult();
+}
     // Compte le nombre de commandes par ID client
     public function countCommandesByClientId(int $clientId): int
     {

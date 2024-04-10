@@ -219,15 +219,20 @@ public function ajouterProduitPanier(Request $request, $ref,ProduitRepository $p
 if (!$utilisateur) {
     throw $this->createNotFoundException('Utilisateur non trouvé pour l\'ID '.$id_client);
 }
-    $commande = new Commande();
-    $commande->setDateCommande(new \DateTime());
-  
-$commande->setUtilisateur($utilisateur);
 
-   
-    $commande->setTotaleCommande($panier->getTotale());
-    $commande->setRemise(0);
-    $commande->setEtat('non validé');
+
+
+
+    $commande = $this->commandeRepository->findDerniereCommandeEnCoursParUtilisateur($id_client);
+    if (!$commande) {
+        $commande = new Commande();
+        $commande->setDateCommande(new \DateTime());
+        $commande->setUtilisateur($utilisateur);
+        $commande->setEtat('non validé');
+    }
+    $commande->setTotaleCommande($total);
+
+
 
 
     foreach ($panier->getLignesCommande() as $ligneCommande) {
@@ -299,11 +304,11 @@ return $this->render('produit/index.html.twig', [
 'prixTotalApresRemise' => $prixTotalApresRemise,
 'nombreArticlesDansPanier' => $nombreArticlesDansPanier,
 
+
 'produits' => $produits,
+
 ]);
 }
-
-
 
 
 
@@ -382,64 +387,59 @@ public function augmenterQuantite($idLigneCommande): Response
 
 
 
-
-
-
-
+//afficher une alerte quand il veux décrementer la qte de 1 //controle de saisie
 
 /**
-     * @Route("/panier/diminuer_quantite/{idLigneCommande}", name="diminuer_quantite")
-     */
-    public function diminuerQuantite($idLigneCommande): Response
-    {
-        $ligneCommande = $this->ligneCommandeRepository->find($idLigneCommande);
+ * @Route("/panier/diminuer_quantite/{idLigneCommande}", name="diminuer_quantite")
+ */
+public function diminuerQuantite($idLigneCommande): Response
+{
+    $ligneCommande = $this->ligneCommandeRepository->find($idLigneCommande);
 
     if ($ligneCommande) {
-        $ligneCommande->setQuantite($ligneCommande->getQuantite() -1);
-        $this->entityManager->persist($ligneCommande);
-        $this->entityManager->flush();
+        $quantiteActuelle = $ligneCommande->getQuantite();
 
-        $panier = $ligneCommande->getPanier();
+        if ($quantiteActuelle > 0) {
+            // Réduire la quantité si elle est supérieure à 0
+            $ligneCommande->setQuantite($quantiteActuelle - 1);
 
-      
-        $total = 0.0;
-        foreach ($panier->getLignesCommande() as $ligne) {
-            $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
-        }
-        $panier->setTotale($total);
-
-
-        $nombreDeCommandes = $this->commandeRepository->countCommandesByClientId($panier->getUtilisateur()->getId());
-
-        $dateActuelle = new \DateTime();
-        $dateDebutRemise = new \DateTime('2024-01-01');
-        $dateFinRemise = new \DateTime('2024-02-01');
-        $dateDansPeriodeRemise = $dateActuelle >= $dateDebutRemise && $dateActuelle < $dateFinRemise;
-
-        if ($dateDansPeriodeRemise) {
-            $remise = $total * 0.5;
-        } else {
-            if ($nombreDeCommandes >= 3 && $nombreDeCommandes <= 9) {
-                $remise = $total * 0.15;
-            } elseif ($nombreDeCommandes > 9) {
-                $remise = $total * 0.25;
-            } else {
-                $remise = 0;
+            // Supprimer le produit si la quantité devient 0
+            if ($quantiteActuelle - 1 == 0) {
+                $this->entityManager->remove($ligneCommande);
+                $this->addFlash('notice', 'Produit supprimé car la quantité est zéro.');
             }
+        } else {
+            // Si la quantité est déjà à 0, afficher un message d'erreur
+            $this->addFlash('error', 'Impossible de diminuer la quantité en dessous de zéro.');
         }
 
-       
-        $panier->setRemise($remise);
-        $prixTotalApresRemise = $total - $remise;
-
-       
-        $this->entityManager->persist($panier);
         $this->entityManager->flush();
+
+        // Réactualiser le panier si encore pertinent
+        if ($quantiteActuelle > 0) {
+            $panier = $ligneCommande->getPanier();
+            $total = 0.0;
+            foreach ($panier->getLignesCommande() as $ligne) {
+                $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
+            }
+            $panier->setTotale($total);
+
+            $this->entityManager->persist($panier);
+            $this->entityManager->flush();
+        }
+    } else {
+        // Si la ligne de commande n'est pas trouvée, rediriger vers la page du panier avec un message d'erreur
+        $this->addFlash('error', 'La ligne de commande n\'a pas été trouvée.');
+        return $this->redirectToRoute('voir_panier');
     }
 
-    return $this->redirectToRoute('voir_panier', ['ref' => $ligneCommande->getProduit()->getRef()]);
-    
+    return $this->redirectToRoute('voir_panier');
 }
+
+
+
+
+
     
 
 
@@ -492,11 +492,13 @@ public function augmenterQuantite($idLigneCommande): Response
 
                 $entityManager->persist($commande);
                 $entityManager->flush();
+                $this->viderrPanier($request);
 
                 return $this->redirectToRoute('app_test'); // Assurez-vous que c'est la route correcte
             } else {
                 // Stocker totalEnDevise dans la session avant la redirection
                 $session->set('totalEnDevise', $totalEnDevise);
+                $session->set('idcommande', $commande->getId());
                 
                 return $this->redirectToRoute('stripe'); // Rediriger vers la page de paiement Stripe
             }
@@ -507,6 +509,25 @@ public function augmenterQuantite($idLigneCommande): Response
             // Vous pouvez aussi passer totalEnDevise ici si nécessaire
         ]);
     }
+/**
+ * Vider le panier en rendant les lignes de commande orphelines.
+ */
+private function viderrPanier(Request $request): void
+{
+    $session = $request->getSession();
+    $panierId = $session->get('panier_id');
+    if ($panierId) {
+        $panier = $this->panierRepository->find($panierId);
+        foreach ($panier->getLignesCommande() as $ligne) {
+            // Rendre la ligne de commande orpheline
+            $ligne->setPanier(null);
+            $this->entityManager->persist($ligne);
+        }
+        // Réinitialiser le total du panier à 0
+        $panier->setTotale(0.0);
+        $this->entityManager->flush();
+    }
+}
 
 
 
