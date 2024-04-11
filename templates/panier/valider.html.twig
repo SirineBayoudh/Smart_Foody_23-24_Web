@@ -1,6 +1,5 @@
 {% extends 'base_accueil.html.twig' %}
 
-
 {% block header_image %}
 <div class="hero-wrap hero-bread" style="background-image: url('{{ asset('images/bg_1.jpg') }}');">
     <div class="container">
@@ -15,6 +14,27 @@
 {% endblock %}
 
 {% block body %}
+<style>
+    #mapContainer {
+        display: none; /* Pour cacher la carte par défaut */
+        text-align: center;
+        margin-top: 20px;
+    }
+    #map {
+        height: 400px;
+        width: 80%;
+        margin: auto;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+</style>
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -25,46 +45,127 @@
                 <div class="card-body">
                     <h5 class="card-title">Détails de la commande</h5>
                     <p class="card-text"><strong> Nom Client :</strong> {{ commande.utilisateur.nom }}</p>
-                <p class="card-text"><strong> Prenom Client :</strong> {{ commande.utilisateur.prenom }}</p>
-
+                    <p class="card-text"><strong> Prenom Client :</strong> {{ commande.utilisateur.prenom }}</p>
                     <p class="card-text"><strong>Date Commande:</strong> {{ commande.dateCommande|date('Y-m-d') }}</p>
                     <p class="card-text"><strong>Total Commande:</strong> {{ commande.totaleCommande }} TND </p>
-                      <p class="card-text"><strong>Remise:</strong> {{ commande.remise }}TND</p>
-
-{% set pourcentageRemise = ((commande.totaleCommande - prixTotalAvecRemise) / commande.totaleCommande) * 100 %}
-<p class="card-text"><strong>Pourcentage Remise:</strong> {{ pourcentageRemise }} %</p>
-
-
-                  <p class="card-text"><strong>Prix Total avec Remise:</strong> {{ prixTotalAvecRemise }} TND</p> <!-- Nouveau champ -->
-
+                    <p class="card-text"><strong>Remise:</strong> {{ commande.remise }}TND</p>
+                    {% set pourcentageRemise = ((commande.totaleCommande - prixTotalAvecRemise) / commande.totaleCommande) * 100 %}
+                    <p class="card-text"><strong>Pourcentage Remise:</strong> {{ pourcentageRemise }} %</p>
+                    <p class="card-text"><strong>Prix Total avec Remise:</strong> {{ prixTotalAvecRemise }} TND</p> <!-- Nouveau champ -->
                     <p class="card-text"><strong>Total en Devise (EUR):</strong> {{ totalEnDevise }} €</p> <!-- Affiche le total en devise -->
-
-                  
                     <p class="card-text"><strong>État:</strong> {{ commande.etat }}</p>
-                    <p class="card-text"><strong>Coordonnées:</strong> {{ commande.longitude }}, {{ commande.latitude }}</p>
+                    <p class="card-text"><strong>Coordonnées:</strong> {{ commande.address }}</p>
                     <!-- Bouton Ouvrir la carte -->
                     <div class="mb-3">
-                        <a href="{{ path('routeMaps', {'id': commande.id}) }}" class="btn btn-outline-success">Ouvrir la carte</a>
+                        <button id="openMapButton" class="btn btn-outline-success">Ouvrir la carte</button>
                     </div>
-                   
 
-               
+                    <!-- Formulaire pour la localisation -->
+                    <div id="mapContainer">
+                        <div id="map"></div>
+                        <form method="post" id="locationForm">
+                            <input type="hidden" id="latitude" name="latitude" value="">
+                            <input type="hidden" id="longitude" name="longitude" value="">
+                            <input type="hidden" id="adresse" name="adresse" placeholder="Adresse" />
 
+                            <div id="buttonContainer" style="text-align: center; margin-top: 20px;">
+                                <button type="button" class="btn btn-primary" onclick="sendData()">Confirmer l'emplacement</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Fin du formulaire -->
+
+                    <!-- Votre formulaire de commande et autres éléments ici -->
                     <form action="{{ path('payment', {'id': commande.id}) }}" method="post">
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="etatCommande" name="etatCommande" value="nonLivree" />
                             <label class="form-check-label" for="etatCommande">Payer à la Livraison</label>
                         </div>
-                          <a href="{{ path('cANU', {'id': commande.id}) }}" class="btn btn-primary">Anuuler la commande</a>
+                        <a href="{{ path('cANU', {'id': commande.id}) }}" class="btn btn-primary">Anuuler la commande</a>
                         <button type="submit" class="btn btn-primary">Valider la Commande</button>
-
                     </form>
-                      
-
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+
+<script>
+// Fonction pour ouvrir la carte
+document.getElementById("openMapButton").addEventListener("click", function() {
+    document.getElementById("mapContainer").style.display = "block";
+    initMap(); // Initialiser la carte une fois qu'elle est affichée
+});
+
+// Initialisation de la carte Google Maps
+function initMap() {
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 6, // Vous pouvez ajuster le niveau de zoom selon vos besoins
+        center: {lat: 34.0000, lng: 9.0000} // Coordonnées centrées sur la Tunisie
+    });
+
+    // Ajout d'un écouteur d'événements pour les clics sur la carte
+    map.addListener('click', function(e) {
+        placeMarkerAndPanTo(e.latLng, map);
+    });
+}
+
+function placeMarkerAndPanTo(latLng, map) {
+    if (window.marker) window.marker.setMap(null);
+    window.marker = new google.maps.Marker({
+        position: latLng,
+        map: map
+    });
+    map.panTo(latLng);
+    document.getElementById('latitude').value = latLng.lat();
+    document.getElementById('longitude').value = latLng.lng();
+
+    // Utilisation du géocodage inversé pour obtenir l'adresse
+    var geocoder = new google.maps.Geocoder;
+    geocoder.geocode({'location': latLng}, function(results, status) {
+        if (status === 'OK') {
+            if (results[0]) {
+                document.getElementById('adresse').value = results[0].formatted_address;
+            } else {
+                window.alert('Aucun résultat trouvé');
+            }
+        } else {
+            window.alert('Le géocodage a échoué en raison de : ' + status);
+        }
+    });
+}
+
+// Envoi des données de localisation au serveur
+function sendData() {
+    var latitude = document.getElementById('latitude').value;
+    var longitude = document.getElementById('longitude').value;
+    var adresse = document.getElementById('adresse').value; // Récupération de l'adresse
+
+    var urlParts = window.location.pathname.split('/');
+    var id = urlParts[urlParts.length - 1];
+
+    var url = `/commande/validermaps/${id}`;
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ latitude: latitude, longitude: longitude, adresse: adresse }) // Envoi de l'adresse
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('L\'emplacement et l\'adresse ont été confirmés avec succès.');
+            window.location.href = `/commande/valider/${id}`;
+        } else {
+            alert('Une erreur est survenue.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de la communication avec le serveur.');
+    });
+}
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAZxrDjNK7_HqMz-reXjQXfG6-fAmOf1s&callback=initMap"></script>
 {% endblock %}

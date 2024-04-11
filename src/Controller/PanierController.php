@@ -213,7 +213,7 @@ public function ajouterProduitPanier(Request $request, $ref,ProduitRepository $p
 
     $this->entityManager->persist($panier);
     $this->entityManager->flush();
-
+ 
  
 
 if (!$utilisateur) {
@@ -249,8 +249,8 @@ if (!$utilisateur) {
 $dateActuelle = new \DateTime();
 
 
-$dateDebutRemise = new \DateTime('2024-01-01');
-$dateFinRemise = new \DateTime('2024-02-01');
+$dateDebutRemise = new \DateTime('2024-04-10');
+$dateFinRemise = new \DateTime('2024-04-15');
 $dateDansPeriodeRemise = $dateActuelle >= $dateDebutRemise && $dateActuelle < $dateFinRemise;
 
 
@@ -304,7 +304,6 @@ return $this->render('produit/index.html.twig', [
 'prixTotalApresRemise' => $prixTotalApresRemise,
 'nombreArticlesDansPanier' => $nombreArticlesDansPanier,
 
-
 'produits' => $produits,
 
 ]);
@@ -343,43 +342,23 @@ public function augmenterQuantite($idLigneCommande): Response
 
         $panier = $ligneCommande->getPanier();
 
-      
+        // Mise à jour du total du panier
         $total = 0.0;
         foreach ($panier->getLignesCommande() as $ligne) {
             $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
         }
         $panier->setTotale($total);
 
-
-        $nombreDeCommandes = $this->commandeRepository->countCommandesByClientId($panier->getUtilisateur()->getId());
-
-        $dateActuelle = new \DateTime();
-        $dateDebutRemise = new \DateTime('2024-01-01');
-        $dateFinRemise = new \DateTime('2024-02-01');
-        $dateDansPeriodeRemise = $dateActuelle >= $dateDebutRemise && $dateActuelle < $dateFinRemise;
-
-        if ($dateDansPeriodeRemise) {
-            $remise = $total * 0.5;
-        } else {
-            if ($nombreDeCommandes >= 3 && $nombreDeCommandes <= 9) {
-                $remise = $total * 0.15;
-            } elseif ($nombreDeCommandes > 9) {
-                $remise = $total * 0.25;
-            } else {
-                $remise = 0;
-            }
-        }
-
-       
+        // Utilisation de la méthode de calcul de la remise
+        $remise = $this->calculerRemise($panier, $panier->getUtilisateur());
         $panier->setRemise($remise);
-        $prixTotalApresRemise = $total - $remise;
 
-       
+        // Mettre à jour le panier avec les nouvelles valeurs
         $this->entityManager->persist($panier);
         $this->entityManager->flush();
     }
 
-    return $this->redirectToRoute('voir_panier', ['ref' => $ligneCommande->getProduit()->getRef()]);
+    return $this->redirectToRoute('voir_panier');
 }
 
 
@@ -392,52 +371,84 @@ public function augmenterQuantite($idLigneCommande): Response
 /**
  * @Route("/panier/diminuer_quantite/{idLigneCommande}", name="diminuer_quantite")
  */
+/**
+ * @Route("/panier/diminuer_quantite/{idLigneCommande}", name="diminuer_quantite")
+ */
+/**
+ * @Route("/panier/diminuer_quantite/{idLigneCommande}", name="diminuer_quantite")
+ */
 public function diminuerQuantite($idLigneCommande): Response
 {
     $ligneCommande = $this->ligneCommandeRepository->find($idLigneCommande);
-
-    if ($ligneCommande) {
-        $quantiteActuelle = $ligneCommande->getQuantite();
-
-        if ($quantiteActuelle > 0) {
-            // Réduire la quantité si elle est supérieure à 0
-            $ligneCommande->setQuantite($quantiteActuelle - 1);
-
-            // Supprimer le produit si la quantité devient 0
-            if ($quantiteActuelle - 1 == 0) {
-                $this->entityManager->remove($ligneCommande);
-                $this->addFlash('notice', 'Produit supprimé car la quantité est zéro.');
-            }
-        } else {
-            // Si la quantité est déjà à 0, afficher un message d'erreur
-            $this->addFlash('error', 'Impossible de diminuer la quantité en dessous de zéro.');
-        }
-
-        $this->entityManager->flush();
-
-        // Réactualiser le panier si encore pertinent
-        if ($quantiteActuelle > 0) {
-            $panier = $ligneCommande->getPanier();
-            $total = 0.0;
-            foreach ($panier->getLignesCommande() as $ligne) {
-                $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
-            }
-            $panier->setTotale($total);
-
-            $this->entityManager->persist($panier);
-            $this->entityManager->flush();
-        }
-    } else {
-        // Si la ligne de commande n'est pas trouvée, rediriger vers la page du panier avec un message d'erreur
+    if (!$ligneCommande) {
         $this->addFlash('error', 'La ligne de commande n\'a pas été trouvée.');
         return $this->redirectToRoute('voir_panier');
     }
+
+    $quantiteActuelle = $ligneCommande->getQuantite();
+    if ($quantiteActuelle <= 1) {
+        $this->entityManager->remove($ligneCommande);
+        $this->addFlash('notice', 'Produit supprimé du panier.');
+    } else {
+        $ligneCommande->setQuantite($quantiteActuelle - 1);
+        $this->entityManager->persist($ligneCommande);
+    }
+
+    $this->entityManager->flush();
+
+    $panier = $ligneCommande->getPanier();
+    $total = 0.0;
+    foreach ($panier->getLignesCommande() as $ligne) {
+        $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
+    }
+    $panier->setTotale($total);
+    
+    // Recalculer la remise en fonction du nouveau total
+    $remise = $this->calculerRemise($panier, $panier->getUtilisateur());
+    $panier->setRemise($remise);
+
+    // Mettre à jour le panier avec les nouvelles valeurs
+    $this->entityManager->persist($panier);
+    $this->entityManager->flush();
 
     return $this->redirectToRoute('voir_panier');
 }
 
 
 
+
+
+private function calculerRemise(Panier $panier): float
+{
+    $id_client=13;
+
+
+    $utilisateur = $this->utilisateurRepository->find($id_client);
+    $total = 0.0;
+    foreach ($panier->getLignesCommande() as $ligne) {
+        $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
+    }
+
+    $dateActuelle = new \DateTime();
+    $dateDebutRemise = new \DateTime('2024-04-10');
+    $dateFinRemise = new \DateTime('2024-04-15');
+    $dateDansPeriodeRemise = $dateActuelle >= $dateDebutRemise && $dateActuelle < $dateFinRemise;
+
+    if ($dateDansPeriodeRemise) {
+        $remise = $total * 0.5;
+    } else {
+        $nombreDeCommandes = $this->commandeRepository->countCommandesByClientId($utilisateur->getId());
+        if ($nombreDeCommandes >= 3 && $nombreDeCommandes <= 9) {
+            $remise = $total * 0.15;
+        } elseif ($nombreDeCommandes > 9) {
+            $remise = $total * 0.25;
+        } else {
+            $remise = 0;
+        }
+    }
+
+    return $remise;
+}
 
 
     

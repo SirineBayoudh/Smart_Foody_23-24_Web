@@ -1,0 +1,114 @@
+{% block body %}
+<style>
+    #mapContainer {
+        text-align: center;
+        margin-top: 20px;
+    }
+    #map {
+        height: 400px;
+        width: 80%;
+        margin: auto;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+</style>
+
+<div id="formContainer">
+    <form method="post" id="locationForm">
+        <input type="hidden" id="latitude" name="latitude" value="">
+        <input type="hidden" id="longitude" name="longitude" value="">
+        <input type="hidden" id="adresse" name="adresse" placeholder="Adresse" />
+
+        <div id="buttonContainer" style="text-align: center; margin-top: 20px;">
+            <button type="button" class="btn btn-primary" onclick="sendData()">Confirmer l'emplacement</button>
+        </div>
+    </form>
+</div>
+
+<div id="mapContainer">
+    <div id="map"></div>
+</div>
+
+<script>
+// Initialisation de la carte Google Maps
+function initMap() {
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 6, // Vous pouvez ajuster le niveau de zoom selon vos besoins
+        center: {lat: 34.0000, lng: 9.0000} // Coordonnées centrées sur la Tunisie
+    });
+
+    // Ajout d'un écouteur d'événements pour les clics sur la carte
+    map.addListener('click', function(e) {
+        placeMarkerAndPanTo(e.latLng, map);
+    });
+}
+
+function placeMarkerAndPanTo(latLng, map) {
+    if (window.marker) window.marker.setMap(null);
+    window.marker = new google.maps.Marker({
+        position: latLng,
+        map: map
+    });
+    map.panTo(latLng);
+    document.getElementById('latitude').value = latLng.lat();
+    document.getElementById('longitude').value = latLng.lng();
+
+    // Utilisation du géocodage inversé pour obtenir l'adresse
+    var geocoder = new google.maps.Geocoder;
+    geocoder.geocode({'location': latLng}, function(results, status) {
+        if (status === 'OK') {
+            if (results[0]) {
+                document.getElementById('adresse').value = results[0].formatted_address;
+            } else {
+                window.alert('Aucun résultat trouvé');
+            }
+        } else {
+            window.alert('Le géocodage a échoué en raison de : ' + status);
+        }
+    });
+}
+
+
+// Envoi des données de localisation au serveur
+function sendData() {
+    var latitude = document.getElementById('latitude').value;
+    var longitude = document.getElementById('longitude').value;
+    var adresse = document.getElementById('adresse').value; // Récupération de l'adresse
+
+    var urlParts = window.location.pathname.split('/');
+    var id = urlParts[urlParts.length - 1];
+
+    var url = `/commande/validermaps/${id}`;
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ latitude: latitude, longitude: longitude, adresse: adresse }) // Envoi de l'adresse
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('L\'emplacement et l\'adresse ont été confirmés avec succès.');
+               window.location.href = `/commande/valider/${id}`;
+        } else {
+            alert('Une erreur est survenue.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de la communication avec le serveur.');
+    });
+}
+    
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAZxrDjNK7_HqMz-reXjQXfG6-fAmOf1s&callback=initMap"></script>
+{% endblock %}

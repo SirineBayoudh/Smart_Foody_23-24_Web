@@ -20,6 +20,22 @@ class LigneCommandeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, LigneCommande::class);
     }
+    public function commandeDetails($id, CommandeRepository $commandeRepository, LigneCommandeRepository $ligneCommandeRepository)
+{
+    $commande = $commandeRepository->find($id);
+
+    if (!$commande) {
+        throw $this->createNotFoundException('La commande demandée n\'existe pas');
+    }
+
+    // Récupérer les lignes de commande associées à la commande
+    $lignesCommande = $ligneCommandeRepository->findBy(['commande' => $commande]);
+
+    return $this->render('commande/details_commande.html.twig', [
+        'commande' => $commande,
+        'lignesCommande' => $lignesCommande,
+    ]);
+}
 
 //    /**
 //     * @return LigneCommande[] Returns an array of LigneCommande objects
