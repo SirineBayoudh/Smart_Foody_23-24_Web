@@ -1,3 +1,21 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+# routes.yaml
+
+app_qr_code:
+    path: /qr-code/{id}
+    controller: App\Service\QrCodeGeneratorService::generateQrCode
+
+
+stripe_index:
+    path: /stripe
+    controller: App\Service\StripeController::index
+
+stripe_create_charge:
+    path: /stripe/create-charge
+    controller: App\Service\StripeController::createCharge
+    methods: POST
+stripe:
+    resource: ../src/Service/StripeController.php
+    type: annotation
