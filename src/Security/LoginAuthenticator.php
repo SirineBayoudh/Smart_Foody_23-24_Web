@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-class LoginAuthenticator extends AbstractAuthenticator
+/*class LoginAuthenticator extends AbstractAuthenticator
 {
     use TargetPathTrait;
 
@@ -97,3 +97,4 @@ class LoginAuthenticator extends AbstractAuthenticator
         return $this->urlGenerator->generate('accueil');
     }
 }
+*/

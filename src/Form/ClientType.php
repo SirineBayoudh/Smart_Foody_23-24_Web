@@ -10,8 +10,10 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ClientType extends AbstractType
 {
@@ -25,23 +27,50 @@ class ClientType extends AbstractType
                 [
                     'Femme' => 'Femme',
                     'Homme' => 'Homme',
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'champ obligatoire'])
                 ]
             ])
             ->add('email')
-            ->add('motDePasse')
-            ->add('numTel')
-            ->add('adresse')
+            ->add('motDePasse', TextType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'champ obligatoire',
+                    ])
+                ]])
+            ->add('numTel', TextType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'champ obligatoire',
+                    ])
+                ]])
+            ->add('adresse', TextType::class, [
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'champ obligatoire',
+                    ])
+                ]])
             ->add('objectif', EntityType::class, [
                 'class' => Objectif::class,
                 'choice_label' => 'libelle', 
                 'placeholder' => 'Sélectionnez un objectif',
                 'required' => true,
+                'constraints' => [
+                    new NotBlank(['message' => 'champ obligatoire'])
+                ]
             ])
             ->add('taille', NumberType::class, [
-                'attr' => ['class' => 'form-control spinner', 'id' => 'taille']
+                'attr' => ['class' => 'form-control spinner', 'id' => 'taille'],
+                'constraints' => [
+                    new NotBlank(['message' => 'champ obligatoire'])
+                ]
             ])
             ->add('poids', NumberType::class, [
-                'attr' => ['class' => 'form-control spinner', 'id' => 'poids']
+                'attr' => ['class' => 'form-control spinner', 'id' => 'poids'],
+                'constraints' => [
+                    new NotBlank(['message' => 'champ obligatoire'])
+                ]
             ])
             ->add('photo')
             ->add('Inscription', SubmitType::class, [
@@ -54,8 +83,7 @@ class ClientType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Utilisateur::class,
-            'validation_groups' => ['Default','Client']
+            'data_class' => Utilisateur::class
         ]);
     }
 }

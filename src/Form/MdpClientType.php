@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MdpClientType extends AbstractType
 {
@@ -19,10 +20,7 @@ class MdpClientType extends AbstractType
                 'label' => 'Ancien mot de passe',
                 'mapped' => false, 
             ])
-            ->add('motDePasse', PasswordType::class, [
-                'label' => 'Nouveau mot de passe',
-                'required' => false, // Pour afficher le champ vide
-            ])
+            ->add('motDePasse')
             ->add('Modifier', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn', 'id' => 'submitBtn' ,'style' => 'background-color: #56ab2f; border-color:#56ab2f']
             ])

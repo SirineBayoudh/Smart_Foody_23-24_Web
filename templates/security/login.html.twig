@@ -21,7 +21,7 @@
 		<div>
 			<div>
 				{% if error %}
-					<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+				<h1> error </h1>
 				{% endif %}
 				{% if app.user %}
 					<div class="mb-3">
@@ -47,10 +47,10 @@
 										</div>
 										<form class="pt-3" method="post">
 											<div class="form-group">
-												<input type="email" name="email" class="form-control form-control-lg" value="{{last_username}}" id="exampleInputEmail1" placeholder="Email" required autofocus>
+												<input type="email" name="email" class="form-control form-control-lg" id="exampleInputEmail1" placeholder="Email" required autofocus>
 											</div>
 											<div class="form-group">
-												<input type="password" name="password" class="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password" required>
+												<input type="password" name="mot_de_passe" class="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password" required>
 											</div>
 											<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 											<button class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" type="submit" value="submit" style="background-color:#56ab2f; border-color:#56ab2f">

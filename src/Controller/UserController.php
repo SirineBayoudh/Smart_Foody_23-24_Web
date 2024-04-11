@@ -28,27 +28,41 @@ use Symfony\Component\Security\Core\Security;
 
 class UserController extends AbstractController
 {
-    /* 
+    
     #[Route('/login', name: 'login')]
-    public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
-    {
-        // Récupérer les erreurs de connexion, s'il y en a
-        $error = $authenticationUtils->getLastAuthenticationError();
-        // Récupérer le dernier email saisi par l'utilisateur
-        $lastEmail = $authenticationUtils->getLastUsername();
+    public function login(Request $request, ManagerRegistry $manager): Response{$error = '';
 
-        if ($this->getUser()) {
-            return $this->redirectToRoute('accueil');
+        if ($request->isMethod('POST')) {
+
+            $email = $request->request->get('email');
+            $password = $request->request->get('mot_de_passe');
+
+            // Rechercher l'utilisateur dans la base de données
+
+            $user = $manager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
+
+            if($user) {
+                if ($user->getMotDePasse() == md5($password) ){
+                    dump("we found it");
+                    // Authentification réussie, rediriger vers une autre page par exemple
+                    return $this->redirectToRoute('accueil'); // Rediriger vers la page d'accueil
+                } else {
+                    dump("we didn't found it");
+                    // Identifiants invalides, afficher un message d'erreur
+                    $error = 'mot de passe incorrect';
+                }
+            } else {
+                $error = 'Utilisateur non trouvé';
+            }
+            
         }
 
-        // Afficher le formulaire de connexion avec un éventuel message d'erreur
-        return $this->render('user/login.html.twig', [
-            'controller_name' => 'UserController',
-            'last_email' => $lastEmail,
+        // Afficher le formulaire de connexion avec éventuellement un message d'erreur
+        return $this->render('security/login.html.twig', [
             'error' => $error,
         ]);
     }
-    */
+    
 
     /** Méthodes pour le client */
 
