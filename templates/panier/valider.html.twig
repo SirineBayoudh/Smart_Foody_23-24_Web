@@ -15,157 +15,172 @@
 
 {% block body %}
 <style>
-    #mapContainer {
-        display: none; /* Pour cacher la carte par défaut */
+    .form-control {
+        font-weight: bold !important;
+      
+          background-color: #e8f5e9 !important;
+        animation: borderAnimation 3s infinite !important;
+        border: 1px solid #66BB6A !important;
+    }
+
+    .form-control:focus {
+        background-color: #e8f5e9 !important;
+        border-color: #66BB6A !important;
+    }
+
+    .form-group label {
+        font-weight: bold !important;
+    }
+
+    @keyframes borderAnimation {
+        0%, 100% { border-color: #66BB6A !important; }
+        50% { border-color: #238823 !important; }
+    }
+    .mapContainer {
         text-align: center;
+        width: 1000%; /* Vous pouvez ajuster la largeur comme vous le souhaitez */
+        height: 1000px; /* Ajustez la hauteur pour agrandir la carte */
         margin-top: 20px;
+        display: none; /* Cache le conteneur de la carte initialement */
     }
-    #map {
-        height: 400px;
-        width: 80%;
-        margin: auto;
+    .map {
+        height: 100%;
+        width: 100%;
     }
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
+    @keyframes rotateBorder {
+    0% { border-color: green; }
+    50% { border-color: transparent; }
+    100% { border-color: green; }
+}
+
+.animated-border {
+    border: 2px solid green;
+    animation: rotateBorder 2s linear infinite;
+}
+
+   .content-frame {
+        border: 2px solid #66BB6A !important;
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+        border-radius: 10px !important;
+        background-color: #f9f9f9 !important;
     }
-    .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-    }
+
+    
 </style>
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="text-center">Validation de la Commande</h2>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Détails de la commande</h5>
-                    <p class="card-text"><strong> Nom Client :</strong> {{ commande.utilisateur.nom }}</p>
-                    <p class="card-text"><strong> Prenom Client :</strong> {{ commande.utilisateur.prenom }}</p>
-                    <p class="card-text"><strong>Date Commande:</strong> {{ commande.dateCommande|date('Y-m-d') }}</p>
-                    <p class="card-text"><strong>Total Commande:</strong> {{ commande.totaleCommande }} TND </p>
-                    <p class="card-text"><strong>Remise:</strong> {{ commande.remise }}TND</p>
-                    {% set pourcentageRemise = ((commande.totaleCommande - prixTotalAvecRemise) / commande.totaleCommande) * 100 %}
-                    <p class="card-text"><strong>Pourcentage Remise:</strong> {{ pourcentageRemise }} %</p>
-                    <p class="card-text"><strong>Prix Total avec Remise:</strong> {{ prixTotalAvecRemise }} TND</p> <!-- Nouveau champ -->
-                    <p class="card-text"><strong>Total en Devise (EUR):</strong> {{ totalEnDevise }} €</p> <!-- Affiche le total en devise -->
-                    <p class="card-text"><strong>État:</strong> {{ commande.etat }}</p>
-                    <p class="card-text"><strong>Coordonnées:</strong> {{ commande.address }}</p>
-                    <!-- Bouton Ouvrir la carte -->
-                    <div class="mb-3">
-                        <button id="openMapButton" class="btn btn-outline-success">Ouvrir la carte</button>
-                    </div>
-
-                    <!-- Formulaire pour la localisation -->
-                    <div id="mapContainer">
-                        <div id="map"></div>
-                        <form method="post" id="locationForm">
-                            <input type="hidden" id="latitude" name="latitude" value="">
-                            <input type="hidden" id="longitude" name="longitude" value="">
-                            <input type="hidden" id="adresse" name="adresse" placeholder="Adresse" />
-
-                            <div id="buttonContainer" style="text-align: center; margin-top: 20px;">
-                                <button type="button" class="btn btn-primary" onclick="sendData()">Confirmer l'emplacement</button>
+<section class="ftco-section" >
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 ftco-animate fadeInUp ftco-animated">
+                 
+                <form action="{{ path('payment', {'id': commande.id}) }}" method="post" class="billing-form">
+                    <h3 class="mb-4  text-center">Détails de la commande</h3>
+                    
+                    <div class="row align-items-end">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="firstname">Nom Client</label>
+                                <input type="text" class="form-control" value="{{ commande.utilisateur.nom }}" readonly>
                             </div>
-                        </form>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="lastname">Prénom Client</label>
+                                <input type="text" class="form-control" value="{{ commande.utilisateur.prenom }}" readonly>
+                            </div>
+                        </div>
+                         <div class="w-100"></div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Email Client</label>
+                                <input type="text" class="form-control" value="{{ commande.utilisateur.email }}" readonly>
+                            </div>
+                        </div>
+                            <div class="w-100"></div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Numéro Client</label>
+                                <input type="text" class="form-control" value="{{ commande.utilisateur.NumTel }}" readonly>
+                            </div>
+                        </div>
+                        <div class="w-100"></div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Etat de la commande</label>
+                                <input type="text" class="form-control" value="{{ commande.etat }}" readonly>
+                            </div>
+                        </div>
+                          <div class="w-100"></div>
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <label>Adresse de Livraison</label>
+                                <input type="text" class="form-control" value="{{ commande.address }}" readonly>
+                            
+                             <div class="w-100"></div>
+                             
+                            <div class="text-center mt-3">
+                                <button type="button" id="openMapButton" class="btn btn-outline-success">Ouvrir la carte</button>
+                            </div>
+                            </div>
+                              <div id="mapContainer" style="display:none;">
+                            {% include 'panier/maps.html.twig' %}
+                        </div>
+                        </div>
+                      
                     </div>
-                    <!-- Fin du formulaire -->
-
-                    <!-- Votre formulaire de commande et autres éléments ici -->
-                    <form action="{{ path('payment', {'id': commande.id}) }}" method="post">
+                </form>
+            </div>
+            <div class="col-xl-5">
+                <div class="row mt-5 pt-3">
+                    <div class="col-md-12 d-flex mb-5">
+                        <div class="cart-detail cart-total p-3 p-md-4 animated-border">
+                            <h3 class="billing-heading mb-4 text-center">Total de la commande</h3>
+                            <p class="d-flex">
+                                <span>Total Commande</span>
+                                <span>{{ commande.totaleCommande }} TND</span>
+                            </p>
+                            <p class="d-flex">
+                                <span>Remise</span>
+                                <span>{{ commande.remise }} TND</span>
+                            </p>
+                            <p class="d-flex">
+                            {% set pourcentageRemise = ((commande.totaleCommande - prixTotalAvecRemise) / commande.totaleCommande) * 100 %}
+                                <span>Pourcentage Remise</span>
+                                <span>{{ pourcentageRemise }} %</span>
+                            </p>
+                            <p class="d-flex">
+                                <span>Prix Total avec Remise</span>
+                                <span>{{ prixTotalAvecRemise }} TND</span>
+                            </p>
+                            <p class="d-flex">
+                                <span>Total en Devise (EUR)</span>
+                                <span>{{ totalEnDevise }} €</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+              
+                  <form action="{{ path('payment', {'id': commande.id}) }}" method="post">
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="etatCommande" name="etatCommande" value="nonLivree" />
                             <label class="form-check-label" for="etatCommande">Payer à la Livraison</label>
                         </div>
-                        <a href="{{ path('cANU', {'id': commande.id}) }}" class="btn btn-primary">Anuuler la commande</a>
+                          <a href="{{ path('cANU', {'id': commande.id}) }}" class="btn btn-primary">Anuuler la commande</a>
                         <button type="submit" class="btn btn-primary">Valider la Commande</button>
+
                     </form>
-                </div>
-            </div>
         </div>
     </div>
-</div>
-
+</section>
 <script>
-// Fonction pour ouvrir la carte
 document.getElementById("openMapButton").addEventListener("click", function() {
-    document.getElementById("mapContainer").style.display = "block";
-    initMap(); // Initialiser la carte une fois qu'elle est affichée
+    var mapContainer = document.getElementById("mapContainer");
+    mapContainer.style.display = mapContainer.style.display === "none" ? "block" : "none";
+
+    // Initialisez la carte après que le conteneur est devenu visible
+    if (mapContainer.style.display === "block") {
+        initMap();
+    }
 });
-
-// Initialisation de la carte Google Maps
-function initMap() {
-    var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 6, // Vous pouvez ajuster le niveau de zoom selon vos besoins
-        center: {lat: 34.0000, lng: 9.0000} // Coordonnées centrées sur la Tunisie
-    });
-
-    // Ajout d'un écouteur d'événements pour les clics sur la carte
-    map.addListener('click', function(e) {
-        placeMarkerAndPanTo(e.latLng, map);
-    });
-}
-
-function placeMarkerAndPanTo(latLng, map) {
-    if (window.marker) window.marker.setMap(null);
-    window.marker = new google.maps.Marker({
-        position: latLng,
-        map: map
-    });
-    map.panTo(latLng);
-    document.getElementById('latitude').value = latLng.lat();
-    document.getElementById('longitude').value = latLng.lng();
-
-    // Utilisation du géocodage inversé pour obtenir l'adresse
-    var geocoder = new google.maps.Geocoder;
-    geocoder.geocode({'location': latLng}, function(results, status) {
-        if (status === 'OK') {
-            if (results[0]) {
-                document.getElementById('adresse').value = results[0].formatted_address;
-            } else {
-                window.alert('Aucun résultat trouvé');
-            }
-        } else {
-            window.alert('Le géocodage a échoué en raison de : ' + status);
-        }
-    });
-}
-
-// Envoi des données de localisation au serveur
-function sendData() {
-    var latitude = document.getElementById('latitude').value;
-    var longitude = document.getElementById('longitude').value;
-    var adresse = document.getElementById('adresse').value; // Récupération de l'adresse
-
-    var urlParts = window.location.pathname.split('/');
-    var id = urlParts[urlParts.length - 1];
-
-    var url = `/commande/validermaps/${id}`;
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ latitude: latitude, longitude: longitude, adresse: adresse }) // Envoi de l'adresse
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('L\'emplacement et l\'adresse ont été confirmés avec succès.');
-            window.location.href = `/commande/valider/${id}`;
-        } else {
-            alert('Une erreur est survenue.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Une erreur est survenue lors de la communication avec le serveur.');
-    });
-}
 </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAZxrDjNK7_HqMz-reXjQXfG6-fAmOf1s&callback=initMap"></script>
 {% endblock %}
