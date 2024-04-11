@@ -22,6 +22,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Security;
 
 class UserController extends AbstractController
@@ -61,9 +63,9 @@ class UserController extends AbstractController
         $form->handleRequest($req);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $plainPassword = $user->getMotDePasse();
-            $hashedPassword = md5($plainPassword);
-            $user->setMotDePasse($hashedPassword);
+            //$plainPassword = $user->getMotDePasse();
+            //$hashedPassword = md5($plainPassword);
+            //$user->setMotDePasse($hashedPassword);
 
             $user->setRole('Client');
             $user->setMatricule('');
@@ -73,13 +75,13 @@ class UserController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-           /* $email = (new Email())
+           $email = (new Email())
                 ->from('smartfoody.2024@gmail.com')
                 ->to($user->getEmail())
                 ->subject('Bienvenue sur notre site')
                 ->html('<p>Bienvenue sur notre site!</p>');
 
-            $mailer->send($email);*/
+            $mailer->send($email);
 
             return $this->redirectToRoute("app_login");
         }
@@ -123,8 +125,7 @@ class UserController extends AbstractController
             'user' => $user,
         ]);
     }
-
-    #[Route('/profilClientMDP/{id}', name: 'client_profilMDP')]
+   
     public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
     {
 

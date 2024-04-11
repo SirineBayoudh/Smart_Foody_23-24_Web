@@ -27,7 +27,7 @@
 		Ajouter un conseiller
 	</h2>
 	<div style="margin-top:100px; z-index:9; margin-right:100px;">
-		{{ form(f) }}
+		{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
 
 		<div>
 			<span>{{ form_label(f.nom) }}</span>

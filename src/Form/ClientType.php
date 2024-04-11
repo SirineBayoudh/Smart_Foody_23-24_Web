@@ -55,7 +55,7 @@ class ClientType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Utilisateur::class,
-            'validation_groups' => ['Client']
+            'validation_groups' => ['Default','Client']
         ]);
     }
 }

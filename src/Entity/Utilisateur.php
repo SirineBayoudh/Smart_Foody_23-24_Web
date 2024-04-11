@@ -11,8 +11,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-#[Assert\GroupSequence(["Utilisateur", "Conseiller","Client"])]
-class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
+#[Assert\GroupSequence(["Utilisateur", "Conseiller", "Client"])]
+#[ORM\Table(name: "utilisateur")]
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
@@ -20,63 +21,68 @@ class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
     private $idUtilisateur;
 
     #[ORM\Column(type: "string", length: 255, name: "nom")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $nom;
 
     #[ORM\Column(type: "string", length: 255, name: "prenom")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $prenom;
 
     #[ORM\Column(type: "string", length: 255, name: "genre")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $genre;
 
     #[ORM\Column(type: "string", length: 255, name: "email")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $email;
 
     #[ORM\Column(type: "string", length: 255, name: "mot_de_passe")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $mot_de_passe;
 
     #[ORM\Column(type: "integer", name: "num_tel")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
+    #[Assert\Length(
+        min: 8,
+        max: 8,
+        exactMessage: "Le numéro de téléphone doit avoir exactement {{ limit }} chiffres",
+        normalizer: "trim"
+    )]
     private $num_tel;
 
     #[ORM\Column(type: "string", length: 255, name: "role")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
     private $role;
 
     #[ORM\Column(type: "string", length: 255, name: "matricule")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $matricule;
 
     #[ORM\Column(type: "string", length: 255, name: "attestation")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $attestation;
 
     #[ORM\Column(type: "string", length: 255, name: "adresse")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $adresse;
 
     #[ORM\Column(type: "integer", name: "tentative")]
-    
     private $tentative;
 
     #[ORM\Column(type: "float", name: "taille")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $taille;
 
     #[ORM\Column(type: "float", name: "poids")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $poids;
 
     #[ORM\Column(type: "string", length: 255, name: "photo")]
-    #[Assert\NotBlank(message:"champ obligatoire")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private $photo;
 
     #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
     #[ORM\JoinColumn(name: "objectif", referencedColumnName: "id_obj")]
+    #[Assert\NotBlank(message: "champ obligatoire")]
     private ?Objectif $objectif = null;
 
     #[ORM\OneToMany(mappedBy: 'id_client', targetEntity: Conseil::class)]
@@ -113,7 +119,7 @@ class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
         return $this->nom;
     }
 
-    public function setNom(string $nom): static
+    public function setNom(?string $nom): static
     {
         $this->nom = $nom;
 
@@ -479,6 +485,10 @@ class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @var string The hashed password
+     */
+
+    /**
      * @see PasswordAuthenticatedUserInterface
      */
     public function getPassword(): string
@@ -488,7 +498,7 @@ class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
 
     public function setPassword(string $password): self
     {
-        $this->mot_de_passe = md5($password);
+        $this->mot_de_passe = $password;
 
         return $this;
     }

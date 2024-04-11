@@ -44,7 +44,7 @@
 
 
 		</div>
-		<div class="side" id="donnéesClient"style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;display:block;">
+		<div class="side" id="donnéesClient" style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;display:block;">
 			<div class="col-md-6 grid-margin stretch-card">
 				<div class="card">
 					<div class="card-body">
@@ -67,7 +67,7 @@
 								{{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
 								{{ form_errors(f.email) }}
 							</div>
-                            <div class="form-group">
+							<div class="form-group">
 								<label for="exampleInputUsername1">{{ form_label(f.objectif) }}</label>
 								{{ form_widget(f.objectif, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
 								{{ form_errors(f.objectif) }}
@@ -108,7 +108,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="side" id="mdpClient"style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;display:none;">
+		<div class="side" id="mdpClient" style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;display:none;">
 			<div class="col-md-6 grid-margin stretch-card">
 				<div class="card">
 					<div class="card-body">
@@ -116,9 +116,19 @@
 
 						<div class="forms-sample">
 							{{ form_start(f2,{'attr':{'novalidate':'novalidate'}}) }}
-							<div class="form-group">
-								<label for="exampleInputUsername1">{{ form_label(f2.motDePasse) }}</label>
-								{{ form_widget(f2.motDePasse, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+							<div
+								class="form-group">
+								{# Affichage du champ ancienMotDePasse #}
+								{{ form_label(f2.ancienMotDePasse) }}
+								{{ form_widget(f2.ancienMotDePasse) }}
+								{{ form_errors(f2.ancienMotDePasse) }}
+							</div>
+
+							<div
+								class="form-group">
+								{# Affichage du champ nouveauMotDePasse #}
+								{{ form_label(f2.motDePasse) }}
+								{{ form_widget(f2.motDePasse) }}
 								{{ form_errors(f2.motDePasse) }}
 							</div>
 							{{ form_end(f2) }}
@@ -131,24 +141,21 @@
 
 
 	<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ciblez le lien "Mot de passe"
-            var linkPassword = document.getElementById('linkPassword');
-            // Ciblez les deux côtés
-            var donnéesClient = document.getElementById('donnéesClient');
-            var mdpClient = document.getElementById('mdpClient');
+		document.addEventListener('DOMContentLoaded', function () { // Ciblez le lien "Mot de passe"
+var linkPassword = document.getElementById('linkPassword');
+// Ciblez les deux côtés
+var donnéesClient = document.getElementById('donnéesClient');
+var mdpClient = document.getElementById('mdpClient');
 
-            // Ajoutez un écouteur d'événements sur le lien "Mot de passe"
-            linkPassword.addEventListener('click', function(event) {
-                event.preventDefault(); // Empêchez le comportement par défaut du lien
+// Ajoutez un écouteur d'événements sur le lien "Mot de passe"
+linkPassword.addEventListener('click', function (event) {
+event.preventDefault();
+// Empêchez le comportement par défaut du lien
 
-                // Rendez "donnéesClient" invisible et "mdpClient" visible
-                donnéesClient.style.display = 'none';
-                mdpClient.style.display = 'block';
-            });
-        });
-    </script>
+// Rendez "donnéesClient" invisible et "mdpClient" visible
+donnéesClient.style.display = 'none';
+mdpClient.style.display = 'block';
+});
+});
+	</script>
 {% endblock %}
-
-
-

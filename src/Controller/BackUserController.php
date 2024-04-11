@@ -37,7 +37,8 @@ class BackUserController extends AbstractController
         }
 
         return $this->render('back_user/listUsers.html.twig', [
-            'users' => $list
+            'users' => $list,
+            'role' => $roleFilter
         ]);
     }
 
