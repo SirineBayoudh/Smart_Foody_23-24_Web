@@ -58,8 +58,8 @@
                               <td style="font-size: 12px;">{{ s.quantite }}</td>
                               <td style="font-size: 12px;">{{ s.nbvendu }}</td>
                           
-
-                              <td >{{ s.cout }}</td>
+                              <td class="cost" data-amount="{{ s.cout }}">{{ s.cout }} Dinar</td>
+                              {# <td >{{ s.cout }}</td> #}
                               <td style="font-size: 12px;">{{ s.dateArrivage|date('Y-m-d') }}</td>
                               <td><img src="{{ asset('images/' ~ s.image) }}" alt="Image"></td>
                               <td> 
@@ -79,6 +79,28 @@
                                 onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
                                  <i class="ti-trash"></i>
                              </a> 
+                            </td>
+                          
+                            <td>
+                                <a id="convertToDollar"  href="#"  class="btn btn-danger btn-sm" title="convertir dollar"  style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
+                                onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
+                                onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+                                &dollar;
+                             </a> 
+                            </td> 
+                            <td>
+                                <a id="convertToEuro"  href="#"  class="btn btn-danger btn-sm" title="convertir euro"  style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
+                                onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
+                                onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+                                &euro;
+                             </a> 
+                            </td>
+                            <td>
+                                <a id="restoreOriginalCosts"  href="#"  class="btn btn-danger btn-sm" title=" restoreOriginalCosts"  style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
+                                onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
+                                onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+                          TND
+                             </a> 
                             </td> </tr>
                         {% endfor %}
                     {# {% endfor %} #}
@@ -86,12 +108,15 @@
                 </table>
                 
               </div>
+   
+          
+
               <td>
                                   <a href="{{ path('export_pdf') }}" class="export-btn">
                                       <button type="button" class="btn btn-secondary">Export PDF</button>
                                   </a>
              </td>
-             
+            
               <div class="d-flex justify-content-center">
                 {% do pagination.setPageRange(2) %}
                 {{ knp_pagination_render(pagination, 'pagination.html.twig') }}
@@ -104,7 +129,7 @@
   {% endfor %}
 </div>
 
-
+{# ****************swwet Alert ************************ #}
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function confirmSuppression(url) {
@@ -161,7 +186,7 @@
     }
 </script>
 
-
+{# ****************Chart ************************ #}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -232,9 +257,135 @@
         });
     });
 </script>
+{# ****************Euro ************************ #}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const convertToEuroButton = document.getElementById('convertToEuro');
+        const costs = document.querySelectorAll('.cost');
+        let tndToEuroRate = 0; // Variable pour stocker le taux de change
+        let originalCosts = []; // Variable pour stocker les coûts d'origine
+        // Fonction pour appeler l'API et obtenir le taux de change
+        function fetchExchangeRate() {
+            fetch('https://api.exchangerate-api.com/v4/latest/TND')
+                .then(response => response.json())
+                .then(data => {
+                    tndToEuroRate = data.rates.EUR; // Récupérer le taux de change TND/EUR
+                    console.log(`Le taux de change TND/EUR est : ${tndToEuroRate}`);
+                })
+                .catch(error => {
+                    console.error('Error fetching exchange rate:', error);
+                });
+        }
 
+        // Fonction pour convertir les coûts en euro
+        function convertToEuro() {
+            saveOriginalCosts(); 
+            costs.forEach(function (cost) {
+                const tndAmount = parseFloat(cost.dataset.amount);
+                const euroAmount = tndAmount * tndToEuroRate;
+                cost.innerText = euroAmount.toFixed(2) + ' Euro';
+            });
+        }
+        function saveOriginalCosts() {
+            costs.forEach(function (cost, index) {
+                originalCosts[index] = cost.innerText;
+            });
+        }
 
+        // Fonction pour restaurer les coûts initiaux
+        function restoreOriginalCosts() {
+            costs.forEach(function (cost, index) {
+                cost.innerText = originalCosts[index];
+            });
+        }
 
+        // Appeler l'API pour obtenir le taux de change au chargement de la page
+        fetchExchangeRate();
+
+        // Ajouter un événement au bouton de conversion en euro
+        convertToEuroButton.addEventListener('click', function () {
+           
+            if (tndToEuroRate !== 0) {
+                convertToEuro();
+            } else {
+                // Attendre que le taux de change soit récupéré avant de convertir
+                setTimeout(convertToEuro, 1000); // Attendre 1 seconde avant de réessayer
+            }
+        });
+ 
+      // Ajouter un événement au bouton pour restaurer les coûts d'origine
+      const restoreOriginalCostsButton = document.getElementById('restoreOriginalCosts');
+        restoreOriginalCostsButton.addEventListener('click', function () {
+            restoreOriginalCosts();
+        });
+        });
+</script>
+{# ****************Dollar ************************ #}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const convertToDollarButton = document.getElementById('convertToDollar');
+        const costs = document.querySelectorAll('.cost');
+        let tndToDollarRate = 0; // Variable pour stocker le taux de change
+        let originalCosts = []; // Variable pour stocker les coûts d'origine
+        
+        // Fonction pour appeler l'API et obtenir le taux de change
+        function fetchExchangeRate() {
+            fetch('https://api.exchangerate-api.com/v4/latest/TND')
+                .then(response => response.json())
+                .then(data => {
+                    tndToDollarRate = data.rates.USD; // Récupérer le taux de change TND/USD
+                    console.log(`Le taux de change TND/USD est : ${tndToDollarRate}`);
+                })
+                .catch(error => {
+                    console.error('Error fetching exchange rate:', error);
+                });
+        }
+
+        // Fonction pour convertir les coûts en dollar
+        function convertToDollar() {
+            saveOriginalCosts(); // Sauvegarder les coûts d'origine avant la conversion
+            costs.forEach(function (cost) {
+                const tndAmount = parseFloat(cost.dataset.amount);
+                const dollarAmount = tndAmount * tndToDollarRate;
+                cost.innerText = dollarAmount.toFixed(2) + ' Dollar';
+            });
+        }
+
+        // Fonction pour sauvegarder les coûts d'origine
+        function saveOriginalCosts() {
+            costs.forEach(function (cost, index) {
+                originalCosts[index] = cost.innerText;
+            });
+        }
+
+        // Fonction pour restaurer les coûts initiaux
+        function restoreOriginalCosts() {
+            costs.forEach(function (cost, index) {
+                cost.innerText = originalCosts[index];
+            });
+        }
+
+        // Appeler l'API pour obtenir le taux de change au chargement de la page
+        fetchExchangeRate();
+
+        // Ajouter un événement au bouton de conversion en dollar
+        convertToDollarButton.addEventListener('click', function () {
+            // Vérifier si le taux de change a été récupéré
+            if (tndToDollarRate !== 0) {
+                convertToDollar();
+            } else {
+                // Attendre que le taux de change soit récupéré avant de convertir
+                setTimeout(convertToDollar, 1000); // Attendre 1 seconde avant de réessayer
+            }
+        });
+
+        // Ajouter un événement au bouton pour restaurer les coûts d'origine
+        const restoreOriginalCostsButton = document.getElementById('restoreOriginalCosts');
+        restoreOriginalCostsButton.addEventListener('click', function () {
+            restoreOriginalCosts();
+        });
+    });
+</script>
 {% endblock %}
   
   {% block stylesheets %}
@@ -250,21 +401,8 @@
           }
       </style>
   {% endblock %}
-  {# {% block javascripts %} #}
-      {# <script>
-          $(document).ready(function() {
-              $('#btnAjouter').click(function() {
-                  $('#addStockModal').modal('show');
-              });
-              
-              $('.btnModifier').click(function() {
-          var id_s = $(this).data('id');
-          var formAction = '{{ path('stock_edit', {id: 'ID'}) }}'.replace('ID', id_s);
-          $('#updateStockForm').attr('action', formAction);
-      });
-          });
-      </script>
-      {% endblock %} #}
+ 
+   
       {% block javascripts %}
           <script>
               document.addEventListener("DOMContentLoaded", function() {

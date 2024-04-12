@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Stock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpClient\HttpClient;
 
 /**
  * @extends ServiceEntityRepository<Stock>
@@ -89,4 +90,27 @@ class StockRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    public function convertDinarToEuro($amount)
+    {
+        // Appel de l'API pour obtenir le taux de change
+        $httpClient = HttpClient::create();
+        $response = $httpClient->request('GET', 'https://api.exchangerate-api.com/v4/latest/TND');
+        $data = $response->toArray();
+        
+        // Vérifier si la requête a réussi
+        if ($response->getStatusCode() === 200) {
+            // Obtenez le taux de change pour l'euro
+            $eurExchangeRate = $data['rates']['EUR'];
+
+            // Convertir le montant du dinar en euro
+            $amountInEuro = $amount / $eurExchangeRate;
+
+            return $amountInEuro;
+        } else {
+            // En cas d'échec de la requête API, vous pouvez gérer l'erreur ici
+            throw new \Exception('Failed to fetch exchange rate from API.');
+        }
+    }
+
 }
