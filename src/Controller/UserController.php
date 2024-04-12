@@ -11,6 +11,7 @@ use App\Form\ProfilClientType;
 use App\Form\ProfilConseillerType;
 use App\Form\UtilisateurType;
 use App\Repository\UtilisateurRepository;
+use App\Service\EmailService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,9 +29,11 @@ use Symfony\Component\Security\Core\Security;
 
 class UserController extends AbstractController
 {
-    
+
     #[Route('/login', name: 'login')]
-    public function login(Request $request, ManagerRegistry $manager): Response{$error = '';
+    public function login(Request $request, ManagerRegistry $manager): Response
+    {
+        $error = '';
 
         if ($request->isMethod('POST')) {
 
@@ -41,26 +44,25 @@ class UserController extends AbstractController
 
             $user = $manager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
 
-            if($user) {
-                if ($user->getMotDePasse() == md5($password)){
+            if ($user) {
+                if ($user->getMotDePasse() == md5($password)) {
                     dump("we found it");
-                  
+
                     if ($user->getRole() == 'Admin') {
-                
+
                         return $this->redirectToRoute('app_back');
                     } else {
-                        
+
                         return $this->redirectToRoute('accueil');
                     }
                 } else {
                     dump("we didn't found it");
-                   
+
                     $error = 'mot de passe incorrect';
                 }
             } else {
                 $error = 'Utilisateur non trouvé';
             }
-            
         }
 
         // Afficher le formulaire de connexion avec éventuellement un message d'erreur
@@ -72,7 +74,7 @@ class UserController extends AbstractController
     /** Méthodes pour le client */
 
     #[Route('/signup', name: 'signup')]
-    public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer): Response
+    public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer, EmailService $emailService): Response
     {
         $user = new Utilisateur();
         $form = $this->createForm(ClientType::class, $user);
@@ -94,13 +96,15 @@ class UserController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-           $email = (new Email())
+            /*$email = (new Email())
                 ->from('smartfoody.2024@gmail.com')
                 ->to($user->getEmail())
                 ->subject('Bienvenue sur notre site')
                 ->html('<p>Bienvenue sur notre site!</p>');
 
-            $mailer->send($email);
+            $mailer->send($email);*/
+
+            $emailService->sendResetPasswordEmail($user->getEmail(), 'Réinitialisation du mot de passe', $user->getPrenom());
 
             return $this->redirectToRoute("login");
         }
@@ -144,7 +148,7 @@ class UserController extends AbstractController
             'user' => $user,
         ]);
     }
-   
+
     public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
     {
 
