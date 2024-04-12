@@ -36,14 +36,14 @@
 		    		<div class="row d-flex">
 		    			<div class="col-md pr-4 d-flex topper align-items-center">
 					    	<div class="icon mr-2 d-flex justify-content-center align-items-center"><span class="icon-phone2"></span></div>
-						    <span class="text">+ 1235 2355 98</span>
+						    <span class="text">90 537 252 </span>
 					    </div>
 					    <div class="col-md pr-4 d-flex topper align-items-center">
 					    	<div class="icon mr-2 d-flex justify-content-center align-items-center"><span class="icon-paper-plane"></span></div>
-						    <span class="text">youremail@email.com</span>
+						    <span class="text">smartfoody2024@gmail.com</span>
 					    </div>
 					    <div class="col-md-5 pr-4 d-flex topper align-items-center text-lg-right">
-						    <span class="text">3-5 Business days delivery &amp; Free Returns</span>
+						    <span class="text">Livraison gratuite</span>
 					    </div>
 				    </div>
 			    </div>
@@ -124,6 +124,7 @@
 	        </div>
 	      </div>
 	    </div>
+      
     </section>
     {% endblock %}
 
@@ -243,7 +244,26 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
   <script src="{{asset('js/google-map.js')}}"></script>
   <script src="{{asset('js/main.js')}}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+    // Vérifier si nous sommes dans la période de solde
+    // Ici, vous devez remplacer la condition par votre propre logique pour vérifier la période de solde
+    var dateDebutSolde = new Date('2024-01-01');
+    var dateFinSolde = new Date('2024-02-01');
+    var dateActuelle = new Date();
 
-    
+    if (dateActuelle >= dateDebutSolde && dateActuelle <= dateFinSolde) {
+        // Afficher la fenêtre de notification
+        $('.toast').toast('show');
+    }
+   
+    $(document).ready(function(){
+        $('.toast').toast('show');
+    });
+
+</script>
+
+
   </body>
 </html>

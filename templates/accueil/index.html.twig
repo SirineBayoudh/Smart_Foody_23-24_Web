@@ -4,11 +4,100 @@
 
 {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .notification-box {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        width: 400px; /* Ajustez la largeur selon vos besoins */
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        background-color: #f8f9fa; /* Couleur de fond */
+        color: #333; /* Couleur du texte */
+        font-family: Arial, sans-serif; /* Police de caractères */
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .notification-box.show {
+        opacity: 1;
+    }
+
+    .notification-header {
+        position: relative;
+        background-color: #28a745; /* Couleur d'arrière-plan de l'en-tête */
+        padding: 15px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .notification-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: black; /* Couleur du texte de l'en-tête */
+    }
+
+    .notification-close {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 20px;
+        color: #fff; /* Couleur du texte du bouton de fermeture */
+    }
+
+  
+    .notification-image {
+        width: 100%;
+        height: 200px;
+        background: url('images/téléchargement.jpg') center center / cover no-repeat; /* Modifier le chemin de votre image */
+    }
+
+    .notification-message {
+        margin-top: 15px;
+        color: green; /* Couleur du texte pour le message */
+        font-size: 14px;
+    }
+    .notification-content {
+    padding: 30px;
+    font-weight: bold;
+    font-size: 16px;
+    background-color: #fff; /* Couleur de fond */
+    border-bottom-left-radius: 10px; /* Arrondir le coin inférieur gauche */
+    border-bottom-right-radius: 10px; /* Arrondir le coin inférieur droit */
+}
+
+
+
 </style>
 
-<div class="example-wrapper">
-    test 
-</div>
+{% set debutSolde = '2024-04-01' %}
+{% set finSolde = '2024-04-30' %}
+{% set debutSolde2 = '2024-08-01' %}
+{% set finSolde2 = '2024-08-30' %}
+{% set dateActuelle = 'now'|date('Y-m-d') %} {# Récupère la date actuelle du système #}
+
+{% if dateActuelle >= debutSolde and dateActuelle <= finSolde or dateActuelle >= debutSolde2 and dateActuelle <= finSolde2 %}
+
+    <div class="notification-box show">
+        <div class="notification-header">
+            <span class="notification-title">Promotion spéciale</span>
+            <span class="notification-close" onclick="closeNotification()">X</span>
+        </div>
+        <div class="notification-image"></div>
+        <div class="notification-content">
+            Profitez de 50% de réduction sur notre site.
+            <div class="notification-message">Cette offre est valable jusqu'au fin de mois .</div>
+        </div>
+    </div>
+{% endif %}
+
+<script>
+    function closeNotification() {
+        document.querySelector('.notification-box').style.display = 'none';
+    }
+</script>
 {% endblock %}
