@@ -17,18 +17,17 @@ class Objectif
     #[ORM\Column]
     private ?int $id_obj = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255 , nullable: true)]
     #[Assert\NotBlank(message:'Le libellé est obligatoire')]
     private ?string $libelle = null;
 
     #[ORM\Column(length: 255)]
-    
     private ?string $listCritere = null;
 
     #[ORM\OneToMany(mappedBy: 'objectif', targetEntity: Utilisateur::class)]
     private Collection $utilisateurs;
 
-    #[ORM\OneToMany(mappedBy: 'critere', targetEntity: Produit::class)]
+    #[ORM\OneToMany(mappedBy: 'critere', targetEntity: Produit::class , cascade: ["remove"])]
     private Collection $produits;
     /**
      * Get the list of criteria as an array.
@@ -145,6 +144,8 @@ class Objectif
 
         return $criteresArray;
     }
+
+    
 
     
     

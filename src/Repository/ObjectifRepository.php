@@ -20,7 +20,28 @@ class ObjectifRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Objectif::class);
     }
-    
+    /**
+     * Récupère toutes les listes de critères distinctes parmi tous les objectifs.
+     *
+     * @return array
+     */
+    public function findAllCriteres(): array
+    {
+        $criteres = $this->createQueryBuilder('o')
+        ->select('o.listCritere')
+        ->getQuery()
+        ->getResult();
+
+    $criteresList = [];
+    foreach ($criteres as $critere) {
+        $criteresList = array_merge($criteresList, explode(', ', $critere['listCritere']));
+    }
+
+    // Supprimer les doublons
+    $criteresList = array_unique($criteresList);
+
+    return $criteresList;
+    }
 
 //    /**
 //     * @return Objectif[] Returns an array of Objectif objects

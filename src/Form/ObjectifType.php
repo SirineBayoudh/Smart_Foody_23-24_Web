@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ObjectifType extends AbstractType
 {
@@ -28,6 +29,7 @@ class ObjectifType extends AbstractType
             'label' => 'Objectif :',
             'required' => true,
             'placeholder' => 'Choisir un objectif',
+            
         ])
         ->add('listCritere', ChoiceType::class, [
             'label' => 'Critères :',

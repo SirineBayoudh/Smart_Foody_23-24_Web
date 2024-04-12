@@ -1,10 +1,10 @@
 {% extends 'base_back.html.twig' %}
 
-{% block title %}Ajouter objectif{% endblock %}
+{% block title %}Table des objectifs{% endblock %}
 
 {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 
     /* CSS pour l'effet hover sur les lignes de tableau */
@@ -26,6 +26,10 @@
     .btn:hover {
         background-color: #72c22f; /* Nouvelle couleur de fond */
     }
+    .btn.dropdown-toggle:focus {
+    background-color: #ffffff; /* Couleur de fond du bouton lorsqu'il est ouvert */
+    color: #000000; /* Couleur du texte du bouton lorsqu'il est ouvert */
+}
 </style>
 
 <div class="col-lg-10 grid-margin stretch-card">
@@ -37,6 +41,12 @@
                     <i class="ti-plus"></i>
                     Ajouter objectif
                 </a>
+                <select id="critere" name="critere" onchange="filterObjectifs() ; resetButtonStyle();" class="btn btn-primary dropdown-toggle ">
+                    <option value="">Tous les critères</option>
+                    {% for critere in criteres %}
+                        <option value="{{ critere }}">{{ critere }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -49,18 +59,18 @@
                     </thead>
                     <tbody>
                         {% for o in obj %}
-                        <tr>
-                            <td>{{ o.libelle }}</td>
-                            <td>{{ o.listCritere }}</td>
-                            <td>
-                                <a href="{{ path('edit_objectif', {'id': o.id}) }}" class="btn btn-warning btn-sm">
-                                    <i class="ti-pencil-alt"></i>
-                                </a>
-                                <a href="{{ path('delete_objectif', {'id': o.id}) }}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet objectif ?');">
-                                    <i class="ti-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>{{ o.libelle }}</td>
+                                <td>{{ o.listCritere }}</td>
+                                <td>
+                                    <a href="{{ path('edit_objectif', {'id': o.id}) }}" class="btn btn-warning btn-sm">
+                                        <i class="ti-pencil-alt"></i>
+                                    </a>
+                                    <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ o.id }}')">
+                                        <i class="ti-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -68,4 +78,50 @@
         </div>
     </div>
 </div>
+
+<!-- Inclusion de SweetAlert2 via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<!-- Script pour la confirmation de suppression avec SweetAlert2 -->
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: "Est-ce que vous êtes sûr?",
+            text: "Vous allez supprimer cet objectif !!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Oui, Supprime-le!",
+            cancelButtonText: "Annuler"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ path('delete_objectif', {'id': '__id__'}) }}".replace('__id__', id);
+            }
+        });
+    }
+
+    function filterObjectifs() {
+        var selectedCritere = document.getElementById('critere').value;
+        var rows = document.querySelectorAll('.table-striped tbody tr');
+        
+        rows.forEach(function(row) {
+            var critereCell = row.querySelector('td:nth-child(2)').innerText;
+            if (selectedCritere === '' || critereCell.includes(selectedCritere)) {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function resetButtonStyle() {
+    var button = document.getElementById('critere');
+    button.style.backgroundColor = '#56ab2f';
+    button.style.backgroundColor = '#56ab2f';
+    button.style.borderColor = '#56ab2f';
+    button.style.color = '#ffffff';
+    button.style.transition = 'background-color 0.3s';
+}
+</script>
 {% endblock %}

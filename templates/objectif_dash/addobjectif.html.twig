@@ -17,7 +17,7 @@
                 {% endfor %}
                 {% if not atLeastOneChecked %}
                     <div class="alert alert-danger" role="alert">
-                        Veuillez sélectionner au moins un critère.
+                        Veuillez Remplir tous les champs au-dessous.
                     </div>
                 {% endif %}
             {% endif %}
@@ -25,7 +25,7 @@
             <div class="form-group">
                 {{ form_label(form.libelle, 'Libelle') }}
                 {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Libelle'}}) }}
-                {{ form_errors(form.libelle) }}
+                <span class="error-message">{{ form_errors(form.libelle) }}</span>
             </div>
             {% for choice in form.listCritere %}
                 <div class="form-check critere-item">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
             {% endfor %}
-            {{ form_errors(form.listCritere) }}
+            <span class="error-message">{{ form_errors(form.listCritere) }}</span>
             <button type="submit" class="btn btn-primary mr-2">Ajouter</button>
             {{ form_end(form) }}
         </div>
@@ -56,6 +56,9 @@
     }
     .btn:hover {
         background-color: #72c22f; /* Nouvelle couleur de fond */
+    }
+    .error-message {
+        color: red; /* Couleur rouge pour les messages d'erreur */
     }
 </style>
 {% endblock %}

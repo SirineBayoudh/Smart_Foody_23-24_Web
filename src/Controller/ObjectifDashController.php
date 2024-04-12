@@ -24,11 +24,18 @@ class ObjectifDashController extends AbstractController
 
     #[Route('/objectif/all', name: 'objectif_all')]
     public function listProduit(ObjectifRepository $prodrepository): Response
-{
-    return $this->render('objectif_dash/list_objectif.html.twig', [
-        'obj' => $prodrepository->findAll(),
-    ]);
-}
+    {
+        $objectifs = $this->getDoctrine()->getRepository(Objectif::class)->findBy([], ['id_obj' => 'DESC']);
+        
+        // Récupérer la liste des critères
+        $criteres = $prodrepository->findAllCriteres(); // Remplacez cela par votre propre méthode pour récupérer les critères
+        
+        return $this->render('objectif_dash/list_objectif.html.twig', [
+            'obj' => $objectifs,
+            'criteres' => $criteres, // Passer les critères à votre modèle Twig
+        ]);
+    }
+    
 
 #[Route('/addobject', name: 'add_object')]
 public function addProduct(Request $request): Response
@@ -100,21 +107,28 @@ public function editObjectif(int $id, Request $request): Response
 
     $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        
-        // Mettre à jour la chaîne de critères avec les nouvelles valeurs sélectionnées
-        $listeCritereString = implode(',', $form->get('listCritere')->getData());
-        $objectif->setListCritere($listeCritereString);
+    $emptySubmission = false;
 
-        $entityManager->flush();
+    if ($form->isSubmitted()) {
+        // Vérifier si au moins un critère est sélectionné
+        if (empty($form->get('listCritere')->getData())) {
+            $emptySubmission = true;
+        } elseif ($form->isValid()) {
+            // Mettre à jour la chaîne de critères avec les nouvelles valeurs sélectionnées
+            $listeCritereString = implode(',', $form->get('listCritere')->getData());
+            $objectif->setListCritere($listeCritereString);
 
-        // Redirection après la mise à jour
-        return $this->redirectToRoute('objectif_all');
+            $entityManager->flush();
+
+            // Redirection après la mise à jour
+            return $this->redirectToRoute('objectif_all');
+        }
     }
 
     // Affichage du formulaire de modification
     return $this->render('objectif_dash/editobjectif.html.twig', [
         'form' => $form->createView(),
+        'emptySubmission' => $emptySubmission,
     ]);
 }
 

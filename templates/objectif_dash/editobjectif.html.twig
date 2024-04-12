@@ -8,57 +8,42 @@
         <div class="card-body">
             <h4 class="card-title">Modifier un objectif</h4>
             <p class="card-description">Veuillez Modifier les informations de l'objectif ci-dessous.</p>
+            {% if emptySubmission %}
+                {% set atLeastOneChecked = false %}
+                {% for choice in form.listCritere %}
+                    {% if choice.vars.checked %}
+                        {% set atLeastOneChecked = true %}
+                    {% endif %}
+                {% endfor %}
+                {% if not atLeastOneChecked %}
+                    <div class="alert alert-danger" role="alert">
+                        Veuillez sélectionner au moins un critère.
+                    </div>
+                {% endif %}
+            {% endif %}
             {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'objectif-form'}}) }}
             <div class="form-group">
-              {{ form_label(form.libelle, 'Libelle') }}
-              {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Libelle'}}) }}
-              {% if form_errors(form.libelle) and form.libelle.vars.value is not null %}
-                  <div class="invalid-feedback">
-                      {{ form_errors(form.libelle) }}
-                  </div>
-              {% endif %}
-          </div>
+                {{ form_label(form.libelle, 'Libelle') }}
+                {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Libelle'}}) }}
+                
+            </div>
             <div class="form-group">
                 {{ form_label(form.listCritere, 'Critères') }}
                 {% for choice in form.listCritere %}
-                <div class="form-check critere-item">
-                    <div style="display: flex; align-items: center;"> <!-- Div pour aligner les éléments -->
-                        {{ form_widget(choice, { 'attr': {'class': 'form-check-input custom-checkbox', 'required': 'required'} }) }}
-                        <label class="form-check-label" style="margin-left: 10px; font-weight: bold;">{{ choice.vars.label }}</label>
+                    <div class="form-check critere-item">
+                        <div style="display: flex; align-items: center;">
+                            {{ form_widget(choice, { 'attr': {'class': 'form-check-input custom-checkbox'} }) }}
+                            <label class="form-check-label" style="margin-left: 10px; font-weight: bold;">{{ choice.vars.label }}</label>
+                        </div>
                     </div>
-                </div>
                 {% endfor %}
-                {{ form_errors(form.listCritere) }} {# Affiche les erreurs éventuelles des critères #}
+                <span class="error-message">{{ form_errors(form.listCritere) }}</span>
             </div>
             <button type="submit" class="btn btn-primary mr-2">Modifier</button>
             {{ form_end(form) }}
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById('objectif-form').addEventListener('submit', function(event) {
-        var libelleInput = document.getElementById('objectif_libelle');
-        if (!libelleInput.value) {
-            alert('Veuillez saisir un libellé.');
-            event.preventDefault();
-        }
-        
-        var checkboxes = document.querySelectorAll('.form-check-input.custom-checkbox');
-        var checked = false;
-        checkboxes.forEach(function(checkbox) {
-            if (checkbox.checked) {
-                checked = true;
-            }
-        });
-        if (!checked) {
-            alert('Veuillez sélectionner au moins un critère.');
-            event.preventDefault();
-        }
-    });
-});
-</script>
 
 <style>
     .custom-checkbox {
@@ -74,6 +59,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     .btn:hover {
         background-color: #72c22f; /* Nouvelle couleur de fond */
+    }
+    .error-message {
+        color: red; /* Couleur rouge pour les messages d'erreur */
     }
 </style>
 {% endblock %}
