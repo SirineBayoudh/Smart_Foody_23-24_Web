@@ -42,13 +42,19 @@ class UserController extends AbstractController
             $user = $manager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
 
             if($user) {
-                if ($user->getMotDePasse() == md5($password) ){
+                if ($user->getMotDePasse() == md5($password)){
                     dump("we found it");
-                    // Authentification réussie, rediriger vers une autre page par exemple
-                    return $this->redirectToRoute('accueil'); // Rediriger vers la page d'accueil
+                  
+                    if ($user->getRole() == 'Admin') {
+                
+                        return $this->redirectToRoute('app_back');
+                    } else {
+                        
+                        return $this->redirectToRoute('accueil');
+                    }
                 } else {
                     dump("we didn't found it");
-                    // Identifiants invalides, afficher un message d'erreur
+                   
                     $error = 'mot de passe incorrect';
                 }
             } else {
@@ -62,7 +68,6 @@ class UserController extends AbstractController
             'error' => $error,
         ]);
     }
-    
 
     /** Méthodes pour le client */
 
@@ -77,9 +82,9 @@ class UserController extends AbstractController
         $form->handleRequest($req);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            //$plainPassword = $user->getMotDePasse();
-            //$hashedPassword = md5($plainPassword);
-            //$user->setMotDePasse($hashedPassword);
+            $plainPassword = $user->getMotDePasse();
+            $hashedPassword = md5($plainPassword);
+            $user->setMotDePasse($hashedPassword);
 
             $user->setRole('Client');
             $user->setMatricule('');
@@ -97,7 +102,7 @@ class UserController extends AbstractController
 
             $mailer->send($email);
 
-            return $this->redirectToRoute("app_login");
+            return $this->redirectToRoute("login");
         }
         return $this->renderform('user/register.html.twig', ['f' => $form]);
     }

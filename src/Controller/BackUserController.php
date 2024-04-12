@@ -72,6 +72,10 @@ class BackUserController extends AbstractController
         $form->handleRequest($req);
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $plainPassword = $user->getMotDePasse();
+            $hashedPassword = md5($plainPassword);
+            $user->setMotDePasse($hashedPassword);
+
             $user->setRole('Conseiller');
             $user->setAdresse('');
             $user->setObjectif(null);
