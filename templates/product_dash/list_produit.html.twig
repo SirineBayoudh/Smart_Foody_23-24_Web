@@ -14,6 +14,42 @@
         background-color: #bbddab; /* Couleur de fond au survol */
         color: #fff; /* Couleur du texte au survol */
     }
+    .thead-green {
+        background-color: #77bb58;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    .table-striped tbody tr:hover {
+        background-color: #bbddab; /* Couleur de fond au survol */
+        color: #fff; /* Couleur du texte au survol */
+    }
+
+    /* Styles pour les boutons */
+    .btn {
+        /* Styles normaux des boutons */
+        background-color: #56ab2f;
+        border-color: #56ab2f;
+        color: #ffffff; /* Couleur du texte */
+        transition: background-color 0.3s; /* Transition fluide pour la couleur de fond */
+    }
+
+    /* Styles pour les boutons lorsqu'ils sont survolés */
+    .btn:hover {
+        background-color: #72c22f; /* Nouvelle couleur de fond */
+    }
+    .btn.dropdown-toggle:focus {
+    background-color: #ffffff; /* Couleur de fond du bouton lorsqu'il est ouvert */
+    color: #000000; /* Couleur du texte du bouton lorsqu'il est ouvert */
+}
+.thead-green {
+        background-color: #77bb58;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
 </style>
 
 <div class="example-wrapper">
@@ -34,7 +70,7 @@
             
             <div class="table-responsive">
               <table class="table table-striped custom-table-width">
-                <thead>
+                <thead class="thead-green">
                   <tr>
                     <th>Image</th>
                     <th>Marque</th>
@@ -60,20 +96,13 @@
                             <td>{{ product.prix }}</td>
                             <!-- Ajoutez d'autres cellules pour d'autres attributs -->
                             <td>
-                                <!-- Bouton de modification -->
-                                <a href="{{ path('edit_product', {'id': product.ref}) }}" enctype="multipart/form-data" class="btn btn-warning btn-sm" title="Modifier" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
-                                   onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
-                                   onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
-                                    <i class="ti-pencil-alt"></i>
-                                </a>
-                                
-                                <!-- Bouton de suppression -->
-                                <a href="{{ path('delete_product', {'id': product.ref}) }}" class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
-                                   onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
-                                   onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
-                                    <i class="ti-trash"></i>
-                                </a>
-                            </td>
+                              <a href="{{ path('edit_product', {'id': product.ref}) }}" class="btn btn-warning btn-sm">
+                                  <i class="ti-pencil-alt"></i>
+                              </a>
+                              <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ product.ref }}')">
+                                  <i class="ti-trash"></i>
+                              </button>
+                          </td>
                             
                         </tr>
                     {% endfor %}
@@ -84,4 +113,27 @@
         </div>
       </div>
 </div>
+
+<!-- Inclusion de SweetAlert2 via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<!-- Script pour la confirmation de suppression avec SweetAlert2 -->
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: "Est-ce que vous êtes sûr?",
+            text: "Vous allez supprimer cet objectif !!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Oui, Supprime-le!",
+            cancelButtonText: "Annuler"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ path('delete_product', {'id': '__id__'}) }}".replace('__id__', id);
+            }
+        });
+    }
+    </script>
 {% endblock %}

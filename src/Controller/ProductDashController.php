@@ -28,8 +28,9 @@ class ProductDashController extends AbstractController
     #[Route('/product/all', name: 'product_all')]
     public function listProduit(ProduitRepository $prodrepository): Response
 {
+    $produits = $prodrepository->findBy([], ['ref' => 'DESC']);
     return $this->render('product_dash/list_produit.html.twig', [
-        'prod' => $prodrepository->findAll(),
+        'prod' => $produits,
     ]);
 }
 
@@ -137,15 +138,28 @@ public function editProduct(int $id, EntityManagerInterface $entityManager, Requ
     ]);
 }
 
-#[Route('/author/delete/{id}', name: 'delete_product')]
-    public function deleteAuthor($id, ManagerRegistry $manager, ProduitRepository $authorepository): Response
-    {
-        $em = $manager->getManager();
-        $author = $authorepository->find($id);
-            $em->remove($author);
+#[Route('/product/delete/{id}', name: 'delete_product')]
+public function deleteProd($id, ManagerRegistry $manager, ProduitRepository $prodrepository): Response
+{
+    $em = $manager->getManager();
+    $prod = $prodrepository->find($id);
+
+    if ($prod !== null) {
+        // Vérifier si l'objet critère est défini pour l'objectif
+        $critere = $prod->getCritere();
+        if ($critere !== null) {
+            // Si le critère est défini, supprimer l'objectif
+            $em->remove($prod);
             $em->flush();
-            return $this->redirectToRoute('product_all');
-        } 
+        } else {
+            // Si le critère n'est pas défini, afficher un message d'erreur ou rediriger vers une autre page
+            // Exemple: return $this->redirectToRoute('page_without_criteria');
+        }
+    }
+
+    return $this->redirectToRoute('product_all');
+}
+
         
     
 }
