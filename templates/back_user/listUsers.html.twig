@@ -61,7 +61,8 @@
 			margin-top: 130px; /* Espacement entre l'image et le titre */
 
 		}
-		.col-lg-2 {
+		.table-striped tbody tr:nth-of-type(odd) {
+			background-color:#ddeed5;
 		}
 	</style>
 
@@ -203,6 +204,11 @@
 							</tbody>
 						</table>
 					</div>
+					<div class="text-center mt-4" >
+						<div style="display: inline-block;">
+							{{ knp_pagination_render(pagination, 'pagination.html.twig') }}
+						</div>
+					</div>
 				</div>
 			</div>
 			<button type="button" class="btn btn-inverse-success btn-fw" style="margin-top:20px; width:300px; margin-left:900px;" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
@@ -228,4 +234,6 @@ window.location.href = url;
 });
 }
 	</script>
+
+
 {% endblock %}

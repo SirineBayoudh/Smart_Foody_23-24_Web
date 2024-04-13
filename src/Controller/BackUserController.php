@@ -8,9 +8,11 @@ use App\Form\ProfilConseillerType;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Knp\Component\Pager\PaginatorInterface;
 
 class BackUserController extends AbstractController
 {
@@ -25,7 +27,7 @@ class BackUserController extends AbstractController
     /* Afficher la liste des utilisateurs  */
 
     #[Route('/listUsers', name: 'usersList')]
-    public function getAll(Request $request, UtilisateurRepository $repo): Response
+    public function getAll(Request $request, UtilisateurRepository $repo, PaginatorInterface $paginator): Response
     {
 
         $roleFilter = $request->query->get('role');
@@ -36,6 +38,14 @@ class BackUserController extends AbstractController
             $list = $repo->findAll();
         }
 
+        $queryBuilder = $repo->createQueryBuilder('u')
+            ->orderBy('u.idUtilisateur', 'DESC');
+
+        $pagination = $paginator->paginate(
+            $queryBuilder->getQuery(),
+            $request->query->getInt('page', 1), //num page
+            5 // nb element par page
+        );
 
         $entityManager = $this->getDoctrine()->getManager();
         
@@ -62,6 +72,7 @@ class BackUserController extends AbstractController
             'role' => $roleFilter,
             'totalClients' => $clientsCount,
             'totalConseillers' => $conseillersCount,
+            'pagination' => $pagination,
         ]);
     }
 
@@ -157,6 +168,49 @@ class BackUserController extends AbstractController
         return $this->redirectToRoute("usersList");
     }
 
+    #[Route('/rechercherUsers', name: 'rechercher_utilisateurs')]
+    public function rechercher(Request $request): JsonResponse
+    {
+        $searchText = $request->query->get('searchText');
 
+        $entityManager = $this->getDoctrine()->getManager();
+        $userRepository = $entityManager->getRepository(Utilisateur::class);
+
+        if (empty($searchText)) {
+            $users = $userRepository->findAll();
+        } else {
+            $users = $userRepository->createQueryBuilder('u')
+                ->where('LOWER(u.nom) LIKE :searchText')
+                ->setParameter('searchText', '%'.strtolower($searchText).'%')
+                ->getQuery()
+                ->getResult();
+        }
+
+        // Convertit les utilisateurs en tableau associatif pour une sortie JSON
+        $response = [];
+        foreach ($users as $user) {
+            $response[] = [
+                'photo' => $user->getPhoto(),
+                'nom' => $user->getNom(),
+                'prenom' => $user->getPrenom(),
+                'genre' => $user->getGenre(),
+                'email' => $user->getEmail(),
+                'motDePasse' => $user->getMotDePasse(),
+                'numTel' => $user->getNumTel(),
+                'role' => $user->getRole(),
+                'matricule' => $user->getMatricule(),
+                'attestation' => $user->getAttestation(),
+                'adresse' => $user->getAdresse(),
+                'objectif' => $user->getObjectif() ? $user->getObjectif()->getLibelle() : null,
+                'taille' => $user->getTaille(),
+                'poids' => $user->getPoids(),
+                'idUtilisateur' => $user->getIdUtilisateur(), // Ajoute l'ID de l'utilisateur pour les liens d'édition et de suppression
+            ];
+        }
+
+        return $this->json([
+            'users' => $users,
+        ]);
+    }
     
 }
