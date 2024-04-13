@@ -30,27 +30,36 @@
     background-color: #ffffff; /* Couleur de fond du bouton lorsqu'il est ouvert */
     color: #000000; /* Couleur du texte du bouton lorsqu'il est ouvert */
 }
+.thead-green {
+        background-color: #77bb58;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
 </style>
+
+
 
 <div class="col-lg-10 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
             <h4 class="card-title">Table des objectifs :</h4>
             <div class="col text-right mb-4">
-                <a href="{{ path('add_object') }}" class="btn btn-primary">
+                <a href="{{ path('add_object') }}" class="btn btn-primary btn-sm mr-2">
                     <i class="ti-plus"></i>
                     Ajouter objectif
                 </a>
-                <select id="critere" name="critere" onchange="filterObjectifs() ; resetButtonStyle();" class="btn btn-primary dropdown-toggle ">
+                <select id="critere" name="critere" onchange="filterObjectifs() ; resetButtonStyle();" class="btn btn-primary btn-sm dropdown-toggle ">
                     <option value="">Tous les critères</option>
                     {% for critere in criteres %}
                         <option value="{{ critere }}">{{ critere }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
+            <div class="table-responsive ">
+                <table class="table table-striped ">
+                    <thead class="thead-green">
                         <tr>
                             <th>Libelle</th>
                             <th>ListCritere</th>
@@ -58,7 +67,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for o in obj %}
+                        {% for o in pagination %}
                             <tr>
                                 <td>{{ o.libelle }}</td>
                                 <td>{{ o.listCritere }}</td>
@@ -74,10 +83,16 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <div class="text-center mt-4">
+                    <div style="display: inline-block;">
+                        {{ knp_pagination_render(pagination, 'pagination.html.twig') }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Inclusion de SweetAlert2 via CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

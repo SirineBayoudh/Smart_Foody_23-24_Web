@@ -24,8 +24,12 @@
             {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'objectif-form'}}) }}
             <div class="form-group">
                 {{ form_label(form.libelle, 'Libelle') }}
-                {{ form_widget(form.libelle, {'attr': {'class': 'form-control', 'placeholder': 'Libelle'}}) }}
-                
+                {{ form_widget(form.libelle, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.libelle) ? ' is-invalid' : '')}}) }}
+                {% if form_errors(form.libelle) %}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.libelle) }}
+                    </div>
+                {% endif %}
             </div>
             <div class="form-group">
                 {{ form_label(form.listCritere, 'Critères') }}
@@ -39,7 +43,7 @@
                 {% endfor %}
                 <span class="error-message">{{ form_errors(form.listCritere) }}</span>
             </div>
-            <button type="submit" class="btn btn-primary mr-2">Modifier</button>
+            <button type="submit" class="btn btn-primary mr-2" id="submitBtn">Modifier</button>
             {{ form_end(form) }}
         </div>
     </div>
@@ -63,5 +67,30 @@
     .error-message {
         color: red; /* Couleur rouge pour les messages d'erreur */
     }
+    .is-invalid {
+    border-color: #dc3545; /* Couleur de bordure rouge */
+}
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    document.getElementById('submitBtn').addEventListener('click', function() {
+        Swal.fire({
+            title: "Est-ce que vous êtes sûr?",
+            text: "Voulez-vous vraiment accorder une modification pour cet objectif?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Oui, Modifier!",
+            cancelButtonText: "Annuler",
+            allowOutsideClick: false, // Empêcher la fermeture en cliquant à l'extérieur
+            allowEscapeKey: false // Empêcher la fermeture en appuyant sur la touche Escape
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('objectif-form').submit();
+            }
+        });
+    });
+</script>
 {% endblock %}

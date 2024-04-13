@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Knp\Component\Pager\PaginatorInterface;
 
 class ObjectifDashController extends AbstractController
 {
@@ -23,16 +24,21 @@ class ObjectifDashController extends AbstractController
     }
 
     #[Route('/objectif/all', name: 'objectif_all')]
-    public function listProduit(ObjectifRepository $prodrepository): Response
+    public function listProduit(ObjectifRepository $prodrepository,PaginatorInterface $paginator,Request $request): Response
     {
         $objectifs = $this->getDoctrine()->getRepository(Objectif::class)->findBy([], ['id_obj' => 'DESC']);
+        $pagination = $paginator->paginate(
+            $objectifs, // Requête à paginer
+            $request->query->getInt('page', 1), // Le numéro de page, 1 par défaut
+            2 // Limite par page
+        );
         
         // Récupérer la liste des critères
         $criteres = $prodrepository->findAllCriteres(); // Remplacez cela par votre propre méthode pour récupérer les critères
         
         return $this->render('objectif_dash/list_objectif.html.twig', [
-            'obj' => $objectifs,
             'criteres' => $criteres, // Passer les critères à votre modèle Twig
+            'pagination' => $pagination,
         ]);
     }
     
