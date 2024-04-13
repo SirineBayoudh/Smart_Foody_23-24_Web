@@ -36,9 +36,32 @@ class BackUserController extends AbstractController
             $list = $repo->findAll();
         }
 
+
+        $entityManager = $this->getDoctrine()->getManager();
+        
+        // Récupérer le nombre de clients
+        $clientsCount = $entityManager->getRepository(Utilisateur::class)
+            ->createQueryBuilder('u')
+            ->select('COUNT(u)')
+            ->where('u.role = :role')
+            ->setParameter('role', 'client')
+            ->getQuery()
+            ->getSingleScalarResult();
+        
+        // Récupérer le nombre de conseillers
+        $conseillersCount = $entityManager->getRepository(Utilisateur::class)
+            ->createQueryBuilder('u')
+            ->select('COUNT(u)')
+            ->where('u.role = :role')
+            ->setParameter('role', 'conseiller')
+            ->getQuery()
+            ->getSingleScalarResult();
+
         return $this->render('back_user/listUsers.html.twig', [
             'users' => $list,
-            'role' => $roleFilter
+            'role' => $roleFilter,
+            'totalClients' => $clientsCount,
+            'totalConseillers' => $conseillersCount,
         ]);
     }
 
@@ -68,9 +91,12 @@ class BackUserController extends AbstractController
         $form = $this->createForm(ConseillerType::class, $user);
 
         $em = $manager->getManager();
+        $emptySubmission = false;
 
         $form->handleRequest($req);
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $emptySubmission = true;
 
             $plainPassword = $user->getMotDePasse();
             $hashedPassword = md5($plainPassword);
@@ -86,8 +112,13 @@ class BackUserController extends AbstractController
             $em->persist($user);
             $em->flush();
             return $this->redirectToRoute("usersList");
+        }elseif ($form->isSubmitted()) {
+            $emptySubmission = true;
         }
-        return $this->renderform('back_user/ajouterConseiller.html.twig', ['f' => $form]);
+        return $this->renderform('back_user/ajouterConseiller.html.twig', [
+            'f' => $form,
+            'emptySubmission' => $emptySubmission ?? false,
+        ]);
     }
 
     /* Modifier un Conseiller */
@@ -125,4 +156,7 @@ class BackUserController extends AbstractController
         $em->flush();
         return $this->redirectToRoute("usersList");
     }
+
+
+    
 }

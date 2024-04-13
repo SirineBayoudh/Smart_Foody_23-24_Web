@@ -3,17 +3,99 @@
 {% block title %}Utilisateur
 {% endblock %}
 
+{% block stylesheet %}{% endblock %}
 
 {% block body %}
+
+	<style>
+		.table-striped tbody tr:hover {
+			background-color: #bbddab; /* Couleur de fond au survol */
+			color: #fff; /* Couleur du texte au survol */
+		}
+
+		.anchor-pane {
+			display: flex;
+			justify-content: space-around;
+			margin-top: 20px;
+		}
+
+		.cards-container {
+			display: flex;
+			gap: 20px; /* Espacement entre les cartes */
+			margin-left: 400px;
+		}
+
+		.card2 {
+			background: linear-gradient(to right, #19330e, #56ab2f);
+			border-radius: 5px;
+			padding: 20px;
+			color: white;
+			text-align: center;
+			width: 270px;
+			position: relative;
+			height: 200px;
+		}
+
+		.card2:hover {
+			background: linear-gradient(to right, #56ab2f, #19330e);
+		}
+
+		.card-image {
+			width: 86px;
+			height: 78px;
+			margin: 0 auto; /* Centrage horizontal de l'image */
+			display: block; /* Assurer que l'image se comporte comme un bloc */
+			position: absolute;
+			top: 10px; /* Distance du haut */
+			left: 10px;
+		}
+
+		.total {
+			font-size: 30px;
+			font-weight: bold;
+			position: absolute;
+			top: 10px; /* Distance du haut */
+			right: 10px;
+		}
+		h3 {
+			margin-top: 130px; /* Espacement entre l'image et le titre */
+
+		}
+		.col-lg-2 {
+		}
+	</style>
+
 	<div class="col-lg-10 grid-margin stretch-card">
 		<div class="card">
-			
-			<button type="button" class="btn btn-inverse-primary btn-fw" style="margin-top:20px; width:300px; margin-left:900px;" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
+
+			<div class="anchor-pane">
+				<div class="col-lg-2">
+					<form action="{{ path('usersList') }}" method="GET">
+						<select name="role" class="form-control" onchange="this.form.submit()">
+							<option value="">Tous</option>
+							<option value="Client">Client</option>
+							<option value="Conseiller">Conseiller</option>
+						</select>
+					</form>
+				</div>
+				<div class="cards-container">
+					<div class="card2" id="cardClient">
+						<img src="{{ asset('images/groupe.png') }}" alt="Total Clients" class="card-image">
+						<h3>Total Clients</h3>
+						<p id="totalClients" class="total">{{ totalClients }}</p>
+					</div>
+					<div class="card2" id="cardConseiller">
+						<img src="{{ asset('images/nutritionniste_blanc.png') }}" alt="Total Conseillers" class="card-image">
+						<h3>Total Conseillers</h3>
+						<p id="totalConseillers" class="total">{{ totalConseillers }}</p>
+					</div>
+				</div>
+			</div>
 			<div class="card-body">
 				<div class="table-responsive">
 					<div class="table-wrapper">
-						<table class="table table-hover">
-							<thead>
+						<table class="table table-striped">
+							<thead style=" background-color: #77bb58; color: white; position: sticky; top: 0; z-index: 1;">
 								<tr>
 									<th>
 										Photo
@@ -109,10 +191,10 @@
 											{{ user.poids }}
 										</td>
 										<td>
-											<a href="{{ path('conseiller_update', {'id': user.idUtilisateur}) }}">
+											<a href="{{ path('conseiller_update', {'id': user.idUtilisateur}) }}" class="btn btn-warning btn-sm">
 												<i class="ti-pencil menu-icon"></i>
 											</a>
-											<a href="{{ path('conseiller_delete', {'id': user.idUtilisateur}) }}">
+											<a class="btn btn-danger btn-sm" onclick="confirmSuppression('{{ path('conseiller_delete', {'id': user.idUtilisateur}) }}')">
 												<i class="icon-trash menu-icon"></i>
 											</a>
 										</td>
@@ -123,9 +205,27 @@
 					</div>
 				</div>
 			</div>
-
+			<button type="button" class="btn btn-inverse-success btn-fw" style="margin-top:20px; width:300px; margin-left:900px;" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
 		</div>
 
 	</div>
 
+	<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		function confirmSuppression(url) {
+Swal.fire({
+title: 'Êtes-vous sûr?',
+text: "Vous êtes sur le point de supprimer cet article du panier!",
+icon: 'warning',
+showCancelButton: true,
+confirmButtonColor: '#dc3545',
+cancelButtonColor: '#28a745',
+confirmButtonText: 'Oui, supprimer!'
+}).then((result) => {
+if (result.isConfirmed) {
+window.location.href = url;
+}
+});
+}
+	</script>
 {% endblock %}

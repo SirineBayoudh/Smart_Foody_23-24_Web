@@ -295,6 +295,7 @@ a.editable-click.editable-disabled:hover {
 .table-striped .datepicker table tr th {
   background-color: transparent;
 }
+
 .datepicker table tr td.day:hover {
   background: #eeeeee;
   cursor: pointer;
