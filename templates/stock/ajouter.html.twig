@@ -16,7 +16,11 @@
                                 {% endif %}
                             </h4>
                             <p class="card-description"></p>
-    
+                        	{% if emptySubmission %}
+								<div class="alert alert-danger" role="alert">
+									Veuillez remplir tous les champs.
+								</div>
+							{% endif %}
                             {{ form_start(form, {'attr': {'id': 'yourFormId', 'class': 'forms-sample', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
                             <!-- Début du formulaire -->
                             <div class="form-group">
@@ -72,17 +76,17 @@
                                 {% endif %}
                             </div>
                             <br><br>
-                            
-                            <div class="form-group">
-                                <label>File upload</label>
-                                <input type="file" name="img[]" class="file-upload-default" id="fileInput">
-                                <div class="input-group col-xs-12">
-                                    <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" id="imageName">
-                                    <span class="input-group-append">
-                                        <button class="file-upload-browse btn btn-primary" type="button" onclick="document.getElementById('fileInput').click()">Upload</button>
-                                    </span>
-                                </div>
-                            </div>
+                     
+                <div class="form-group">
+                    <label>File upload</label>
+                    <input type="file" name="img[]" class="file-upload-default" id="fileInput">
+                    <div class="input-group col-xs-12">
+                        <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" id="imageName">
+                        <span class="input-group-append">
+                            <button class="file-upload-browse btn btn-primary" type="button" onclick="document.getElementById('fileInput').click()">Upload</button>
+                        </span>
+                    </div>
+                </div>
                        <!-- Fin du formulaire -->
                             <br><br>
                             {# <button class="btn btn-light" onclick="window.history.back();">Cancel</button>
@@ -133,7 +137,26 @@
         calendar.render();
     });
     </script> #}
-   
+    <script>
+        // Sélectionnez l'élément d'entrée de fichier
+        const fileInput = document.getElementById('fileInput');
+        // Sélectionnez l'élément d'entrée de texte
+        const imageName = document.getElementById('imageName');
+    
+        // Ajoutez un écouteur d'événements pour le changement de fichier
+        fileInput.addEventListener('change', function() {
+            // Vérifiez si un fichier est sélectionné
+            if (this.files.length > 0) {
+                // Obtenez le nom du fichier
+                const fileName = this.files[0].name;
+                // Afficher le nom du fichier dans le champ de texte
+                imageName.value = fileName;
+            } else {
+                // Réinitialisez le champ de texte s'il n'y a pas de fichier sélectionné
+                imageName.value = '';
+            }
+        });
+    </script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
     <script>
         document.getElementById('saveButton').addEventListener('click', function() {

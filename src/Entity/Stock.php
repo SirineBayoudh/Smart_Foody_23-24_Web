@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints as CustomAssert;
 
 #[ORM\Entity(repositoryClass: StockRepository::class)]
 class Stock
@@ -36,6 +37,7 @@ class Stock
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le champ ne peut pas être vide")]
+
     private ?string $marque = null;
     #[ORM\Column(length: 255, nullable: true)]
 

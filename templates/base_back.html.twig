@@ -296,7 +296,7 @@
       </div>
       <!-- partial -->
       <!-- partial:partials/_sidebar.html -->
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <nav class="sidebar sidebar-offcanvas" id="sidebar" style="color: green; background-color: #77bb58;">
         <ul class="nav">
           <li class="nav-item">
             <a class="nav-link" href="index.html">
@@ -333,40 +333,40 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
               <i class="icon-bar-graph menu-icon"></i>
-              <span class="menu-title">Charts</span>
+              <span class="menu-title">Stocks</span>
               <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="charts">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="pages/charts/chartjs.html">ChartJs</a></li>
+                <li class="nav-item"> <a class="nav-link" href="pages/charts/chartjs.html">stock existant</a></li>
               </ul>
             </div>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
-              <i class="icon-grid-2 menu-icon"></i>
-              <span class="menu-title">Stocks</span>
-              <i class="menu-arrow"></i>
+          <li class="nav-item" >
+            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables" style="color: green; background-color: #77bb58;">
+                <i class="icon-grid-2 menu-icon"></i>
+                <span class="menu-title" style="color: white;">Stocks</span>
+                <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="tables">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="/stock">stock existant</a></li>
-              </ul>
-          
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="/stock_venir">Stock en arrivage</a></li>
-              </ul>
+                <ul class="nav flex-column sub-menu"style="color: green; background-color: #77bb58;">
+                    <li class="nav-item"> <a class="nav-link" href="/stock">stock existant</a></li>
+                </ul>
+                <ul class="nav flex-column sub-menu"style="color: green; background-color: #77bb58;">
+                    <li class="nav-item"> <a class="nav-link" href="/stock_venir">Stock en arrivage</a></li>
+                </ul>
             </div>
-          </li>
+        </li>
+
           <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
+            <a class="nav-link" data-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons" style="color: White; background-color: #77bb58;">
               <i class="icon-contract menu-icon"></i>
               <span class="menu-title">Alertes</span>
               <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="icons">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="/alerte">alertes</a></li>
+              <ul class="nav flex-column sub-menu"style="color: green; background-color: #77bb58;">
+                <li class="nav-item"> <a class="nav-link" href="/alerte" >alertes</a></li>
               </ul>
             </div>
           </li>
@@ -1099,3 +1099,26 @@
 
 </html>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentPage = window.location.pathname;
+
+        // Vérifier si la page actuelle correspond à /stock ou /stock_venir
+        if (currentPage.includes('/stock') || currentPage.includes('/stock_venir')) {
+            const stockLink = document.querySelector('.nav-link[href="#tables"]');
+            const stockTitle = document.querySelector('.nav-link[href="#tables"] .menu-title');
+
+            stockTitle.style.fontWeight = 'bold';
+            stockTitle.style.fontSize = '30px';
+        }
+
+        // Vérifier si la page actuelle correspond à /alerte
+        if (currentPage.includes('/alerte')) {
+            const alertesLink = document.querySelector('.nav-link[href="#icons"]');
+            const alertesTitle = document.querySelector('.nav-link[href="#icons"] .menu-title');
+
+            alertesTitle.style.fontWeight = 'bold';
+            alertesTitle.style.fontSize = '30px';
+        }
+    });
+</script>

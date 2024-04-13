@@ -163,8 +163,9 @@ class StockController extends AbstractController
             ->getForm();
         $form->handleRequest($req);
         $em = $manager->getManager();
+        $emptySubmission = false;
         if ($form->isSubmitted()  && $form->isValid()) {
-
+            $emptySubmission = true;
             $em->persist($j);  // juste préparer les requetes
             $em->flush();
 
@@ -174,6 +175,7 @@ class StockController extends AbstractController
             'stock/ajouter.html.twig',
             [
                 'form' => $form,
+                'emptySubmission' => $emptySubmission ?? false,
                 //'stocks' => $repo->findAll() // Passer les stocks à la vue
             ]
         );
@@ -189,8 +191,9 @@ class StockController extends AbstractController
         $form = $this->createForm(AjouterStockType::class, $stock);
         $form->handleRequest($request);
         $em = $manager->getManager();
-
+        $emptySubmission = false;
         if ($form->isSubmitted() && $form->isValid()) {
+            $emptySubmission = true;
             // Vérifier si des fichiers ont été téléchargés
             if ($request->files->has('img')) {
                 $imageFile = $request->files->get('img')[0];
@@ -219,11 +222,13 @@ class StockController extends AbstractController
 
             // Rediriger l'utilisateur vers la page de liste des stocks ou une autre page appropriée
             return $this->redirectToRoute('stock_get');
+        } elseif ($form->isSubmitted()) {
+            $emptySubmission = true;
         }
-
         // Afficher le formulaire si celui-ci n'est pas soumis ou n'est pas valide
         return $this->render('stock/ajouter.html.twig', [
             'form' => $form->createView(),
+            'emptySubmission' => $emptySubmission ?? false,
         ]);
     }
 

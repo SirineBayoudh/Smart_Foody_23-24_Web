@@ -43,7 +43,6 @@ class AjouterStockType extends AbstractType
             ->add('date_arrivage', DateTimeType::class, [
                 'date_widget' => 'single_text'
             ]);
-
         // ->add('submit', SubmitType::class, [
         //     'attr' => ['class' => 'btn btn-primary mr-2'],
         // ]);

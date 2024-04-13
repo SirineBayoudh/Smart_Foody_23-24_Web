@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Conversion de devises</title>
+</head>
+<body>
+    <h1>Conversion de devises</h1>
+
+    <form action="{{ path('convert_currency') }}" method="post">
+        <label for="amount">Montant en dinar :</label>
+        <input type="number" id="amount" name="amount" required>
+        <button type="submit" name="currency" value="eur">Convertir en Euro</button>
+        <button type="submit" name="currency" value="usd">Convertir en Dollar</button>
+    </form>
+
+    {% if convertedAmount is defined %}
+        <p>Résultat de la conversion : {{ convertedAmount }}</p>
+    {% endif %}
+</body>
+</html>
