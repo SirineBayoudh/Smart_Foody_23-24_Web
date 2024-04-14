@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Objectif;
 use App\Entity\Produit;
+use App\Service\PdfGenerator;
 use App\Form\ProduitType;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ProduitRepository;
@@ -18,6 +19,13 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ProductDashController extends AbstractController
 {
+    private $pdfGenerator;
+
+    public function __construct(PdfGenerator $pdfGenerator)
+    {
+        $this->pdfGenerator = $pdfGenerator;
+    }
+
     #[Route('/product/dash', name: 'app_product_dash')]
     public function index(): Response
     {
@@ -170,6 +178,21 @@ public function deleteProd($id, ManagerRegistry $manager, ProduitRepository $pro
     return $this->redirectToRoute('product_all');
 }
 
-        
+#[Route('/export-pdf', name: 'export_pdf')]
+public function exportPdf(PdfGenerator $pdfGenerator, ProduitRepository $produitRepository)
+{
+    // Récupérez les données des produits depuis le repository ou un autre endroit approprié
+    $products = $produitRepository->findAll();
+
+    // Générez le PDF à partir des données des produits
+    $pdfContent = $pdfGenerator->generatePdf($products);
+
+    // Créez une réponse Symfony pour renvoyer le PDF
+    $response = new Response($pdfContent);
+    $response->headers->set('Content-Type', 'application/pdf');
+    $response->headers->set('Content-Disposition', 'attachment; filename="liste_produits.pdf"');
+
+    return $response;
+}     
     
 }

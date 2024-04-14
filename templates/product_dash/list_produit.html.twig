@@ -72,23 +72,24 @@
             <div class="row mb-4">
                 <div class="col text-right mb-4">
                     <a href="{{ path('add_product') }}" class="btn btn-primary btn-sm mr-5 hover-effect" style="background-color: #56ab2f; border-color: #56ab2f;" 
-   onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
-   onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
-    <i class="ti-plus"></i>
-    Ajouter produit
-</a>
+                        onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
+                        onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
+                        <i class="ti-plus"></i>
+                            Ajouter produit
+                    </a>
 
-<select id="critere" name="critere" onchange="filterObjectifs(); resetButtonStyle();" class="btn btn-primary btn-sm dropdown-toggle mr-5">
-    <option value="">Tous les critères</option>
-    {% for critere in criteres %}
-        <option value="{{ critere }}">{{ critere }}</option>
-    {% endfor %}
-</select>
+                    <select id="critere" name="critere" onchange="filterObjectifs(); resetButtonStyle();" class="btn btn-primary btn-sm dropdown-toggle mr-5">
+                            <option value="">Tous les critères</option>
+                                {% for critere in criteres %}
+                            <option value="{{ critere }}">{{ critere }}</option>
+                                {% endfor %}
+                    </select>
 
-<input type="text" name="search" id="searchInput" class="mr-2" placeholder="Rechercher par marque...">
+                    <input type="text" name="search" id="searchInput" class="mr-2" placeholder="Rechercher par marque...">
 
-<button class="btn btn-primary btn-sm" onclick="filterByMarque()">Rechercher</button>
+                    <button class="btn btn-primary btn-sm mr-5" onclick="filterByMarque()">Rechercher</button>
 
+                    <a href="{{ path('export_pdf') }}" class="btn btn-primary btn-sm mr-5">Télécharger en PDF</a>
                 </div>
             </div>
             
