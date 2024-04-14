@@ -122,13 +122,16 @@ class BackUserController extends AbstractController
 
             $em->persist($user);
             $em->flush();
+
+            $this->addFlash('success', 'Conseiller ajouté avec succès');
+
             return $this->redirectToRoute("usersList");
         }elseif ($form->isSubmitted()) {
             $emptySubmission = true;
         }
         return $this->renderform('back_user/ajouterConseiller.html.twig', [
             'f' => $form,
-            'emptySubmission' => $emptySubmission ?? false,
+            'emptySubmission' => $emptySubmission ?? false
         ]);
     }
 
@@ -148,6 +151,9 @@ class BackUserController extends AbstractController
 
             $em->persist($user);
             $em->flush();
+
+            $this->addFlash('success', 'Conseiller modifié avec succès');
+
             return $this->redirectToRoute("usersList");
         }
         return $this->renderform('back_user/modifierConseiller.html.twig', ['f' => $form]);

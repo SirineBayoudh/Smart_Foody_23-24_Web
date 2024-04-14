@@ -4,60 +4,71 @@
 {% endblock %}
 
 {% block body %}
+	<style>
+		.card-body h2.card-title {
+			text-align: center;
+			color: #56ab2f; /* Couleur du texte */
+			font-size: 24px;
+			font-family: "Roboto", sans-serif;
+		}
+	</style>
+
+	
+
 	<div class="col-md-6 grid-margin stretch-card">
 		<div class="card">
 			<div class="card-body">
-				<h4 class="card-title">Ajouter un conseiller</h4>
 				{% if emptySubmission %}
 					<div class="alert alert-danger" role="alert">
 						Veuillez remplir tous les champs.
 					</div>
 				{% endif %}
+				<h2 class="card-title">Ajouter un conseiller</h2>
 				<div class="forms-sample">
 					{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
 					<div class="form-group">
-						<label for="exampleInputUsername1">{{ form_label(f.nom) }}</label>
+						<label for="exampleInputNom1">{{ form_label(f.nom) }}</label>
 						{{ form_widget(f.nom, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
 						{{ form_errors(f.nom) }}
 					</div>
 					<div class="form-group">
-						<label for="exampleInputEmail1">{{ form_label(f.prenom) }}</label>
+						<label for="exampleInputPrenom1">{{ form_label(f.prenom) }}</label>
 						{{ form_widget(f.prenom, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
 						{{ form_errors(f.prenom) }}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputEmail1">{{ form_label(f.email) }}</label>
-						{{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+						{{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Email'}}) }}
 						{{ form_errors(f.email) }}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputPassword1">{{ form_label(f.motDePasse) }}</label>
-						{{ form_widget(f.motDePasse, {'attr': {'class': 'form-control', 'id': 'exampleInputPassword1', 'placeholder': 'Prenom'}}) }}
+						{{ form_widget(f.motDePasse, {'attr': {'class': 'form-control', 'id': 'exampleInputPassword1', 'placeholder': 'Mot de passe'}}) }}
 						{{ form_errors(f.motDePasse) }}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.genre) }}</label>
-						{{ form_widget(f.genre, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+						{{ form_widget(f.genre, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Genre'}}) }}
 						{{ form_errors(f.genre) }}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
-						{{ form_widget(f.numTel, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+						{{ form_widget(f.numTel, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Numéro de téléphone'}}) }}
 						{{ form_errors(f.numTel) }}
 					</div>
 					<div class="form-group">
-						<label for="exampleInputUsername1">{{ form_label(f.matricule) }}</label>
-						{{ form_widget(f.matricule, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+						<label for="exampleInputMatricule1">{{ form_label(f.matricule) }}</label>
+						{{ form_widget(f.matricule, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Matricule'}}) }}
 						{{ form_errors(f.matricule) }}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.attestation) }}</label>
-						{{ form_widget(f.attestation, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+						{{ form_widget(f.attestation, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
 						{{ form_errors(f.attestation) }}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
-						{{ form_widget(f.photo, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+						{{ form_widget(f.photo, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Photo'}}) }}
 						{{ form_errors(f.photo) }}
 					</div>
 					{{ form_end(f) }}

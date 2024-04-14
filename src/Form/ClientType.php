@@ -64,13 +64,15 @@ class ClientType extends AbstractType
                 'attr' => ['class' => 'form-control spinner', 'id' => 'taille'],
                 'constraints' => [
                     new NotBlank(['message' => 'champ obligatoire'])
-                ]
+                ],
+                'data' => 170
             ])
             ->add('poids', NumberType::class, [
                 'attr' => ['class' => 'form-control spinner', 'id' => 'poids'],
                 'constraints' => [
                     new NotBlank(['message' => 'champ obligatoire'])
-                ]
+                ],
+                'data' => 70
             ])
             ->add('photo')
             ->add('Inscription', SubmitType::class, [

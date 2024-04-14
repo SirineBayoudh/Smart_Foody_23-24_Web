@@ -62,13 +62,28 @@
 
 		}
 		.table-striped tbody tr:nth-of-type(odd) {
-			background-color:#ddeed5;
+			background-color: #ddeed5;
+		}
+
+		#successMessage {
+			height: 50px;
+			width: 250px;
+			margin-right: 250px;
+			position: absolute;
+			z-index: 999;
+		}
+
+		#successMessageModif {
+			height: 50px;
+			width: 250px;
+			margin-right: 250px;
+			position: absolute;
+			z-index: 999;
 		}
 	</style>
 
 	<div class="col-lg-10 grid-margin stretch-card">
 		<div class="card">
-
 			<div class="anchor-pane">
 				<div class="col-lg-2">
 					<form action="{{ path('usersList') }}" method="GET">
@@ -79,6 +94,32 @@
 						</select>
 					</form>
 				</div>
+				{% for flash_message in app.flashes('success') %}
+					<div class="alert alert-success" id="successMessage" role="alert">
+						{{ flash_message }}
+					</div>
+				{% endfor %}
+
+				<script>
+					// Masquer l'alerte après 5 secondes
+setTimeout(function () {
+document.getElementById('successMessage').style.display = 'none';
+}, 5000); // 5000 millisecondes = 5 secondes
+				</script>
+
+				{% for flash_message in app.flashes('success') %}
+					<div class="alert alert-success" id="successMessageModif" role="alert">
+						{{ flash_message }}
+					</div>
+				{% endfor %}
+
+				<script>
+					// Masquer l'alerte après 5 secondes
+setTimeout(function () {
+document.getElementById('successMessage').style.display = 'none';
+}, 5000); // 5000 millisecondes = 5 secondes
+				</script>
+
 				<div class="cards-container">
 					<div class="card2" id="cardClient">
 						<img src="{{ asset('images/groupe.png') }}" alt="Total Clients" class="card-image">
@@ -204,7 +245,7 @@
 							</tbody>
 						</table>
 					</div>
-					<div class="text-center mt-4" >
+					<div class="text-center mt-4">
 						<div style="display: inline-block;">
 							{{ knp_pagination_render(pagination, 'pagination.html.twig') }}
 						</div>

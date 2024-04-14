@@ -55,7 +55,7 @@ class ConseillerType extends AbstractType
                 ]])
             ->add('photo')
             ->add('Ajouter', SubmitType::class, [
-                'attr' => ['class' => 'btn btn-primary mr-2']
+                'attr' => ['class' => 'btn btn-success mr-2']
             ]);
         ;
     }
