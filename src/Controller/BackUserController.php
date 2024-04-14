@@ -17,10 +17,14 @@ use Knp\Component\Pager\PaginatorInterface;
 class BackUserController extends AbstractController
 {
     #[Route('/back/user', name: 'app_back_user')]
-    public function index(): Response
+    public function index(UtilisateurRepository $repo): Response
     {
+
+        $photo = $repo->getAdminImage();
+
         return $this->render('back_user/index.html.twig', [
             'controller_name' => 'BackUserController',
+            'photo' => $photo
         ]);
     }
 
@@ -67,12 +71,16 @@ class BackUserController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+            $photo = $repo->getAdminImage();
+
+
         return $this->render('back_user/listUsers.html.twig', [
             'users' => $list,
             'role' => $roleFilter,
             'totalClients' => $clientsCount,
             'totalConseillers' => $conseillersCount,
             'pagination' => $pagination,
+            'photo' => $photo
         ]);
     }
 
@@ -81,14 +89,31 @@ class BackUserController extends AbstractController
     {
 
         // Comptez le nombre d'hommes et de femmes dans la base de données
-        $nombreHommes = $repo->countByGenre('Homme');
-        $nombreFemmes = $repo->countByGenre('Femme');
+        $nbFemme = $repo->getCountByGender('Femme');
+        $nbHomme = $repo->getCountByGender('Homme');
 
+        $nbBienEtre = $repo->getCountByObjectif('1');
+        $nbPrisePoids = $repo->getCountByObjectif('2');
+        $nbPertePoids = $repo->getCountByObjectif('3');
+        $nbPriseMasse = $repo->getCountByObjectif('4');
 
+        $nbClients = $repo->getCountByRole('Client');
+        $nbConseillers = $repo->getCountByRole('Conseiller');
+
+        
+
+        $photo = $repo->getAdminImage();
         // Transmettez ces données au modèle
         return $this->render('back_user/statistiquesUser.html.twig', [
-            'nombre_hommes' => $nombreHommes,
-            'nombre_femmes' => $nombreFemmes,
+            'nbFemme' => $nbFemme,
+            'nbHomme' => $nbHomme,
+            'nbBienEtre' => $nbBienEtre,
+            'nbPrisePoids' => $nbPrisePoids,
+            'nbPertePoids' => $nbPertePoids,
+            'nbPriseMasse' => $nbPriseMasse,
+            'nbClients' => $nbClients,
+            'nbConseillers' => $nbConseillers,
+            'photo' => $photo
         ]);
     }
 
@@ -96,13 +121,15 @@ class BackUserController extends AbstractController
     /* Ajouter un Conseiller */
 
     #[Route('/ajouterConseiller', name: 'addConseiller')]
-    public function addConseiller(ManagerRegistry $manager, Request $req): Response
+    public function addConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo): Response
     {
         $user = new Utilisateur();
         $form = $this->createForm(ConseillerType::class, $user);
 
         $em = $manager->getManager();
         $emptySubmission = false;
+
+        $photo = $repo->getAdminImage();
 
         $form->handleRequest($req);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -131,7 +158,8 @@ class BackUserController extends AbstractController
         }
         return $this->renderform('back_user/ajouterConseiller.html.twig', [
             'f' => $form,
-            'emptySubmission' => $emptySubmission ?? false
+            'emptySubmission' => $emptySubmission ?? false,
+            'photo' => $photo
         ]);
     }
 
@@ -146,6 +174,8 @@ class BackUserController extends AbstractController
 
         $em = $manager->getManager();
 
+        $photo = $repo->getAdminImage();
+
         $form->handleRequest($req);
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -156,7 +186,10 @@ class BackUserController extends AbstractController
 
             return $this->redirectToRoute("usersList");
         }
-        return $this->renderform('back_user/modifierConseiller.html.twig', ['f' => $form]);
+        return $this->renderform('back_user/modifierConseiller.html.twig', [
+            'f' => $form,
+            'photo' => $photo
+        ]);
     }
 
     /* Supprimer un Conseiller */

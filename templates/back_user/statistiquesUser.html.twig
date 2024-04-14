@@ -3,65 +3,144 @@
 
 {% block body %}
 
-
-	<!-- partial -->
-
-	<!-- partial -->
-		<div class="main-panel"> <div class="content-wrapper">
-			<div class="row">
-				<div class="col-lg-6 grid-margin stretch-card">
-					<div class="card">
-						<div class="card-body">
-							<h4 class="card-title">Bar chart</h4>
-							<canvas id="barChart"></canvas>
-						</div>
+	<div style="margin-left:20px">
+		<div class="deux" style="display: flex;">
+			<div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title">Statistiques selon le genre</h4>
+						<canvas id="pieChart" width="400" height="300"></canvas>
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card">
-					<div class="card">
-						<div class="card-body">
-							<h4 class="card-title">Pie chart</h4>
-							<canvas id="pieChart"></canvas>
-						</div>
+
+			<div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card" style="margin-left:70px">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title">Statistiques selon l'objectif</h4>
+						<canvas id="barChart" width="400" height="300"></canvas>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- content-wrapper ends -->
-		<!-- partial:../../partials/_footer.html -->
-		<footer class="footer">
-			<div class="d-sm-flex justify-content-center justify-content-sm-between">
-				<span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021.  Premium
-					<a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a>
-					from BootstrapDash. All rights reserved.</span>
-				<span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with
-					<i class="ti-heart text-danger ml-1"></i>
-				</span>
+		<div style="margin-left:340px; text-align:center">
+			<div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title">Statistiques selon le rôle</h4>
+						<canvas id="doughnutChart" width="400" height="300"></canvas>
+					</div>
+				</div>
 			</div>
-		</footer>
-		<!-- partial -->
+		</div>
 	</div>
-	<!-- main-panel ends -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		var ctx = document.getElementById('pieChart').getContext('2d');
+var pieChart = new Chart(ctx, {
+type: 'pie',
+data: {
+labels: [
+'Homme', 'Femme'
+],
+datasets: [
+{
+data: [
+{{ nbHomme }}, {{ nbFemme }}
+],
+backgroundColor: ['#33661c', '#56ab2f',]
+}
+]
+},
+options: {
+responsive: false,
+maintainAspectRatio: false
+}
+});
+	</script>
 
-	<!-- page-body-wrapper ends -->
 
-	<!-- container-scroller -->
-	<!-- plugins:js --><script src="../../vendors/js/vendor.bundle.base.js"> </script>
-	<!-- endinject -->
-	<!-- Plugin js for this page -->
-	<script src="../../vendors/chart.js/Chart.min.js"></script>
-	<!-- End plugin js for this page -->
-	<!-- inject:js -->
-	<script src="../../js/off-canvas.js"></script>
-	<script src="../../js/hoverable-collapse.js"></script>
-	<script src="../../js/template.js"></script>
-	<script src="../../js/settings.js"></script>
-	<script src="../../js/todolist.js"></script>
-	<!-- endinject -->
-	<!-- Custom js for this page-->
-	<script src="../../js/chart.js"></script>
-	<!-- End custom js for this page-->
+	<script>
+		var ctx = document.getElementById('barChart').getContext('2d');
+var barChart = new Chart(ctx, {
+type: 'bar',
+data: {
+labels: [
+'Bien Etre', 'Prise de poids', 'Perte de poids', 'Prise de masse musculaire'
+],
+datasets: [
+{
+label: 'Objectif',
+data: [
+{{ nbBienEtre }}, {{ nbPrisePoids }}, {{ nbPertePoids }}, {{ nbPriseMasse }}
+],
+backgroundColor: [
+'#224412', // Couleur pour la première barre
+'#3c7720', // Couleur pour la deuxième barre
+'#4d992a', // Couleur pour la troisième barre
+'#77bb58' // Couleur pour la quatrième barre
+],
+borderColor: [
+'#224412', // Couleur pour la bordure de la première barre
+'#3c7720', // Couleur pour la bordure de la deuxième barre
+'#4d992a', // Couleur pour la bordure de la troisième barre
+'#77bb58' // Couleur pour la bordure de la quatrième barre
+],
+borderWidth: 1
+}
+]
+},
+options: {
+responsive: false,
+maintainAspectRatio: false,
+scales: {
+yAxes: [
+{
+ticks: {
+beginAtZero: true
+}
+}
+]
+}
+}
+});
+	</script>
+
+	<script>
+		var ctx = document.getElementById('doughnutChart').getContext('2d');
+var doughnutChart = new Chart(ctx, {
+type: 'doughnut',
+data: {
+labels: [
+'Clients', 'Conseillers'
+],
+datasets: [
+{
+data: [
+{{ nbClients }}, {{ nbConseillers }}
+],
+backgroundColor: [
+'#33661c', // Couleur pour les hommes
+'#56ab2f' // Couleur pour les femmes
+],
+borderColor: [
+'#33661c', // Couleur pour les hommes
+'#56ab2f' // Couleur pour la bordure des femmes
+],
+borderWidth: 1
+}
+]
+},
+options: {
+responsive: false,
+maintainAspectRatio: false,
+legend: {
+display: true,
+position: 'bottom'
+}
+}
+});
+	</script>
+
 
 {% endblock %}
