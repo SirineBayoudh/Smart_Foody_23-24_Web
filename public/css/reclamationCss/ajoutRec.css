@@ -1,0 +1,62 @@
+body,html{
+    background-color: aliceblue;
+    height: 100%; /* Assurez-vous que le body et l'html ont une hauteur de 100% pour centrer correctement */
+     margin: 2; /* Supprimez les marges par défaut du body */
+}
+
+
+h1{
+    font-size: 50px;
+    display: flex;
+  justify-content: center;
+  margin-bottom: 50px;
+}
+
+.form-group{
+    margin: 20px;
+    font-size: 25px;
+}
+
+.btn-primary{
+    display: inline-block;
+    padding: 7px 20px;
+    margin-right:40px;
+    margin-left:50%;
+    background-color: green;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover{
+    background-color: #224412;
+}
+
+.btn-secondary{
+    display: inline-block;
+    padding: 5px 20px;
+    background-color: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover{
+    background-color: #c82333;
+}
+
+.cadre{
+    font-size: 15px;
+    height: 3vh;
+    width: 60vh;
+}
+
+.cadreDesc{
+    width: 70vh;
+    height: 20vh;
+    font-size: 15px;
+}

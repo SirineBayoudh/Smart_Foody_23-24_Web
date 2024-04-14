@@ -8,37 +8,355 @@
 {% endblock %}
 
 {% block body %}
-    <div>
-        <br>
-        <div class="table-responsive"></div>
-                <h1 class="card-title">Liste des réclamations</h1>
-                <table class="table table-hover">
-                    <thead>
-                        <tr class="text-center">
-                            <th>Id Reclamation</th>
-                            <th>Id Client</th>
-                            <th>Description</th>
-                            <th>Titre</th>
-                            <th>Statut</th>
-                            <th>Type</th>
-                            <th>Date Reclamation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for reclamation in reclamations %}
-                            <tr class="text-center">
-                                <td>{{ reclamation.id }}</td>
-                                <td>{{ reclamation.idClient.nom }}</td>
-                                <td>{{ reclamation.description }}</td>
-                                <td>{{ reclamation.titre }}</td>
-                                <td>{{ reclamation.statut }}</td>
-                                <td>{{ reclamation.type }}</td>
-                                <td>{{ reclamation.dateReclamation|date('Y-m-d') }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>    
-    </div>
+<div>
+    <br>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="50" height="40"  style="fill: currentColor; vertical-align: middle;" class="liste"  id="toggleButton" onclick="toggleList()">
+        <path fill="none" d="M0 0h24v24H0V0z"  fill="green"/>
+        <path d="M3 9h18v2H3V9zm0 4h18v2H3v-2zm0-8v2h18V5H3z"/>
+      </svg>
+    <div class="table-responsive" id="reclamationsTable">
+        <h1 class="card-title">Liste des réclamations</h1>
+        <table class="table table-hover" class="table">
+            <thead>
+                <tr class="text-center">
+                    <th>Id Reclamation</th>
+                    <th>Id Client</th>
+                    <th>Description</th>
+                    <th>Titre</th>
+                    <th>Statut</th>
+                    <th>Type</th>
+                    <th>Date Reclamation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reclamation in reclamations %}
+                <tr class="text-center">
+                    <td>{{ reclamation.id }}</td>
+                    <td>{{ reclamation.idClient.nom }}</td>
+                    <td>{{ reclamation.description }}</td>
+                    <td>{{ reclamation.titre }}</td>
+                    <td>{{ reclamation.statut }}</td>
+                    <td>{{ reclamation.type }}</td>
+                    <td>{{ reclamation.dateReclamation|date('Y-m-d') }}</td>
+                    <td style="position: relative;">
+                        {% if reclamation.statut == 'Attente' %}
+                            <!-- Premier SVG remplacé -->
+                            <svg id="repondre-{{ reclamation.id }}" xmlns="http://www.w3.org/2000/svg" onclick="showForm({{ reclamation.id }})" viewBox="0 0 512 512" class="button-svg">                                
+                                <!-- Code SVG remplacé -->
+                                <path d="M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z" fill="green"/>
+                            </svg>  
+                        {% endif %}                      
+                    </td>
+                    <td style="position: relative;">
+                        <!-- Deuxième SVG remplacé -->
+                        <svg xmlns="http://www.w3.org/2000/svg" onclick="window.location='{{ path('archiverRec', {'id': reclamation.id}) }}'" viewBox="0 0 512 512" class="button-svg">
+                            <!-- Code SVG remplacé -->
+                            <path d="M32 32H480c17.7 0 32 14.3 32 32V96c0 17.7-14.3 32-32 32H32C14.3 128 0 113.7 0 96V64C0 46.3 14.3 32 32 32zm0 128H480V416c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V160zm128 80c0 8.8 7.2 16 16 16H336c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z" fill="red"/>
+                        </svg> 
+                    </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
+
+
+
+
+
+
+
+    <div class="table-responsive" id="archivesTable" style="display:none;">
+        <h1 class="card-title">Liste des archives</h1>
+        <table class="table table-hover">
+            <thead>
+                <tr class="text-center">
+                    <th>Id Reclamation</th>
+                    <th>Id Client</th>
+                    <th>Description</th>
+                    <th>Titre</th>
+                    <th>Statut</th>
+                    <th>Type</th>
+                    <th>Date Reclamation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for archives in archives %}
+                <tr class="text-center">
+                    <td>{{ archives.id }}</td>
+                    <td>{{ archives.idClient.nom }}</td>
+                    <td>{{ archives.description }}</td>
+                    <td>{{ archives.titre }}</td>
+                    <td>{{ archives.statut }}</td>
+                    <td>{{ archives.type }}</td>
+                    <td>{{ archives.dateReclamation|date('Y-m-d') }}</td>
+                    <td style="position: relative;">                      
+                    </td>
+                    <td style="position: relative;">
+                        <!-- Deuxième SVG remplacé -->
+                        <svg xmlns="http://www.w3.org/2000/svg" onclick="window.location='{{ path('desarchiverRec', {'id': archives.id}) }}'" viewBox="0 0 512 512" class="button-svg">
+                            <!-- Code SVG remplacé -->
+                            <path d="M32 32H480c17.7 0 32 14.3 32 32V96c0 17.7-14.3 32-32 32H32C14.3 128 0 113.7 0 96V64C0 46.3 14.3 32 32 32zm0 128H480V416c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V160zm128 80c0 8.8 7.2 16 16 16H336c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z" fill="green"/>
+                        </svg> 
+                    </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>    
+
+
+
+
+
+
+
+
+
+
+    {# Formulaire de réponse à la réclamation #}
+        {% for reclamation in reclamations %}
+            <div id="form-repondre-{{ reclamation.id }}" style="display: none;" class="bg-white p-5 contact-form">
+                <div class="form-group">
+                    <h2><strong>Répondre à la réclamation :</strong></h2>
+                    {% if reclamation.idClient %}
+                        <label for="nom">Nom & Prénom:</label>
+                        <input type="text" id="nom" name="nom" class="form-control" value="{{ reclamation.idClient.nom }} {{ reclamation.idClient.prenom }}" readonly>
+                        <label for="email">Email:</label>
+                        <input type="text" id="email" name="email" class="form-control" value="{{ reclamation.idClient.email }}" readonly>
+                    {% endif %}
+                    <label for="type">Type:</label>
+                    <input type="text" id="type" name="type" class="form-control" value="{{ reclamation.type }}" readonly>
+                    <label for="titre">Titre:</label>
+                    <input type="text" id="titre" name="titre" class="form-control" value="{{ reclamation.titre }}" readonly>
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" class="form-control" readonly>{{ reclamation.description }}</textarea>
+                    <label for="reponse">Réponse:</label>
+                    <textarea id="reponse-{{ reclamation.id }}  comment" name="reponse" class="form-control" rows="5"  name="text"></textarea>
+                </div>
+                <button type="button" class="btn btn-success mr-2" onclick="envoyerReponse({{ reclamation.id }})">Envoyer</button>
+            </div>
+        {% endfor %}
+
+
+
+
+
+
+
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+          <div class="card position-relative">
+            <div class="card-body">
+              <div id="detailedReports" class="carousel slide detailed-report-carousel position-static pt-2" data-ride="carousel">
+                <div class="carousel-inner">
+                  <div class="carousel-item active">
+                    <div class="row">
+                      <div class="col-md-12 col-xl-3 d-flex flex-column justify-content-start">
+                        <div class="ml-xl-4 mt-3">
+                        <p class="card-title">Details sur les réclamations</p>
+                          <h1 class="text-primary">{{ nombreRec }}</h1>
+                          <h3 class="font-weight-500 mb-xl-4 text-primary">Nombre Total</h3>
+                          <p class="mb-2 mb-xl-0">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
+                        </div>  
+                        </div>
+                      <div class="col-md-12 col-xl-9">
+                        <div class="row">
+                          <div class="col-md-6 border-right">
+                            <div class="table-responsive mb-3 mb-md-0 mt-3">
+                              <table class="table table-borderless report-table">
+                                <tr>
+                                  <td class="text-muted">Réclamation</td>
+                                  <td class="w-100 px-0">
+                                    <div class="progress progress-md mx-4">
+                                      <div class="progress-bar bg-primary" role="progressbar" style="width: {{ moyTypeRec }}%" aria-valuenow="{{ moyTypeRec }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </td>
+                                  <td><h5 class="font-weight-bold mb-0">{{ nbTypeRec }}</h5></td>
+                                </tr>
+                                <tr>
+                                  <td class="text-muted">Demande d'information</td>
+                                  <td class="w-100 px-0">
+                                    <div class="progress progress-md mx-4">
+                                      <div class="progress-bar bg-warning" role="progressbar" style="width: {{ moyTypeDi }}%" aria-valuenow="{{ moyTypeDi }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </td>
+                                  <td><h5 class="font-weight-bold mb-0">{{ nbTypeDi }}</h5></td>
+                                </tr>
+                                <tr>
+                                  <td class="text-muted">Demande de collaboration</td>
+                                  <td class="w-100 px-0">
+                                    <div class="progress progress-md mx-4">
+                                      <div class="progress-bar bg-danger" role="progressbar" style="width: {{ moyTypeDe }}%" aria-valuenow="{{ moyTypeDe }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </td>
+                                  <td><h5 class="font-weight-bold mb-0">{{ nbTypeDe }}</h5></td>
+                                </tr>
+                                <tr>
+                                  <td class="text-muted">Remerciement</td>
+                                  <td class="w-100 px-0">
+                                    <div class="progress progress-md mx-4">
+                                      <div class="progress-bar bg-info" role="progressbar" style="width: {{ moyTypeRem }}%" aria-valuenow="{{ moyTypeRem }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </td>
+                                  <td><h5 class="font-weight-bold mb-0">{{ nbTypeRem }}</h5></td>
+                                </tr>
+                                <tr>
+                                  <td class="text-muted">Autres</td>
+                                  <td class="w-100 px-0">
+                                    <div class="progress progress-md mx-4">
+                                      <div class="progress-bar bg-primary" role="progressbar" style="width: {{ moyTypeAut }}%" aria-valuenow="{{ moyTypeAut }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </td>
+                                  <td><h5 class="font-weight-bold mb-0">{{ nbTypeAut }}</h5></td>
+                                </tr>
+                              </table>
+                            </div>
+                          </div>
+                                
+
+                          <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+                                <div class="col-md-6 mt-3">   
+                                       <!-- Ajouter les attributs de données -->
+                                       <canvas id="myChart" style="width:100%;max-width:600px" data-x-values="Jan,Fév,Mars,Avr,Mai,Juin,Juil,Août,Sept,Oct,Nov,Déc" data-y-values="{{ reclamationsByMonth|join(',') }}"></canvas>
+
+                                </div>
+
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    
+
+
+
+
+    <!-- Gestion des liste archives/reclamation  -->
+      <script>
+        function toggleList() {
+            var reclamationsTable = document.getElementById('reclamationsTable');
+            var archivesTable = document.getElementById('archivesTable');
+            var toggleButton = document.getElementById('toggleButton');
+    
+            if (reclamationsTable.style.display === 'none') {
+                reclamationsTable.style.display = 'block';
+                archivesTable.style.display = 'none';
+                // toggleButton.textContent = 'Afficher la liste des archives';
+            } else {
+                reclamationsTable.style.display = 'none';
+                archivesTable.style.display = 'block';
+                // toggleButton.textContent = 'Afficher la liste des réclamations';
+            }
+        }
+    </script>
+
+
+
+
+       <!-- Gestion formulaire de réponse à la réclaamtion -->
+    <script>
+        function showForm(reclamationId) {
+            // Récupérer le formulaire correspondant à l'ID de la réclamation
+            var formId = 'form-repondre-' + reclamationId;
+            var form = document.getElementById(formId);
+            
+            // Cacher tous les formulaires de réponse sauf celui correspondant à l'ID de la réclamation cliquée
+            var forms = document.querySelectorAll('[id^="form-repondre"]');
+            forms.forEach(function(f) {
+                if (f.id === formId) {
+                    // Si c'est le formulaire cliqué, basculez son affichage
+                    f.style.display = f.style.display === 'block' ? 'none' : 'block';
+                } else {
+                    // Sinon, masquez les autres formulaires
+                    f.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+
+          <!-- Gestion des states pour toute l'année -->
+            <script>
+                // Récupérer les valeurs depuis les attributs de données
+                const canvas = document.getElementById('myChart');
+                const xValues = canvas.getAttribute('data-x-values').split(',');
+                const yValues = canvas.getAttribute('data-y-values').split(',').map(Number);
+                
+                new Chart("myChart", {
+                type: "line",
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                    fill: false,
+                    lineTension: 0,
+                    backgroundColor: "rgba(0,0,255,1.0)",
+                    borderColor: "rgba(0,0,255,0.1)",
+                    data: yValues
+                    }]
+                },
+                options: {
+                    legend: {display: false},
+                    scales: {
+                    yAxes: [{ticks: {min: Math.min(...yValues), max: Math.max(...yValues)}}],
+                    }
+                }
+                });
+                </script>
+
+
+
+
+<style>
+    /* CSS pour les boutons (SVG) */
+.button-svg {
+    width: 100%;
+    height: auto;
+    max-width: 45px;
+    max-height: 45px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer; /* pour indiquer que c'est un élément cliquable */
+}
+
+/* Style pour le survol des boutons */
+.button-svg:hover {
+    opacity: 0.7; /* réduire légèrement l'opacité lors du survol */
+}
+
+
+/* Style pour le clic des boutons */
+.button-svg:active {
+    transform: translate(-50%, -50%) scale(0.95); /* légère réduction de la taille lors du clic */
+}
+
+.liste {
+  background-color: green;
+  color: white;
+  transition: background-color 0.3s, color 0.3s; /* Animation pour le hover */
+  position: absolute;
+  right: 10px;
+  margin-right: 10px;
+}
+
+/* Style hover */
+.liste:hover {
+  background-color: white;
+  color: black;
+}
+
+</style>
 {% endblock %}
 

@@ -20,52 +20,57 @@ use Symfony\Component\Security\Core\Security;
 class AjoutAvisController extends AbstractController
 {
 
- /**
- * @Route("/NouvelAvis", name="avis_nouveau")
- */
-public function nouveau(Request $request, UtilisateurRepository $utilisateurRepository, ProduitRepository $produitRepository, AvisRepository $avisRepository): Response
-{
-    // Récupérer l'utilisateur et le produit
-    $user = $this->prepareReclamationFormForUser7(7, $utilisateurRepository);
-    $produit = $this->prepareReclamationFormProduit(102, $produitRepository);
+    /**
+     * @Route("/NouvelAvis", name="avis_nouveau")
+     */
+    public function nouveau(Request $request, UtilisateurRepository $utilisateurRepository, ProduitRepository $produitRepository, AvisRepository $avisRepository): Response
+            {
+            // Récupérer l'utilisateur et le produit
+            $user = $this->prepareReclamationFormForUser7(7, $utilisateurRepository);
+            $produit = $this->prepareReclamationFormProduit(102, $produitRepository);
 
-    // Créer une nouvelle instance d'Avis
-    $avis = new Avis();
+            // Créer une nouvelle instance d'Avis
+            $avis = new Avis();
 
-    // Associer l'utilisateur et le produit à l'avis
-    $avis->setIdClient($user);
-    $avis->setRefProduit($produit);
+            // Associer l'utilisateur et le produit à l'avis
+            $avis->setIdClient($user);
+            $avis->setRefProduit($produit);
 
-    // Créer le formulaire
-    $form = $this->createForm(AvisNoteTypType::class, $avis);
-    
-    $form->handleRequest($request);
+            // Créer le formulaire
+            $form = $this->createForm(AvisNoteTypType::class, $avis);
+            
+            $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($avis);
-        $entityManager->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($avis);
+                $entityManager->flush();
 
-        // Rediriger ou afficher un message de succès
-        return $this->redirectToRoute('avis_nouveau');
-    }
+                // Rediriger ou afficher un message de succès
+                return $this->redirectToRoute('avis_nouveau');
+            }
 
-    // Récupérer les quatre derniers avis pour le produit
-    $lastFourAvis = $avisRepository->findByproduit($produit->getRef());
+            // Récupérer les quatre derniers avis pour le produit
+            $lastFourAvis = $avisRepository->findByproduit($produit->getRef());
 
-    // Appeler la fonction pour calculer le nombre d'avis et la moyenne des étoiles
-    $calculAvis = $this->calculerAvis($produit->getRef(), $avisRepository);
+            // Appeler la fonction pour calculer le nombre d'avis et la moyenne des étoiles
+            $calculAvis = $this->calculerAvis($produit->getRef(), $avisRepository);
 
-    return $this->render('avis/produitSingle.html.twig', [
-        'form' => $form->createView(),
-        'user' => $user,
-        'produit' => $produit,
-        'avis' => $avis, // Passer les avis au modèle Twig
-        'nombre_avis' => $calculAvis['nombre_avis'],
-        'moyenne_etoiles' => $calculAvis['moyenne_etoiles'],
-        'last_four_avis' => $lastFourAvis, // Passer les quatre derniers avis au modèle Twig
-    ]);
-}
+            // Récupérer les quatre produits similaires
+            $similarProducts = $produitRepository->findFourSimilarProducts($produit);
+
+            return $this->render('avis/produitSingle.html.twig', [
+                'form' => $form->createView(),
+                'user' => $user,
+                'produit' => $produit,
+                'avis' => $avis, // Passer les avis au modèle Twig
+                'nombre_avis' => $calculAvis['nombre_avis'],
+                'moyenne_etoiles' => $calculAvis['moyenne_etoiles'],
+                'last_four_avis' => $lastFourAvis, // Passer les quatre derniers avis au modèle Twig
+                'similar_products' => $similarProducts, // Passer les produits similaires au modèle Twig
+            ]);
+        }
+
 
 
 /**

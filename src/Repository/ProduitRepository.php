@@ -45,4 +45,19 @@ class ProduitRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+
+ //recuperer les produit similaire par rapport au twig
+public function findFourSimilarProducts(Produit $produit)
+{
+    return $this->createQueryBuilder('p')
+        ->andWhere('p.critere = :critere')
+        ->andWhere('p.ref != :ref') // Exclude the current product
+        ->setParameter('critere', $produit->getCritere())
+        ->setParameter('ref', $produit->getRef())
+        ->setMaxResults(4)
+        ->getQuery()
+        ->getResult();
+}
+
 }
