@@ -70,7 +70,7 @@ class ProduitType extends AbstractType
         ->add('image', FileType::class, [
             'label' => 'Image',
             'mapped' => false,
-            'required' => true,
+            'required' => false,
         ])
         ->add('critere', EntityType::class, [
             'class' => Objectif::class,

@@ -9,34 +9,54 @@
             <h4 class="card-title">Ajouter un produit</h4>
             <p class="card-description">Veuillez remplir le formulaire ci-dessous pour ajouter un produit.</p>
             {{ form_start(form,{'attr': {'novalidate': 'novalidate'}} ) }} 
-                <div class="form-group">
-                    {{ form_label(form.marque) }}
-                    {{ form_widget(form.marque, {'attr': {'class': 'form-control', 'placeholder': 'Marque'}}) }}
-                    {{ form_errors(form.marque) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.categorie) }}
-                    {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.categorie) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.prix) }}
-                    {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix'}}) }}
-                    {{ form_errors(form.prix) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(form.image) }}
-                    <div class="custom-file">
-                        {{ form_widget(form.image, {'attr': {'class': 'custom-file-input', 'id': 'customFile'}}) }}
-                        <label class="custom-file-label" for="customFile" id="customFileLabel">Choisir un fichier</label>
+            <div class="form-group">
+                {{ form_label(form.marque) }}
+                {{ form_widget(form.marque, {'attr': {'class': 'form-control' ~ (form_errors(form.marque) ? ' is-invalid' : ''), 'placeholder': 'Marque'}}) }}
+                {% if form_errors(form.marque) %}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.marque) }}
                     </div>
-                    {{ form_errors(form.image) }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.categorie) }}
+                {{ form_widget(form.categorie, {'attr': {'class': 'form-control' ~ (form_errors(form.categorie) ? ' is-invalid' : '')}}) }}
+                {% if form_errors(form.categorie) %}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.categorie) }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.prix) }}
+                {{ form_widget(form.prix, {'attr': {'class': 'form-control' ~ (form_errors(form.prix) ? ' is-invalid' : ''), 'placeholder': 'Prix'}}) }}
+                {% if form_errors(form.prix) %}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.prix) }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.image) }}
+                <div class="custom-file">
+                    {{ form_widget(form.image, {'attr': {'class': 'custom-file-input' ~ (form_errors(form.image) ? ' is-invalid' : ''), 'id': 'customFile'}}) }}
+                    <label class="custom-file-label" for="customFile" id="customFileLabel">Choisir un fichier</label>
                 </div>
-                <div class="form-group">
-                    {{ form_label(form.critere) }}
-                    {{ form_widget(form.critere, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.critere) }}
-                </div>                          
+                {% if form_errors(form.image) %}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.image) }}
+                    </div>
+                {% endif %}
+            </div>            
+            <div class="form-group">
+                {{ form_label(form.critere) }}
+                {{ form_widget(form.critere, {'attr': {'class': 'form-control' ~ (form_errors(form.critere) ? ' is-invalid' : '')}}) }}
+                {% if form_errors(form.critere) %}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.critere) }}
+                    </div>
+                {% endif %}
+            </div>                           
                 <button type="submit" class="btn btn-primary mr-2" id="submitBtn">Ajouter</button>
             {{ form_end(form) }}
         </div>
@@ -44,12 +64,12 @@
 </div>
 
 <script>
-    $('#customFile').on('change', function () {
-    console.log("Champ d'upload changé !");
-    var fileName = $(this).val().split('\\').pop();
-    $('#customFileLabel').text(fileName);
-});
+    // Effacer le contenu du label du champ de fichier au chargement de la page
+    $(document).ready(function() {
+        $('#customFileLabel').text("Choisir une image");
+    });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
     document.getElementById('submitBtn').addEventListener('click', function() {
@@ -72,4 +92,9 @@
     });
 </script>
 
+<style>
+    .is-invalid {
+    border-color: #dc3545; /* Couleur de bordure rouge */
+}
+</style>
 {% endblock %}

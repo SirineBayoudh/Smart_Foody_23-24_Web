@@ -20,6 +20,28 @@ class ProduitRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Produit::class);
     }
+    public function findAllCriteres(): array
+{
+    $qb = $this->createQueryBuilder('p')
+        ->select('o.listCritere')
+        ->distinct(true)
+        ->leftJoin('p.critere', 'o');
+
+    $query = $qb->getQuery();
+
+    $results = $query->getResult();
+
+    $criteresList = [];
+    foreach ($results as $result) {
+        if ($result['listCritere']) {
+            $criteresList[] = $result['listCritere'];
+        }
+    }
+
+    return $criteresList;
+}
+
+
 
 //    /**
 //     * @return Produit[] Returns an array of Produit objects

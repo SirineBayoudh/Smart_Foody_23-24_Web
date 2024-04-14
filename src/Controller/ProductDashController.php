@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -26,11 +27,20 @@ class ProductDashController extends AbstractController
     }
 
     #[Route('/product/all', name: 'product_all')]
-    public function listProduit(ProduitRepository $prodrepository): Response
+    public function listProduit(ProduitRepository $prodrepository,PaginatorInterface $paginator,Request $request): Response
 {
     $produits = $prodrepository->findBy([], ['ref' => 'DESC']);
+    $pagination = $paginator->paginate(
+        $produits, // Requête à paginer
+        $request->query->getInt('page', 1), // Le numéro de page, 1 par défaut
+        5 // Limite par page
+    );
+
+    $criteres = $prodrepository->findAllCriteres();
     return $this->render('product_dash/list_produit.html.twig', [
         'prod' => $produits,
+        'criteres' => $criteres,
+        'pagination' => $pagination,
     ]);
 }
 

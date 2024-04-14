@@ -21,8 +21,12 @@
                 </div>
                 <div class="form-group">
                     {{ form_label(form.prix) }}
-                    {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix'}}) }}
-                    {{ form_errors(form.prix) }}
+                    {{ form_widget(form.prix, {'attr': {'class': 'form-control' ~ (form_errors(form.prix) ? ' is-invalid' : ''), 'placeholder': 'Prix'}}) }}
+                    {% if form_errors(form.prix) %}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.prix) }}
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     {{ form_label(form.image) }}
@@ -33,9 +37,13 @@
                 </div> 
                 <div class="form-group">
                     {{ form_label(form.critere) }}
-                    {{ form_widget(form.critere, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.critere) }}
-                </div>                          
+                    {{ form_widget(form.critere, {'attr': {'class': 'form-control' ~ (form_errors(form.critere) ? ' is-invalid' : '')}}) }}
+                    {% if form_errors(form.critere) %}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.critere) }}
+                        </div>
+                    {% endif %}
+                </div>                           
                 <button type="submit" class="btn btn-primary mr-2" id="submitBtn">Modifier</button>
             {{ form_end(form) }}
         </div>
