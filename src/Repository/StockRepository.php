@@ -90,14 +90,14 @@ class StockRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-    
+
     public function convertDinarToEuro($amount)
     {
         // Appel de l'API pour obtenir le taux de change
         $httpClient = HttpClient::create();
         $response = $httpClient->request('GET', 'https://api.exchangerate-api.com/v4/latest/TND');
         $data = $response->toArray();
-        
+
         // Vérifier si la requête a réussi
         if ($response->getStatusCode() === 200) {
             // Obtenez le taux de change pour l'euro
@@ -112,5 +112,12 @@ class StockRepository extends ServiceEntityRepository
             throw new \Exception('Failed to fetch exchange rate from API.');
         }
     }
-
+    public function searchStocksByName($searchQuery)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.nom LIKE :query')
+            ->setParameter('query', '%' . $searchQuery . '%')
+            ->getQuery()
+            ->getResult();
+    }
 }

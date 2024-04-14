@@ -185,7 +185,7 @@ class StockController extends AbstractController
 
     #[Route('/ajouter/stock', name: 'app_ajouter_stock')]
 
-    public function index(Request $request, ManagerRegistry $manager, ProduitRepository $produitRepository): Response
+    public function index(Request $request, ManagerRegistry $manager, StockRepository $stockRepository, ProduitRepository $produitRepository): Response
     {
         $stock = new Stock();
         $form = $this->createForm(AjouterStockType::class, $stock);
@@ -194,6 +194,17 @@ class StockController extends AbstractController
         $emptySubmission = false;
         if ($form->isSubmitted() && $form->isValid()) {
             $emptySubmission = true;
+            $marque = $stock->getMarque();
+
+            $existingStock = $stockRepository->findOneBy(['marque' => $marque]);
+
+            if ($existingStock !== null) {
+                // Add a flash message to display the alert
+                $this->addFlash('danger', 'La marque existe déjà dans le tableau.');
+                return $this->redirectToRoute('stock_get'); // Redirect to the desired page
+            }
+
+
             // Vérifier si des fichiers ont été téléchargés
             if ($request->files->has('img')) {
                 $imageFile = $request->files->get('img')[0];
@@ -389,5 +400,43 @@ class StockController extends AbstractController
         $response->headers->set('Content-Disposition', 'attachment; filename="export.pdf"');
 
         return $response;
+    }
+
+    #[Route('/stocks/search', name: 'app_stocks_search')]
+    public function search(StockRepository $stockRepository, Request $request, PaginatorInterface $paginator): Response
+    {
+        $searchQuery = $request->query->get('q');
+
+        if ($searchQuery) {
+            // Effectuer la recherche avec le terme spécifié
+            $queryBuilder = $stockRepository->createQueryBuilder('s');
+            $queryBuilder->where('s.nom LIKE :searchQuery')
+                ->setParameter('searchQuery', '%' . $searchQuery . '%');
+
+            $pagination = $paginator->paginate(
+                $queryBuilder->getQuery(),
+                $request->query->getInt('page', 1),
+                2
+            );
+
+            // Récupérer les stocks paginés
+            $stocks = $pagination;
+        } else {
+            // Si aucune requête de recherche n'est spécifiée, récupérer tous les stocks
+            $pagination = $paginator->paginate(
+                $stockRepository->findAll(),
+                $request->query->getInt('page', 1),
+                2
+            );
+
+            // Récupérer les stocks paginés
+            $stocks = $pagination;
+        }
+
+        return $this->render('stock/index.html.twig', [
+            'stocks' => $stocks,
+            'searchQuery' => $searchQuery,
+            'pagination' => $pagination,
+        ]);
     }
 }

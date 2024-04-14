@@ -3,6 +3,8 @@
     {% block body %}
         {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.css" integrity="sha256-uq9PNlMzB+1h01Ij9cx7zeE2OR2pLAfRw3uUUOOPKdA=" crossorigin="anonymous">
          #}
+         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.css">
+         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
         <div class="col-12 grid-margin stretch-card">
             <div class="main-panel">        
                 <div class="content-wrapper">
@@ -21,6 +23,11 @@
 									Veuillez remplir tous les champs.
 								</div>
 							{% endif %}
+                            {% for flashMessage in app.flashes('danger') %}
+                                <div class="alert alert-danger">
+                                    {{ flashMessage }}
+                                </div>
+                            {% endfor %}
                             {{ form_start(form, {'attr': {'id': 'yourFormId', 'class': 'forms-sample', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
                             <!-- Début du formulaire -->
                             <div class="form-group">
@@ -76,17 +83,17 @@
                                 {% endif %}
                             </div>
                             <br><br>
-                     
-                <div class="form-group">
-                    <label>File upload</label>
-                    <input type="file" name="img[]" class="file-upload-default" id="fileInput">
-                    <div class="input-group col-xs-12">
-                        <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" id="imageName">
-                        <span class="input-group-append">
-                            <button class="file-upload-browse btn btn-primary" type="button" onclick="document.getElementById('fileInput').click()">Upload</button>
-                        </span>
-                    </div>
-                </div>
+                            
+                            <div class="form-group">
+                                <label>File upload</label>
+                                <input type="file" name="img[]" class="file-upload-default" id="fileInput">
+                                <div class="input-group col-xs-12">
+                                    <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" id="imageName">
+                                    <span class="input-group-append">
+                                        <button class="file-upload-browse btn btn-primary" type="button" onclick="document.getElementById('fileInput').click()">Upload</button>
+                                    </span>
+                                </div>
+                            </div>
                        <!-- Fin du formulaire -->
                             <br><br>
                             {# <button class="btn btn-light" onclick="window.history.back();">Cancel</button>
@@ -156,7 +163,7 @@
                 imageName.value = '';
             }
         });
-    </script>
+    </script> 
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
     <script>
         document.getElementById('saveButton').addEventListener('click', function() {
