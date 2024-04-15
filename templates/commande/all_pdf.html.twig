@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table, .table th, .table td { border: 1px solid black; }
+        .table th, .table td { padding: 8px; text-align: left; }
+        .table th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Listes des  Commandes</h1>
+    <table class="table">
+    <thead class="thead-dark">
+        <tr>
+        
+            <th>Date Commande</th>
+            <th>Nom  Client</th>
+            <th>Prenom  Client</th>
+            <th>Totale Commande</th>
+            <th>Remise</th>
+            <th>État</th>
+            <th>Longitude</th>
+            <th>Latitude</th>
+        
+        </tr>
+    </thead>
+    <tbody>
+        {% for commande in commandes %}
+            <tr>
+              
+                <td>{{ commande.dateCommande|date('Y-m-d') }}</td>
+                <td>{{ commande.utilisateur.nom }}</td>
+                 <td>{{ commande.utilisateur.prenom }}</td>
+                <td>{{ commande.totaleCommande }}</td>
+                <td>{{ commande.remise }}</td>
+                <td>{{ commande.etat }}</td>
+                <td>{{ commande.longitude }}</td>
+                <td>{{ commande.latitude }}</td>
+             
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
