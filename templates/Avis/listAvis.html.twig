@@ -1,0 +1,175 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}AvisBack{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+<div>
+    <br>
+    <div class="table-responsive" id="reclamationsTable">
+        <h1 class="card-title">Liste des Avis</h1>
+        <table class="table table-hover" id="avisTable">
+            <thead>
+                <tr class="text-center">
+                    <th>Id Avis</th>
+                    <th>Ref Produit</th>
+                    <th>Id Client</th>
+                    <th>Note</th>
+                    <th>Commentaire</th>
+                    <th>Signale</th>
+                    <th>Date Avis</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for avis in Avis %}
+                <tr class="text-center avisRow">
+                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getId }}</td>
+                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getRefProduit().getRef() }}</td>
+                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getIdClient().getId() }}</td>
+                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getNbEtoiles }}</td>
+                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.commentaire }}</td>
+                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.signaler }}</td>
+                    <td  data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getDateAvis|date('d-m-Y') }}</td>
+                    <td style="position: relative; margin-right: 60px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-right: 30px;"  viewBox="0 0 512 512" width="24" height="24" onclick="window.location='{{ path('refreshSignal', {'id_avis': avis.id}) }}'" onclick="window.location='{{ path('refreshSignal', {'id_avis': avis.id}) }}'" onclick="window.location='{{ path('refreshSignal', {'id_avis': avis.id}) }}'" onclick="window.location='{{ path('refreshSignal', {'id_avis': avis.id}) }}'"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                            <path d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160H352c-17.7 0-32 14.3-32 32s14.3 32 32 32H463.5c0 0 0 0 0 0h.4c17.7 0 32-14.3 32-32V80c0-17.7-14.3-32-32-32s-32 14.3-32 32v35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1V432c0 17.7 14.3 32 32 32s32-14.3 32-32V396.9l17.6 17.5 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352H160c17.7 0 32-14.3 32-32s-14.3-32-32-32H48.4c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z" fill="green"/>
+                        </svg>
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"  width="24" height="24" onclick="window.location='{{ path('deleteAvis', {'id_avis': avis.id}) }}'" onclick="window.location='{{ path('deleteAvis', {'id_avis': avis.id}) }}'" onclick="window.location='{{ path('deleteAvis', {'id_avis': avis.id}) }}'" onclick="window.location='{{ path('deleteAvis', {'id_avis': avis.id}) }}'"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                            <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" fill="red"/>
+                        </svg>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+<br>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card position-relative">
+        <div class="card-body">
+          <div id="detailedReports" class="carousel slide detailed-report-carousel position-static pt-2" data-ride="carousel">
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <div class="row">
+                  <div class="col-md-12 col-xl-3 d-flex flex-column justify-content-start">
+                    <div class="ml-xl-4 mt-3">
+                    <p class="card-title">Details sur les réclamations</p>
+                      <h1 class="text-primary"> nombreRec </h1>
+                      <h3 class="font-weight-500 mb-xl-4 text-primary">Nombre Total</h3>
+                      <p class="mb-2 mb-xl-0">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
+                    </div>  
+                    </div>
+                  <div class="col-md-12 col-xl-9">
+                    <div class="row">
+                      <div class="col-md-6 border-right">
+                        <div class="table-responsive mb-3 mb-md-0 mt-3">
+                          <table class="table table-borderless report-table">
+                            <tr>
+                              <td class="text-muted">Réclamation</td>
+                              <td class="w-100 px-0">
+                                <div class="progress progress-md mx-4">
+                                  <div class="progress-bar bg-primary" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                              </td>
+                              <td><h5 class="font-weight-bold mb-0"> nbTypeRec</h5></td>
+                            </tr>
+                            <tr>
+                              <td class="text-muted">Demande d'information</td>
+                              <td class="w-100 px-0">
+                                <div class="progress progress-md mx-4">
+                                  <div class="progress-bar bg-warning" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                              </td>
+                              <td><h5 class="font-weight-bold mb-0"> nbTypeDi </h5></td>
+                            </tr>
+                            <tr>
+                              <td class="text-muted">Demande de collaboration</td>
+                              <td class="w-100 px-0">
+                                <div class="progress progress-md mx-4">
+                                  <div class="progress-bar bg-danger" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                              </td>
+                              <td><h5 class="font-weight-bold mb-0"> nbTypeDe</h5></td>
+                            </tr>
+                            <tr>
+                              <td class="text-muted">Remerciement</td>
+                              <td class="w-100 px-0">
+                                <div class="progress progress-md mx-4">
+                                  <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                              </td>
+                              <td><h5 class="font-weight-bold mb-0"> nbTypeRem </h5></td>
+                            </tr>
+                            <tr>
+                              <td class="text-muted">Autres</td>
+                              <td class="w-100 px-0">
+                                <div class="progress progress-md mx-4">
+                                  <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                              </td>
+                              <td><h5 class="font-weight-bold mb-0">ffffffffffffffff</h5></td>
+                            </tr>
+                          </table>
+                        </div>
+                      </div>
+                            
+
+                      <canvas id="myChart" style="width:100%;max-width:600px" data-x-values="1,2,3,4,5" data-y-values="{{ yValues }}"></canvas>
+
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- GEstion du graphes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script>
+        const canvas = document.getElementById('myChart');
+        const xValues = canvas.getAttribute('data-x-values').split(',');
+        const yValues = canvas.getAttribute('data-y-values').split(',').map(Number);
+        const barColors = [
+          "#b91d47",
+          "#00aba9",
+          "#2b5797",
+          "#e8c3b9",
+          "#1e7145"
+        ];
+        
+        new Chart("myChart", {
+          type: "pie",
+          data: {
+            labels: xValues,
+            datasets: [{
+              backgroundColor: barColors,
+              data: yValues
+            }]
+          },
+          options: {
+            title: {
+              display: true,
+              text: "World Wide Wine Production 2018"
+            }
+          }
+        });
+    </script>
+
+
+{% endblock %}

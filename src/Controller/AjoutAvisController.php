@@ -7,6 +7,8 @@ use App\Form\AvisNoteTypType;
 use App\Repository\AvisRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\UtilisateurRepository;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -19,6 +21,114 @@ use Symfony\Component\Security\Core\Security;
 
 class AjoutAvisController extends AbstractController
 {
+
+        //---------------------------------------------------------------- Partie Back ---------------------------------------------------------------------------
+     
+        /**
+         * @Route("/avisBack", name="avisBack")
+         */
+        public function index(Request $request, AvisRepository $avisRepository): Response
+        {
+            // Récupérer la variable yValues si elle est passée
+            $yValues = $request->query->get('yValues');
+
+            // Si yValues n'est pas défini, le mettre à zéro
+            if ($yValues === null) {
+                $yValues = '0,0,0,0,0'; // Ou toute autre valeur par défaut que vous souhaitez
+            }
+
+            // Récupérer tous les avis
+            $avis = $avisRepository->findAll();
+
+            // Récupérer la liste de tous les produits
+            $produits = $avisRepository->findAllProducts();
+
+            return $this->render('avis/listAvis.html.twig', [
+                'Avis' => $avis,
+                'yValues' => $yValues, // Passer yValues au template
+                'produits' => $produits, // Passer la liste des produits au template
+            ]);
+        }
+
+
+    /**
+     * @Route("/calculPersonne/{ref_produit}", name="calculPersonne")
+     */
+    public function calculPersonne(Request $request, string $ref_produit, AvisRepository $avisRepository): Response
+    {
+        // Utilisez la référence du produit passée en tant que paramètre dans la route
+        $refProduit = $ref_produit;
+        $data = [];
+        
+        // Boucle pour chaque note de 1 à 5
+        for ($note = 1; $note <= 5; $note++) {
+            // Utilisez la méthode countAvisByProductAndRating pour obtenir le nombre de personnes ayant donné la même note pour un produit donné
+            $nombrePersonnes = $avisRepository->countAvisByProductAndRating($refProduit, $note);
+            $data[] = $nombrePersonnes;
+        }
+
+        $yValues = implode(',', $data); // Les nombres de personnes correspondants
+
+        // Rediriger vers la route "avisBack" tout en passant les valeurs nécessaires
+        return $this->redirectToRoute('avisBack', [
+            'yValues' => $yValues,
+        ]);
+    }
+
+      /**
+     * @Route("/deleteAvis/{id_avis}", name="deleteAvis")
+     */
+    public function deleteAvis(int $id_avis, EntityManagerInterface $entityManager): Response
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $avis = $entityManager->getRepository(Avis::class)->find($id_avis);
+
+        if (!$avis) {
+            throw $this->createNotFoundException('Aucun avis trouvé pour l\'identifiant '.$id_avis);
+        }
+
+        $entityManager->remove($avis);
+        $entityManager->flush();
+
+        // Redirection vers une autre page ou afficher un message de succès
+        return $this->redirectToRoute('avisBack');
+    }
+
+    /**
+     * @Route("/refreshSignal/{id_avis}", name="refreshSignal")
+     */
+    public function refreshSignal(int $id_avis, EntityManagerInterface $entityManager): Response
+    {
+        // Récupérer l'avis à partir de son ID
+        $avis = $entityManager->getRepository(Avis::class)->find($id_avis);
+
+        // Vérifier si l'avis existe
+        if (!$avis) {
+            // Gérer le cas où l'avis n'est pas trouvé, par exemple, rediriger vers une page d'erreur
+            // ou afficher un message d'erreur
+            return $this->redirectToRoute('avisBack');
+        }
+
+        // Mettre à zéro la valeur de "signaler" pour cet avis
+        $avis->setSignaler(0);
+
+        // Enregistrer les modifications dans la base de données
+        $entityManager->flush();
+
+        // Rediriger vers une autre page ou afficher un message de succès
+        return $this->redirectToRoute('avisBack');
+    }
+    
+
+
+
+
+
+
+
+
+        //---------------------------------------------------------------- Partie FRONT ---------------------------------------------------------------------------
+
 
     /**
      * @Route("/NouvelAvis", name="avis_nouveau")
@@ -152,22 +262,6 @@ public function signalerAvis(Request $request, int $id): Response
 }
 
 
- /**
-     * @Route("/listAvis", name="list_avis")
-     */
-    public function afficheList(AvisRepository $avisRepository, UtilisateurRepository $utilisateurRepository): Response
-    {
-        // Appel à la fonction pour récupérer l'utilisateur connecté
-        $user = $this->prepareReclamationFormForUser7(7,$utilisateurRepository);
-
-        $avis = $avisRepository->findByproduit(102);
-
-        return $this->render('avis/list.html.twig', [
-            'avis' => $avis,
-            'user' => $user,
-        ]);
-    }
-
 
   /**
  * @Route("/calculerAvis/{idProduit}", name="calculer_avis")
@@ -199,6 +293,11 @@ public function calculerAvis($idProduit, AvisRepository $avisRepository): array
         'moyenne_etoiles' => $moyenneEtoiles
     ];
 }
+
+
+
+    //---------------------------------------------------------------- Partie Repository ---------------------------------------------------------------------------
+
 
 
 //recuperer les informations de l'utilisateur

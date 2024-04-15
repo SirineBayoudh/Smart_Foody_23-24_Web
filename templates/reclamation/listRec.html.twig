@@ -38,7 +38,7 @@
                     <td>{{ reclamation.titre }}</td>
                     <td>{{ reclamation.statut }}</td>
                     <td>{{ reclamation.type }}</td>
-                    <td>{{ reclamation.dateReclamation|date('Y-m-d') }}</td>
+                    <td>{{ reclamation.dateReclamation|date('d-m-Y') }}</td>
                     <td style="position: relative;">
                         {% if reclamation.statut == 'Attente' %}
                             <!-- Premier SVG remplacé -->
@@ -91,7 +91,7 @@
                     <td>{{ archives.titre }}</td>
                     <td>{{ archives.statut }}</td>
                     <td>{{ archives.type }}</td>
-                    <td>{{ archives.dateReclamation|date('Y-m-d') }}</td>
+                    <td>{{ archives.dateReclamation|date('d-m-Y') }}</td>
                     <td style="position: relative;">                      
                     </td>
                     <td style="position: relative;">

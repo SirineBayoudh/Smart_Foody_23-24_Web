@@ -47,6 +47,8 @@ class Avis
     private ?Produit $ref_produit = null;
 
 
+
+
     public function __construct()
     {
         $this->date_avis = new \DateTime(); // Valeur par défaut pour la date de l'avis

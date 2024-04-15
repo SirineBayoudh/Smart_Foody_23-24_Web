@@ -23,6 +23,12 @@ class AvisRepository extends ServiceEntityRepository
         parent::__construct($registry, Avis::class);
     }
 
+     // Implémentation de la méthode findAll
+        public function findAll(): array
+        {
+            return parent::findAll();
+        }
+
     public function prepareReclamationFormForUser7(int $userId, UtilisateurRepository $utilisateurRepository)
     {
         // Fetch the user with the provided ID
@@ -51,6 +57,39 @@ class AvisRepository extends ServiceEntityRepository
                 ->getResult();
         }
 
+        public function countAvisByProductAndRating(int $productId, int $rating): int
+        {
+            return $this->createQueryBuilder('a')
+                ->select('COUNT(a.id_avis)')
+                ->andWhere('a.ref_produit = :productId')
+                ->andWhere('a.nb_etoiles = :rating')
+                ->setParameter('productId', $productId)
+                ->setParameter('rating', $rating)
+                ->getQuery()
+                ->getSingleScalarResult();
+        }
+
+         
+        public function findAllProducts()
+        {
+            return $this->createQueryBuilder('a') // 'a' est un alias pour l'entité Avis
+                ->select('DISTINCT p') // Sélectionne toutes les données de l'entité Produit
+                ->leftJoin(Produit::class, 'p', 'WITH', 'a.ref_produit = p.ref') // Joindre avec l'entité Produit
+                ->getQuery()
+                ->getResult();
+        }
+
+        // Fonction pour compter le nombre d'avis par produit
+        public function countAvisByProduit(): array
+        {
+            // Sélectionner le nombre d'avis par produit
+            return $this->createQueryBuilder('a')
+                ->select('COUNT(a.id) as nombre_avis, p.ref as ref_produit')
+                ->leftJoin('a.ref_produit', 'p')
+                ->groupBy('a.ref_produit')
+                ->getQuery()
+                ->getResult();
+        }
     
 //    /**
 //     * @return Avis[] Returns an array of Avis objects

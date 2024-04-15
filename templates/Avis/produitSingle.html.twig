@@ -79,7 +79,7 @@
             </li>
 	          <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
 	          <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
-	          <li class="nav-item"><a href="contact.html" class="nav-link">Reclamation</a></li>
+	          <li class="nav-item"><a href="addRec" class="nav-link">Reclamation</a></li>
 	          <li class="nav-item cta cta-colored"><a href="cart.html" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
 
 	        </ul>
@@ -253,15 +253,10 @@
 							<div class="form-group w-100">
 								{% for avis in last_four_avis %}
 									<p><strong>Nom & Prénom :</strong> {{ avis.idClient.nom }}  {{ avis.idClient.prenom }}</p>
-									<p class="text-left mr-4"><strong>Notes :  </strong>
-										<a href="#" class="star"><span class="ion-ios-star-outline"></span></a>
-										<a href="#" class="star"><span class="ion-ios-star-outline"></span></a>
-										<a href="#" class="star"><span class="ion-ios-star-outline"></span></a>
-										<a href="#" class="star"><span class="ion-ios-star-outline"></span></a>
-										<a href="#" class="star"><span class="ion-ios-star-outline"></span></a>
+									<p class="text-left mr-4"><strong>Notes :   </strong> {{ avis.nbEtoiles}}
 									</p>
 									<p><strong>Commentaire :</strong> {{ avis.commentaire }}</p>
-									<p><strong>Date :</strong> {{ avis.dateAvis|date('Y-m-d') }}</p>
+									<p><strong>Date :</strong> {{ avis.dateAvis|date('d-m-Y') }}</p>
 									<div class="text-right"> <!-- div pour aligner les boutons à droite -->
 										{% if user and user.id == avis.idClient.id %}
 											<button class="btn btn-primary mr-2" onclick="window.location='{{ path('modifier_avis', {'id': avis.id}) }}'">Modifier</button>
