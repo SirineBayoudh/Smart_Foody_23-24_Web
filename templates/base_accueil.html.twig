@@ -172,49 +172,49 @@
 		</section>
 
 		<section class="ftco-section ftco-category ftco-no-pt">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-8">
-						<div class="row">
-							<div class="col-md-6 order-md-last align-items-stretch d-flex">
-								<div class="category-wrap-2 ftco-animate img align-self-stretch d-flex" style="background-image: url(images/category.jpg);">
-									<div class="text text-center">
-										<h2>Vegetables</h2>
-										<p>Protect the health of every home</p>
-										<p><a href="#" class="btn btn-primary">Shop now</a></p>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="category-wrap ftco-animate img mb-4 d-flex align-items-end" style="background-image: url(images/category-1.jpg);">
-									<div class="text px-3 py-1">
-										<h2 class="mb-0"><a href="#">Fruits</a></h2>
-									</div>
-								</div>
-								<div class="category-wrap ftco-animate img d-flex align-items-end" style="background-image: url(images/category-2.jpg);">
-									<div class="text px-3 py-1">
-										<h2 class="mb-0"><a href="#">Vegetables</a></h2>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-4">
-						<div class="category-wrap ftco-animate img mb-4 d-flex align-items-end" style="background-image: url(images/category-3.jpg);">
-							<div class="text px-3 py-1">
-								<h2 class="mb-0"><a href="#">Juices</a></h2>
-							</div>		
-						</div>
-						<div class="category-wrap ftco-animate img d-flex align-items-end" style="background-image: url(images/category-4.jpg);">
-							<div class="text px-3 py-1">
-								<h2 class="mb-0"><a href="#">Dried</a></h2>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
+      <div class="container">
+          <div class="row">
+              <div class="col-md-8">
+                  <div class="row">
+                      <div class="col-md-6 order-md-last align-items-stretch d-flex">
+                          <div class="category-wrap-2 ftco-animate img align-self-stretch d-flex" style="background-image: url(images/category.jpg);">
+                              <div class="text text-center">
+                                  <h2>Notre gamme de produits</h2>
+                                  <p>Ornez vos lifestyles par nos produits bios !</p>
+                                  <p><a href="#" class="btn btn-primary" onclick="filterProducts('Vegetables')">Shop now</a></p>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-md-6">
+                          <div class="category-wrap ftco-animate img mb-4 d-flex align-items-end" style="background-image: url(images/category-1.jpg);">
+                              <div class="text px-3 py-1">
+                                  <h2 class="mb-0"><a href="{{ path('app_test', {'category': 'Legume'}) }}" onclick="filterProducts('Legume')">Legumes</a></h2>
+                              </div>
+                          </div>
+                          <div class="category-wrap ftco-animate img d-flex align-items-end" style="background-image: url(images/category-2.jpg);">
+                              <div class="text px-3 py-1">
+                                  <h2 class="mb-0"><a href="{{ path('app_test', {'category': 'Fruit'}) }}" onclick="filterProducts('Fruit')">Fruits</a></h2>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+  
+              <div class="col-md-4">
+                  <div class="category-wrap ftco-animate img mb-4 d-flex align-items-end" style="background-image: url(images/category-3.jpg);">
+                      <div class="text px-3 py-1">
+                          <h2 class="mb-0"><a href="{{ path('app_test', {'category': 'Laitier'}) }}" onclick="filterProducts('Laitier')">Laitier</a></h2>
+                      </div>		
+                  </div>
+                  <div class="category-wrap ftco-animate img d-flex align-items-end" style="background-image: url(images/category-4.jpg);">
+                      <div class="text px-3 py-1">
+                          <h2 class="mb-0"><a href="{{ path('app_test', {'category': 'Grain'}) }}" onclick="filterProducts('Grain')">Grain</a></h2>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
 
 		<section class="ftco-section">
 			<div class="container">
@@ -497,7 +497,20 @@
   <!-- loader -->
   <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
 
+  <script>
+    function filterProducts(category) {
+    // Effectuer une requête AJAX pour récupérer les produits filtrés
+    var url = "{{ path('filter_products_by_category', {'category': '__category__'}) }}";
+    url = url.replace('__category__', category);
 
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        // Mettre à jour le contenu de la division avec les produits filtrés
+        document.getElementById('filteredProducts').innerHTML = data;
+    });
+}
+  </script>
   <script src="{{asset('js/jquery.min.js')}}"></script>
   <script src="{{asset('js/jquery-migrate-3.0.1.min.js')}}"></script>
   <script src="{{asset('js/popper.min.js')}}"></script>

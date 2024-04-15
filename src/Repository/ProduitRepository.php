@@ -72,6 +72,14 @@ public function getTotalPrices()
         ->getQuery()
         ->getSingleScalarResult();
 }
+public function findByCategory($category)
+{
+    return $this->createQueryBuilder('p')
+        ->andWhere('p.categorie = :category')
+        ->setParameter('category', $category)
+        ->getQuery()
+        ->getResult();
+}
 
 
 
