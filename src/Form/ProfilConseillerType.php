@@ -5,11 +5,15 @@ namespace App\Form;
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class ProfilConseillerType extends AbstractType
 {
@@ -28,13 +32,32 @@ class ProfilConseillerType extends AbstractType
                     new NotBlank(['message' => 'champ obligatoire'])
                 ]
             ])
-            ->add('email')
-            ->add('numTel', TextType::class, [
+            ->add('email', TextType::class, [
+                'constraints' => [
+                    new Email([
+                        'message' => 'L\'adresse email n\'est pas de la forme ***@gmail.com.',
+
+                    ]),
+                ],
+            ])
+            ->add('numTel', NumberType::class, [
                 'constraints' => [
                     new NotBlank([
                         'message' => 'champ obligatoire',
-                    ])
-                ]])
+                    ]),
+                    new Length([
+                        'min' => 8,
+                        'max' => 8,
+                        'exactMessage' => 'Le numéro de téléphone doit avoir exactement {{ limit }} chiffres',
+                        'normalizer' => 'trim',
+                    ]),
+                    new Regex([
+                        'pattern' => '/^\d+$/',
+                        'message' => 'Le numéro de téléphone doit contenir uniquement des chiffres.',
+                    ]),
+                ],
+                'invalid_message' => 'Le numéro de téléphone doit contenir uniquement des chiffres'
+            ])
             ->add('matricule', TextType::class, [
                 'constraints' => [
                     new NotBlank([

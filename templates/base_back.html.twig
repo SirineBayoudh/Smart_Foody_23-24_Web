@@ -20,12 +20,11 @@
 		rel="stylesheet" href="{{asset('css/vertical-layout-light/style.css')}}"> <!-- endinject -->
 		<link rel="shortcut icon" href="../../images/trans_logo.png"/>
 		<style>
-			#sidebar li a:hover {
-				background-color: #56ab2f;
+			#sidebar .nav-item .nav-link:hover {
+				background-color: #77bb58;
 			}
-
-			#sidebar li.selected {
-				background-color: #56ab2f;
+			#test:visited{
+				color: green; background-color: #77bb58;
 			}
 		</style>
 
@@ -109,9 +108,9 @@
 						<li class="nav-item nav-profile dropdown">
 
 							<a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-								
-									<img src={{photo}} alt="profile"/>
-								
+
+								<img src={{photo}} alt="profile"/>
+
 							</a>
 
 							<div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
@@ -404,14 +403,14 @@
 								</ul>
 							</div>
 						</li>
-						<li class="nav-item">
-							<a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+						<li class="nav-item" >
+							<a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth" id="test">
 								<i class="icon-head menu-icon"></i>
-								<span class="menu-title">Utilisateur</span>
+								<span class="menu-title" >Utilisateur</span>
 								<i class="menu-arrow"></i>
 							</a>
 							<div class="collapse" id="auth">
-								<ul class="nav flex-column sub-menu">
+								<ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
 									<li class="nav-item">
 										<a class="nav-link" href="listUsers">
 											Liste

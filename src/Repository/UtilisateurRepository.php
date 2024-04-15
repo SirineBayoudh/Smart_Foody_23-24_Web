@@ -65,6 +65,11 @@ class UtilisateurRepository extends ServiceEntityRepository
         return $result['photo'] ?? null;
     }
 
+    public function findByEmail($email)
+    {
+        return $this->findOneBy(['email' => $email]);
+    }
+
     //    /**
     //     * @return Utilisateur[] Returns an array of Utilisateur objects
     //     */

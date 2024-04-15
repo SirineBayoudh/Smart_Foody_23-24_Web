@@ -16,10 +16,6 @@ class MdpClientType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('ancienMotDePasse', PasswordType::class, [
-                'label' => 'Ancien mot de passe',
-                'mapped' => false, 
-            ])
             ->add('motDePasse')
             ->add('Modifier', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn', 'id' => 'submitBtn' ,'style' => 'background-color: #56ab2f; border-color:#56ab2f']

@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -74,7 +75,7 @@ class UserController extends AbstractController
     /** Méthodes pour le client */
 
     #[Route('/signup', name: 'signup')]
-    public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer, EmailService $emailService): Response
+    public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer, EmailService $emailService, UtilisateurRepository $repo): Response
     {
         $user = new Utilisateur();
         $form = $this->createForm(ClientType::class, $user);
@@ -82,32 +83,48 @@ class UserController extends AbstractController
         $em = $manager->getManager();
 
         $form->handleRequest($req);
-        if ($form->isSubmitted() && $form->isValid()) {
 
-            $plainPassword = $user->getMotDePasse();
-            $hashedPassword = md5($plainPassword);
-            $user->setMotDePasse($hashedPassword);
 
-            $user->setRole('Client');
-            $user->setMatricule('');
-            $user->setAttestation('');
-            $user->setTentative('0');
+        if ($form->isSubmitted()) {
+            $email = $form->get('email')->getData();
 
-            $em->persist($user);
-            $em->flush();
+            $existingUser = $repo->findByEmail($email);
 
-            /*$email = (new Email())
-                ->from('smartfoody.2024@gmail.com')
-                ->to($user->getEmail())
-                ->subject('Bienvenue sur notre site')
-                ->html('<p>Bienvenue sur notre site!</p>');
 
-            $mailer->send($email);*/
+            if ($form->isValid()) {
 
-            $emailService->sendResetPasswordEmail($user->getEmail(), 'Réinitialisation du mot de passe', $user->getPrenom());
+                if (!$existingUser) {
 
-            return $this->redirectToRoute("login");
+                    $plainPassword = $user->getMotDePasse();
+                    $hashedPassword = md5($plainPassword);
+                    $user->setMotDePasse($hashedPassword);
+
+                    $user->setRole('Client');
+                    $user->setMatricule('');
+                    $user->setAttestation('');
+                    $user->setTentative('0');
+
+                    $em->persist($user);
+                    $em->flush();
+
+                    $email = (new Email())
+                        ->from('smartfoody.2024@gmail.com')
+                        ->to($user->getEmail())
+                        ->subject('Bienvenue sur notre site')
+                        ->html('<p>Bienvenue sur notre site!</p>');
+
+                    $mailer->send($email);
+
+                    $emailService->sendResetPasswordEmail($user->getEmail(), 'Réinitialisation du mot de passe', $user->getPrenom());
+
+                    return $this->redirectToRoute("login");
+                } else {
+                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                }
+            }
         }
+
+
         return $this->renderform('user/register.html.twig', ['f' => $form]);
     }
 
@@ -120,53 +137,75 @@ class UserController extends AbstractController
         $user = $repo->find($id);
         $form = $this->createForm(ProfilClientType::class, $user);
 
+        $emailExistant = $user->getEmail();
+
         $em = $manager->getManager();
 
         $form->handleRequest($req);
+
         if ($form->isSubmitted()) {
 
-            $em->persist($user);
-            $em->flush();
-            return $this->redirectToRoute("accueil");
+            $emailNV = $user->getEmail();
+
+            if ($emailExistant != $emailNV) {
+
+                $existingUser = $repo->findByEmail($emailNV);
+
+                if ($existingUser) {
+                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                } else {
+                    if ($form->isValid()) {
+
+                        $em->persist($user);
+                        $em->flush();
+                        return $this->redirectToRoute("accueil");
+                    }
+                }
+            }elseif ($form->isValid()) {
+
+                $em->persist($user);
+                $em->flush();
+                return $this->redirectToRoute("accueil");
+            }
         }
 
+        return $this->renderform('user/profilClient.html.twig', [
+            'f' => $form,
+            'user' => $user,
+        ]);
+    }
+
+    #[Route('/profilClientMDP/{id}', name: 'client_profileMDP')]
+    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
+    {
+
+        $user = $repo->find($id);
         $form2 = $this->createForm(MdpClientType::class, $user);
 
         $em2 = $manager->getManager();
 
         $form2->handleRequest($req);
-        if ($form2->isSubmitted()) {
 
-            $em2->persist($user);
-            $em2->flush();
-            return $this->redirectToRoute("app_login");
+        $incorrect = false;
+
+        $ancMDP = $req->request->get('ancienMDP');
+
+        if ($ancMDP == $user->getMotDePasse()) {
+            if ($form2->isSubmitted() && $form2->isValid()) {
+                $em2->persist($user);
+                $em2->flush();
+                return $this->redirectToRoute("login");
+            }
+        } else {
+            $incorrect = false;
         }
 
-        return $this->renderform('user/profilClient.html.twig', [
-            'f' => $form,
+
+
+        return $this->renderform('user/profilClientMDP.html.twig', [
             'f2' => $form2,
             'user' => $user,
-        ]);
-    }
-
-    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
-    {
-
-        $user = $repo->find($id);
-        $form = $this->createForm(MdpClientType::class, $user);
-
-        $em = $manager->getManager();
-
-        $form->handleRequest($req);
-        if ($form->isSubmitted()) {
-
-            $em->persist($user);
-            $em->flush();
-            return $this->redirectToRoute("accueil");
-        }
-        return $this->renderform('user/mdp.html.twig', [
-            'f2' => $form,
-            'user' => $user,
+            'incorrect' => $incorrect ?? false,
         ]);
     }
 
@@ -182,14 +221,36 @@ class UserController extends AbstractController
         $user = $repo->find($id);
         $form = $this->createForm(ProfilConseillerType::class, $user);
 
+        $emailExistant = $user->getEmail();
+
         $em = $manager->getManager();
 
         $form->handleRequest($req);
+
         if ($form->isSubmitted()) {
 
-            $em->persist($user);
-            $em->flush();
-            return $this->redirectToRoute("accueil");
+            $emailNV = $user->getEmail();
+
+            if ($emailExistant != $emailNV) {
+
+                $existingUser = $repo->findByEmail($emailNV);
+
+                if ($existingUser) {
+                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                } else {
+                    if ($form->isValid()) {
+
+                        $em->persist($user);
+                        $em->flush();
+                        return $this->redirectToRoute("accueil");
+                    }
+                }
+            }elseif ($form->isValid()) {
+
+                $em->persist($user);
+                $em->flush();
+                return $this->redirectToRoute("accueil");
+            }
         }
 
         $form2 = $this->createForm(MdpConseillerType::class, $user);
@@ -201,7 +262,7 @@ class UserController extends AbstractController
 
             $em2->persist($user);
             $em2->flush();
-            return $this->redirectToRoute("app_login");
+            return $this->redirectToRoute("login");
         }
 
         return $this->renderform('user/profilConseiller.html.twig', [

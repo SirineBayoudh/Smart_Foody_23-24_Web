@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Knp\Component\Pager\PaginatorInterface;
+use Knp\Snappy\Pdf;
 
 class BackUserController extends AbstractController
 {
@@ -52,7 +53,7 @@ class BackUserController extends AbstractController
         );
 
         $entityManager = $this->getDoctrine()->getManager();
-        
+
         // Récupérer le nombre de clients
         $clientsCount = $entityManager->getRepository(Utilisateur::class)
             ->createQueryBuilder('u')
@@ -61,7 +62,7 @@ class BackUserController extends AbstractController
             ->setParameter('role', 'client')
             ->getQuery()
             ->getSingleScalarResult();
-        
+
         // Récupérer le nombre de conseillers
         $conseillersCount = $entityManager->getRepository(Utilisateur::class)
             ->createQueryBuilder('u')
@@ -71,7 +72,7 @@ class BackUserController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
-            $photo = $repo->getAdminImage();
+        $photo = $repo->getAdminImage();
 
 
         return $this->render('back_user/listUsers.html.twig', [
@@ -100,7 +101,7 @@ class BackUserController extends AbstractController
         $nbClients = $repo->getCountByRole('Client');
         $nbConseillers = $repo->getCountByRole('Conseiller');
 
-        
+
 
         $photo = $repo->getAdminImage();
         // Transmettez ces données au modèle
@@ -126,35 +127,50 @@ class BackUserController extends AbstractController
         $user = new Utilisateur();
         $form = $this->createForm(ConseillerType::class, $user);
 
-        $em = $manager->getManager();
         $emptySubmission = false;
 
         $photo = $repo->getAdminImage();
 
+
+        $em = $manager->getManager();
+
         $form->handleRequest($req);
-        if ($form->isSubmitted() && $form->isValid()) {
 
+
+        if ($form->isSubmitted()) {
+            $email = $form->get('email')->getData();
+
+            $existingUser = $repo->findByEmail($email);
             $emptySubmission = true;
 
-            $plainPassword = $user->getMotDePasse();
-            $hashedPassword = md5($plainPassword);
-            $user->setMotDePasse($hashedPassword);
+            if ($form->isValid()) {
 
-            $user->setRole('Conseiller');
-            $user->setAdresse('');
-            $user->setObjectif(null);
-            $user->setTentative('0');
-            $user->setTaille('0');
-            $user->setPoids('0');
+                if (!$existingUser) {
 
-            $em->persist($user);
-            $em->flush();
+                    $emptySubmission = true;
 
-            $this->addFlash('success', 'Conseiller ajouté avec succès');
+                    $plainPassword = $user->getMotDePasse();
+                    $hashedPassword = md5($plainPassword);
+                    $user->setMotDePasse($hashedPassword);
 
-            return $this->redirectToRoute("usersList");
-        }elseif ($form->isSubmitted()) {
-            $emptySubmission = true;
+                    $user->setRole('Conseiller');
+                    $user->setAdresse('');
+                    $user->setObjectif(null);
+                    $user->setTentative('0');
+                    $user->setTaille('0');
+                    $user->setPoids('0');
+
+                    $em->persist($user);
+                    $em->flush();
+
+
+                    $this->addFlash('success', 'Conseiller ajouté avec succès');
+
+                    return $this->redirectToRoute("usersList");
+                } else {
+                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                }
+            }
         }
         return $this->renderform('back_user/ajouterConseiller.html.twig', [
             'f' => $form,
@@ -162,6 +178,7 @@ class BackUserController extends AbstractController
             'photo' => $photo
         ]);
     }
+
 
     /* Modifier un Conseiller */
 
@@ -172,20 +189,44 @@ class BackUserController extends AbstractController
         $user = $repo->find($id);
         $form = $this->createForm(ProfilConseillerType::class, $user);
 
-        $em = $manager->getManager();
-
         $photo = $repo->getAdminImage();
 
+        $emailExistant = $user->getEmail();
+
+        $em = $manager->getManager();
+
         $form->handleRequest($req);
-        if ($form->isSubmitted() && $form->isValid()) {
 
-            $em->persist($user);
-            $em->flush();
+        if ($form->isSubmitted()) {
 
-            $this->addFlash('success', 'Conseiller modifié avec succès');
+            $emailNV = $user->getEmail();
 
-            return $this->redirectToRoute("usersList");
+            if ($emailExistant != $emailNV) {
+
+                $existingUser = $repo->findByEmail($emailNV);
+
+                if ($existingUser) {
+                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                } else {
+                    if ($form->isValid()) {
+
+                        $em->persist($user);
+                        $em->flush();
+                        $this->addFlash('success', 'Conseiller modifié avec succès');
+
+                        return $this->redirectToRoute("usersList");
+                    }
+                }
+            } elseif ($form->isValid()) {
+
+                $em->persist($user);
+                $em->flush();
+                $this->addFlash('success', 'Conseiller modifié avec succès');
+
+                return $this->redirectToRoute("usersList");
+            }
         }
+
         return $this->renderform('back_user/modifierConseiller.html.twig', [
             'f' => $form,
             'photo' => $photo
@@ -220,7 +261,7 @@ class BackUserController extends AbstractController
         } else {
             $users = $userRepository->createQueryBuilder('u')
                 ->where('LOWER(u.nom) LIKE :searchText')
-                ->setParameter('searchText', '%'.strtolower($searchText).'%')
+                ->setParameter('searchText', '%' . strtolower($searchText) . '%')
                 ->getQuery()
                 ->getResult();
         }
@@ -251,5 +292,30 @@ class BackUserController extends AbstractController
             'users' => $users,
         ]);
     }
-    
+
+    #[Route('/pdfUsers', name: 'export_pdf')]
+    public function usersListPdf(Pdf $pdf, UtilisateurRepository $repo): Response
+    {
+        // Récupérer tous les utilisateurs depuis la base de données
+        //$userRepository = $this->getDoctrine()->getRepository(Utilisateur::class);
+        $users = $repo->findAll();
+
+        // Rendre la vue Twig pour le contenu PDF
+        $html = $this->renderView('back_user/users_pdf.html.twig', [
+            'users' => $users,
+        ]);
+
+        // Générer le PDF à partir du HTML
+        $pdfContent = $pdf->getOutputFromHtml($html);
+
+        // Créer une réponse PDF
+        $response = new Response($pdfContent);
+        $response->headers->set('Content-Type', 'application/pdf');
+
+        // Télécharger le PDF ou l'afficher dans le navigateur selon vos besoins
+        // Par exemple, pour le télécharger :
+        $response->headers->set('Content-Disposition', 'attachment; filename="users_list.pdf"');
+
+        return $response;
+    }
 }

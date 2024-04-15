@@ -92,11 +92,15 @@
 						</select>
 					</form>
 				</div>
+				<a href="{{ path('export_pdf') }}" class="export-btn">
+					<button type="button" class="btn btn-secondary">Export PDF</button>
+				</a>
 				{% for flash_message in app.flashes('success') %}
 					<div class="alert alert-success" id="successMessage" role="alert">
 						{{ flash_message }}
 					</div>
 				{% endfor %}
+
 
 				<script>
 					// Masquer l'alerte après 5 secondes
@@ -275,5 +279,4 @@ window.location.href = url;
 	</script>
 
 
-	
 {% endblock %}
