@@ -46,16 +46,21 @@
         <div class="card-body">
             <h4 class="card-title">Table des objectifs :</h4>
             <div class="col text-right mb-4">
-                <a href="{{ path('add_object') }}" class="btn btn-primary btn-sm mr-2">
+                <a href="{{ path('add_object') }}" class="btn btn-primary btn-sm mr-5">
                     <i class="ti-plus"></i>
                     Ajouter objectif
                 </a>
-                <select id="critere" name="critere" onchange="filterObjectifs() ; resetButtonStyle();" class="btn btn-primary btn-sm dropdown-toggle ">
+                <select id="critere" name="critere" onchange="filterObjectifs() ; resetButtonStyle();" class="btn btn-primary btn-sm dropdown-toggle mr-5 ">
                     <option value="">Tous les critères</option>
                     {% for critere in criteres %}
                         <option value="{{ critere }}">{{ critere }}</option>
                     {% endfor %}
                 </select>
+                <input type="text" name="search" id="searchInput" class="mr-5" placeholder="Rechercher par libelle...">
+
+                    <button class="btn btn-primary btn-sm mr-5" onclick="filterByLibelle()">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
             </div>
             <div class="table-responsive ">
                 <table class="table table-striped ">
@@ -129,6 +134,21 @@
             }
         });
     }
+    function filterByLibelle() {
+    var input = document.getElementById("searchInput");
+    var filter = input.value.toUpperCase();
+    
+    var rows = document.querySelectorAll('.table-striped tbody tr');
+    rows.forEach(function(row) {
+        var libelleCell = row.querySelector('td:nth-child(1)').innerText; // Modifier le sélecteur pour la colonne "Libellé"
+        if (libelleCell.toUpperCase().includes(filter)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+}
 
     function resetButtonStyle() {
     var button = document.getElementById('critere');

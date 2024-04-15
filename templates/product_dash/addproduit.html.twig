@@ -3,6 +3,20 @@
 {% block title %}Ajouter un produit{% endblock %}
 
 {% block body %}
+
+<style>
+    .btn-custom {
+    background-color: #56ab2f;
+    border-color: #56ab2f;
+}
+
+.btn-custom:hover {
+    background-color: #72c22f;
+    border-color: #72c22f;
+}
+
+</style>
+
 <div class="col-10 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
@@ -57,7 +71,8 @@
                     </div>
                 {% endif %}
             </div>                           
-                <button type="submit" class="btn btn-primary mr-2" id="submitBtn">Ajouter</button>
+            <button type="submit" class="btn btn-custom mr-2 text-white" id="submitBtn">Ajouter</button>
+
             {{ form_end(form) }}
         </div>
     </div>

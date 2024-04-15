@@ -16,6 +16,8 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProductDashController extends AbstractController
 {
@@ -35,21 +37,50 @@ class ProductDashController extends AbstractController
     }
 
     #[Route('/product/all', name: 'product_all')]
-    public function listProduit(ProduitRepository $prodrepository,PaginatorInterface $paginator,Request $request): Response
+    public function listProduit(ProduitRepository $prodrepository,PaginatorInterface $paginator,Request $request,SerializerInterface $serializer): Response
 {
-    $produits = $prodrepository->findBy([], ['ref' => 'DESC']);
-    $pagination = $paginator->paginate(
-        $produits, // Requête à paginer
-        $request->query->getInt('page', 1), // Le numéro de page, 1 par défaut
-        5 // Limite par page
-    );
+    // Récupérer le nombre total de produits dans la base de données
+    $totalProduits = $prodrepository->countAll();
 
+    // Calculer le nombre de pages nécessaires pour paginer les produits
+    $totalPages = ceil($totalProduits / 5); // Remplacez 5 par le nombre d'éléments par page de votre pagination
+
+    $pagination = $paginator->paginate(
+        $prodrepository->createQueryBuilder('p')->orderBy('p.ref', 'DESC'),
+        $request->query->getInt('page', 1),
+        5 // Remplacez 5 par le nombre d'éléments par page de votre pagination
+    );
     $criteres = $prodrepository->findAllCriteres();
+    // Définir manuellement les catégories
+    $categories = ['Fruit', 'Legume', 'Laitier', 'Grain'];
+
+// Récupérer le nombre de produits pour chaque catégorie
+$produitsParCategorie = [];
+foreach ($categories as $categorie) {
+    $produitsParCategorie[] = $prodrepository->countProductsByCategory($categorie);
+}
+    // Récupérer le nombre total de produits
+    $totalProducts = $prodrepository->getTotalProducts();
+
+    // Récupérer le total des prix des produits
+    $totalPrices = $prodrepository->getTotalPrices();
+    
     return $this->render('product_dash/list_produit.html.twig', [
-        'prod' => $produits,
+        'totalPages' => $totalPages,
         'criteres' => $criteres,
         'pagination' => $pagination,
+        'categories' => $categories,
+        'productCounts' => $produitsParCategorie,
+        'totalProducts' => $totalProducts,
+        'totalPrices' => $totalPrices,
     ]);
+}
+
+#[Route('/product/criteres', name: 'product_criteres')]
+public function getCriteres(ProduitRepository $prodrepository): JsonResponse
+{
+    $criteres = $prodrepository->findAllCriteres();
+    return $this->json($criteres);
 }
 
 #[Route('/addproduct', name: 'add_product')]
@@ -177,6 +208,9 @@ public function deleteProd($id, ManagerRegistry $manager, ProduitRepository $pro
 
     return $this->redirectToRoute('product_all');
 }
+
+
+
 
 #[Route('/export-pdf', name: 'export_pdf')]
 public function exportPdf(PdfGenerator $pdfGenerator, ProduitRepository $produitRepository)

@@ -62,13 +62,44 @@
 #searchInput::placeholder {
     color: #999; /* Couleur du texte de l'attribut placeholder */
 }
+.text-custom {
+    color: #56ab2f;
+}
+.text-green {
+    color: green !important;
+}
+
 </style>
 
 <div class="example-wrapper">
     <div class="col-lg-24 grid-margin stretch-card">
-        <div class="card">
+        <div class="card"> 
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-chart-bar mr-2"></i> Nombre des produits par chaque catégorie : 
+            </div>
+            <div class="card-body">
+                <canvas id="myChart" width="500" height="100"></canvas>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-auto">
+                    <div class="card mb-3 shadow" style="border: 2px solid #56ab2f; background-color: #ddeed5;">
+                        <div class="card-body text-center ">
+                            <h5 class="card-title text-green">Nombre total de produits</h5>
+                            <p class="card-text text-custom">{{ totalProducts }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-auto">
+                    <div class="card mb-3 shadow" style="border: 2px solid #56ab2f; background-color: #ddeed5;">
+                        <div class="card-body text-center ">
+                            <h5 class="card-title text-green">Total des prix des produits</h5>
+                            <p class="card-text text-custom">{{ totalPrices }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
           <div class="card-body">
-            <h2 class="card-title">Table des produits</h2>
+            <h1 class="card-title text-green">Table des produits : </h1>
             <div class="row mb-4">
                 <div class="col text-right mb-4">
                     <a href="{{ path('add_product') }}" class="btn btn-primary btn-sm mr-5 hover-effect" style="background-color: #56ab2f; border-color: #56ab2f;" 
@@ -87,9 +118,13 @@
 
                     <input type="text" name="search" id="searchInput" class="mr-2" placeholder="Rechercher par marque...">
 
-                    <button class="btn btn-primary btn-sm mr-5" onclick="filterByMarque()">Rechercher</button>
+                    <button class="btn btn-primary btn-sm mr-5" onclick="filterByMarque()">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
 
-                    <a href="{{ path('export_pdf') }}" class="btn btn-primary btn-sm mr-5">Télécharger en PDF</a>
+                    <a href="{{ path('export_pdf') }}"  class="btn btn-primary btn-sm mr-5 btn-icon-text">
+                        <i class="fas fa-download"></i> Télécharger en PDF
+                    </a>
                 </div>
             </div>
             
@@ -149,10 +184,12 @@
 
 <!-- Script pour la confirmation de suppression avec SweetAlert2 -->
 <script>
+    
+
     function confirmDelete(id) {
         Swal.fire({
             title: "Est-ce que vous êtes sûr?",
-            text: "Vous allez supprimer cet objectif !!",
+            text: "Vous allez supprimer ce produit!!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -161,10 +198,14 @@
             cancelButtonText: "Annuler"
         }).then((result) => {
             if (result.isConfirmed) {
+                // Supprimer le produit et ensuite mettre à jour le graphique
                 window.location.href = "{{ path('delete_product', {'id': '__id__'}) }}".replace('__id__', id);
+                
             }
         });
     }
+
+
     function filterObjectifs() {
     var selectedCritere = document.getElementById('critere').value;
     console.log("Critère sélectionné : ", selectedCritere); // Affiche la valeur sélectionnée dans la console
@@ -208,9 +249,54 @@ function filterByMarque() {
     });
 }
 
-
-
-
-
     </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Récupérer le contexte du canvas
+        const ctx = document.getElementById('myChart').getContext('2d');
+        // Définir les catégories statiques
+        const categories = ['Fruit', 'Légume', 'Laitier', 'Grain'];
+        
+        // Convertir les données Twig en JavaScript
+        const produitsParCategorie = JSON.parse('{{ productCounts|json_encode|raw }}');
+        
+        // Définir les données du graphique avec les catégories et le nombre de produits pour chaque catégorie
+        const data = {
+            labels: categories, // Utilisez les catégories comme labels sur l'axe des x
+            datasets: [{
+                label: 'Nombre de produits par catégorie',
+                data: produitsParCategorie, // Le nombre de produits pour chaque catégorie
+                backgroundColor: 'rgba(50, 205, 50, 0.2)', // Couleur de fond en vert
+                borderColor: 'rgba(50, 205, 50, 1)',
+                borderWidth: 1
+            }]
+        };
+        
+        // Options du graphique
+        const options = {
+            scales: {
+                x: {
+                    // Afficher uniquement 4 points sur l'axe des abscisses
+                    maxTicksLimit: 4
+                },
+                y: {
+                    min: 0,
+            max: 50,
+            stepSize: 5
+                }
+            }
+        };
+        
+        // Créer le BarChart
+        new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: options
+        });
+    });
+</script>
+
+
+
 {% endblock %}

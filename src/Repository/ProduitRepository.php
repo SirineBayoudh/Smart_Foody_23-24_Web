@@ -40,6 +40,39 @@ class ProduitRepository extends ServiceEntityRepository
 
     return $criteresList;
 }
+public function countProductsByCategory($category)
+{
+    return $this->createQueryBuilder('p')
+        ->select('COUNT(p)')
+        ->andWhere('p.categorie = :category')
+        ->setParameter('category', $category)
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+public function countAll(): int
+    {
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p.ref)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getTotalProducts()
+{
+    return $this->createQueryBuilder('p')
+        ->select('COUNT(p.ref)')
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
+public function getTotalPrices()
+{
+    return $this->createQueryBuilder('p')
+        ->select('SUM(p.prix)')
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
 
 
 
