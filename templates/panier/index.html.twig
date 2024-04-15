@@ -111,31 +111,35 @@
         });
     }
 
-    function decrementerQuantite(idLigneCommande, quantiteActuelle) {
-        if (quantiteActuelle > 1) {
-            location.href = '{{ path('diminuer_quantite', {'idLigneCommande': 'idLigneCommande'}) }}'.replace('idLigneCommande', idLigneCommande);
-        } else if (quantiteActuelle == 1) {
-            Swal.fire({
-                title: 'Attention!',
-                text: 'La quantité ne peut pas être inférieure à 1. Le produit sera supprimé du panier.',
-                icon: 'warning',
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'Compris'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.href = '{{ path('diminuer_quantite', {'idLigneCommande': 'idLigneCommande'}) }}'.replace('idLigneCommande', idLigneCommande);
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Erreur!',
-                text: 'Impossible de diminuer la quantité en dessous de zéro!',
-                icon: 'error',
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'OK'
-            });
-        }
+  function decrementerQuantite(idLigneCommande, quantiteActuelle) {
+    if (quantiteActuelle > 1) {
+        location.href = '{{ path('diminuer_quantite', {'idLigneCommande': 'idLigneCommande'}) }}'.replace('idLigneCommande', idLigneCommande);
+    } else if (quantiteActuelle == 1) {
+        Swal.fire({
+            title: 'Attention!',
+            text: 'La quantité ne peut pas être inférieure à 1. Le produit sera supprimé du panier.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'OK, supprimer',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                location.href = '{{ path('diminuer_quantite', {'idLigneCommande': 'idLigneCommande'}) }}'.replace('idLigneCommande', idLigneCommande);
+            }
+        });
+    } else {
+        Swal.fire({
+            title: 'Erreur!',
+            text: 'Impossible de diminuer la quantité en dessous de zéro!',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
     }
+}
+
 </script>
 
 {% endblock %}

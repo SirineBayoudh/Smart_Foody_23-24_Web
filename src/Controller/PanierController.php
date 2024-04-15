@@ -3,7 +3,7 @@
 namespace App\Controller;
 use Twig\Environment as TwigEnvironment;
 
-
+use App\Service\QrCodeGeneratorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -110,9 +110,11 @@ class PanierController extends AbstractController
     
             // Retourne la vue avec les données mises à jour
             return $this->render('panier/index.html.twig', [
+                
+                'remise'=>$panier->getRemise(),
                 'lignesCommande' => $panier->getLignesCommande(),
                 'prixTotalAvantRemise' => $prixTotalAvantRemise,
-                'remise' => $remise,
+               
                 'prixTotalApresRemise' => $prixTotalApresRemise,
                 'nombreArticlesDansPanier' => $nombreArticlesDansPanier,
             ]);
@@ -296,7 +298,8 @@ $this->entityManager->flush();
 
 $nombreArticlesDansPanier = count($panier->getLignesCommande());
 $produits = $produitRepository->findAll();
-
+$this->entityManager->persist($commande);
+$this->entityManager->flush();
 return $this->render('produit/index.html.twig', [
 'lignesCommande' => $panier->getLignesCommande(),
 'prixTotalAvantRemise' => $prixTotalAvantRemise,
@@ -332,8 +335,12 @@ return $this->render('produit/index.html.twig', [
  * @Route("/panier/augmenter_quantite/{idLigneCommande}", name="augmenter_quantite")
  */
 public function augmenterQuantite($idLigneCommande): Response
-{
+{ $id_client=13;
+
+
+    $utilisateur = $this->utilisateurRepository->find($id_client);
     $ligneCommande = $this->ligneCommandeRepository->find($idLigneCommande);
+    $commande = $this->commandeRepository->findDerniereCommandeEnCoursParUtilisateur($id_client);
 
     if ($ligneCommande) {
         $ligneCommande->setQuantite($ligneCommande->getQuantite() + 1);
@@ -348,15 +355,20 @@ public function augmenterQuantite($idLigneCommande): Response
             $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
         }
         $panier->setTotale($total);
-
-        // Utilisation de la méthode de calcul de la remise
+    
+        // Recalculer la remise en fonction du nouveau total
         $remise = $this->calculerRemise($panier, $panier->getUtilisateur());
         $panier->setRemise($remise);
-
+    
         // Mettre à jour le panier avec les nouvelles valeurs
         $this->entityManager->persist($panier);
         $this->entityManager->flush();
-    }
+        $commande->setRemise($remise);
+        $commande->setTotaleCommande($total);
+    
+        $this->entityManager->persist($commande);
+            $this->entityManager->flush();
+    }    
 
     return $this->redirectToRoute('voir_panier');
 }
@@ -378,7 +390,11 @@ public function augmenterQuantite($idLigneCommande): Response
  * @Route("/panier/diminuer_quantite/{idLigneCommande}", name="diminuer_quantite")
  */
 public function diminuerQuantite($idLigneCommande): Response
-{
+{ $id_client=13;
+
+
+    $utilisateur = $this->utilisateurRepository->find($id_client);
+    $commande = $this->commandeRepository->findDerniereCommandeEnCoursParUtilisateur($id_client);
     $ligneCommande = $this->ligneCommandeRepository->find($idLigneCommande);
     if (!$ligneCommande) {
         $this->addFlash('error', 'La ligne de commande n\'a pas été trouvée.');
@@ -410,6 +426,12 @@ public function diminuerQuantite($idLigneCommande): Response
     // Mettre à jour le panier avec les nouvelles valeurs
     $this->entityManager->persist($panier);
     $this->entityManager->flush();
+    $commande->setRemise($remise);
+    $commande->setTotaleCommande($total);
+
+    $this->entityManager->persist($commande);
+        $this->entityManager->flush();
+
 
     return $this->redirectToRoute('voir_panier');
 }
@@ -424,6 +446,7 @@ private function calculerRemise(Panier $panier): float
 
 
     $utilisateur = $this->utilisateurRepository->find($id_client);
+    $commande = $this->commandeRepository->findDerniereCommandeEnCoursParUtilisateur($id_client);
     $total = 0.0;
     foreach ($panier->getLignesCommande() as $ligne) {
         $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
@@ -444,7 +467,8 @@ private function calculerRemise(Panier $panier): float
             $remise = $total * 0.25;
         } else {
             $remise = 0;
-        }
+        }$this->entityManager->persist($commande);
+        $this->entityManager->flush();
     }
 
     return $remise;
@@ -452,12 +476,6 @@ private function calculerRemise(Panier $panier): float
 
 
     
-
-
-
-
-
-
 
 
 
@@ -494,8 +512,8 @@ private function calculerRemise(Panier $panier): float
 
                 $emailContent = $twig->render('panier/email.html.twig', ['commande' => $commande]);
                 $email = (new Email())
-                    ->from('yo.yotalent7@gmail.com') 
-                    ->to('hmachlouche@gmail.com')
+                ->from('smartfoody2024@gmail.com') 
+                    ->to($commande->getUtilisateur()->getEmail())
                     ->subject('Confirmation de votre commande')
                     ->html($emailContent);
 
@@ -509,7 +527,6 @@ private function calculerRemise(Panier $panier): float
             } else {
                 // Stocker totalEnDevise dans la session avant la redirection
                 $session->set('totalEnDevise', $totalEnDevise);
-                $session->set('idcommande', $commande->getId());
                 
                 return $this->redirectToRoute('stripe'); // Rediriger vers la page de paiement Stripe
             }
@@ -520,6 +537,13 @@ private function calculerRemise(Panier $panier): float
             // Vous pouvez aussi passer totalEnDevise ici si nécessaire
         ]);
     }
+
+
+
+
+
+
+
 /**
  * Vider le panier en rendant les lignes de commande orphelines.
  */
@@ -563,22 +587,30 @@ private function viderrPanier(Request $request): void
 #[Route('/commande/valider/{id}', name: 'route', methods: ['GET', 'POST'])]
 public function route(EntityManagerInterface $entityManager, Request $request, $id): Response
 {
+    // Récupération de la commande à partir de l'ID
     $commande = $entityManager->getRepository(Commande::class)->find($id);
+    if (!$commande) {
+        throw $this->createNotFoundException('La commande n\'existe pas.');
+    }
 
-  
     $tauxDeConversion = 3.3;
-   
 
+    // Utiliser directement le total et la remise de la commande
+    $totalCommande = $commande->getTotaleCommande();
     $remise = $commande->getRemise(); 
-    $prixTotalAvecRemise = $commande->getTotaleCommande() - $remise;
-
-    $totalEnDevise = ($commande->getTotaleCommande() - $remise )/ $tauxDeConversion;
+    $prixTotalAvecRemise = $totalCommande - $remise;
+    $totalEnDevise = $prixTotalAvecRemise / $tauxDeConversion;
+    //$pourcentageRemise = ($remise / $totalCommande) * 100;
+    $this->entityManager->persist($commande);
+$this->entityManager->flush();
 
 
     return $this->render('panier/valider.html.twig', [
         'commande' => $commande,
+     
         'totalEnDevise' => $totalEnDevise,
-        'prixTotalAvecRemise' => $prixTotalAvecRemise, 
+        'prixTotalAvecRemise' => $prixTotalAvecRemise,
+        //'pourcentageRemise' => $pourcentageRemise 
     ]);
 }
 
