@@ -19,7 +19,6 @@ class CommandeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Commande::class);
     }
-    //autocomplete
     public function findCommandesForAutocomplete(string $query)
     {
         return $this->createQueryBuilder('c')
@@ -119,11 +118,15 @@ public function findDerniereCommandeEnCoursParUtilisateur(int $idUtilisateur): ?
     {
         return $this->createQueryBuilder('c')
             ->join('c.utilisateur', 'u')
-            ->select('u.id_utilisateur AS idClient, SUM(c.totaleCommande) as totalCommande, COUNT(c.id) as nombreCommandes')
+            ->select('u.id_utilisateur  AS idClient, u.nom AS nomClient, u.prenom AS prenomClient, SUM(c.totaleCommande) as totalCommande, COUNT(c.id) as nombreCommandes')
             ->groupBy('u.id_utilisateur')
+            ->addGroupBy('u.nom')
+            ->addGroupBy('u.prenom')
             ->orderBy('totalCommande', 'DESC')
             ->addOrderBy('nombreCommandes', 'DESC')
             ->getQuery()
             ->getArrayResult();
     }
+    
+    
 }

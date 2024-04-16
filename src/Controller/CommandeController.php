@@ -10,7 +10,11 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
+
+use App\Form\SearchType;
+
 
 
 
@@ -20,7 +24,7 @@ class CommandeController extends AbstractController
 
 
 
-    #[Route('/admin', name: 'commande_stat')]
+   /* #[Route('/admin', name: 'commande_stat')]
     public function afficherStatistiques(CommandeRepository $commandeRepository): Response
     {
         $clientsFideles = $commandeRepository->trouverClientsFideles();
@@ -33,9 +37,9 @@ class CommandeController extends AbstractController
             'commandes' => $commandes, 
             
         ]);
-    }
+    }*/
     
-    #[Route('/stat', name: 'statistiques')]
+    /*#[Route('/stat', name: 'statistiques')]
     public function afficherStatistique(CommandeRepository $commandeRepository): Response
     {
         $clientsFideles = $commandeRepository->trouverClientsFideles();
@@ -46,6 +50,30 @@ class CommandeController extends AbstractController
         return $this->render('commande/statistiques.html.twig', [
           'clientsFideles' => $clientsFideles,
             'commandes' => $commandes, 
+        ]);
+    }*/
+    #[Route('/statistiques', name: 'statistiques')]
+    public function afficherStatistique(CommandeRepository $commandeRepository,Request $request,PaginatorInterface $paginator): Response
+    { $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
+        $searchQuery = $form->get('search')->getData() ?: $request->query->get('q', '');
+    
+        $commandesQuery = $commandeRepository->findCommandesByQuery($searchQuery);
+        $clientsFideles = $commandeRepository->trouverClientsFideles();
+        $chartType = 'mixed'; // Définir le type de graphique ici
+        $pagination = $paginator->paginate(
+            $commandesQuery,
+            $request->query->getInt('page', 1),
+            3
+        );
+       
+        return $this->render('commande/statistiques.html.twig', [
+            'clientsFideles' => $clientsFideles,
+            
+            'chartType' => $chartType,
+            'search_form' => $form->createView(),
+            'pagination'=>$pagination,
+            
         ]);
     }
 
@@ -63,7 +91,7 @@ class CommandeController extends AbstractController
 
         // Déterminez le nouvel état basé sur l'état actuel
         switch ($commande->getEtat()) {
-            case 'non livré':
+            case 'non livrée':
                 $nouvelEtat = 'en cours';
                 break;
             case 'en cours':
@@ -71,10 +99,10 @@ class CommandeController extends AbstractController
                 break;
             case 'livré':
                 // Définir le nouvel état si nécessaire, ou laisser inchangé
-                $nouvelEtat = 'non livré'; // ou 'livré' si vous ne voulez pas changer l'état
+                $nouvelEtat = 'non livrée'; // ou 'livré' si vous ne voulez pas changer l'état
                 break;
             default:
-                $nouvelEtat = 'non livré'; // ou gérer autrement
+                $nouvelEtat = 'non livrée'; // ou gérer autrement
                 break;
         }
 
@@ -87,40 +115,82 @@ class CommandeController extends AbstractController
     }
     //recherche 
     #[Route('/commandes/search', name: 'app_commandes_search')]
-    public function search(CommandeRepository $commandeRepository, Request $request): Response
+    public function search(Request $request, PaginatorInterface $paginator, CommandeRepository $commandeRepository): Response
     {
-        $searchQuery = $request->query->get('q');
+        $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
     
-        if ($searchQuery) {
-            $commandes = $commandeRepository->searchCommandes($searchQuery);
-        } else {
-            $commandes = $commandeRepository->findByEtat('Non livrée');
+        if ($form->isSubmitted() && !$form->isValid()) {
+            // Vous pouvez gérer des logiques supplémentaires ici, comme enregistrer des logs ou des statistiques
         }
     
-        return $this->render('commande/index.html.twig', [
-            'commandes' => $commandes,
-            'searchQuery' => $searchQuery,
-        ]);
-    }
+        $searchQuery = $form->get('search')->getData() ?: $request->query->get('q', '');
     
-    #[Route('/commandes', name: 'app_commandes')]
-    public function index(CommandeRepository $commandeRepository,PaginatorInterface $paginator, Request $request): Response
-    {
-        $commandes = $commandeRepository->findByEtat('Non livrée');
-        $commandes1 = $commandeRepository->findByEtat('livré');
-        $commandes2 = $commandeRepository->findByEtat('en cours');
+        $commandesQuery = $commandeRepository->findCommandesByQuery($searchQuery);
+    
         $pagination = $paginator->paginate(
-            $commandes, // Query à paginer
-            $request->query->getInt('page', 1), // Numéro de page par défaut
-            5 // Nombre d'éléments par page
+            $commandesQuery,
+            $request->query->getInt('page', 1),
+            10
         );
-
+    
         return $this->render('commande/index.html.twig', [
-            'commandes' => $commandes,
-            
+            'search_form' => $form->createView(),
             'pagination' => $pagination,
         ]);
     }
+    
+    #[Route('/autocomplete', name: 'autocomplete_search')]
+    public function autocomplete(Request $request, CommandeRepository $commandeRepository): JsonResponse
+    {
+        $query = $request->query->get('query', '');
+        $results = $commandeRepository->findSuggestionsForQuery($query);
+        
+        return $this->json($results);
+    }
+    
+    
+
+    #[Route('/commandes', name: 'app_commandes')]
+    public function index(CommandeRepository $commandeRepository, PaginatorInterface $paginator, Request $request): Response
+    {
+        // Créer le formulaire de recherche
+        $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
+    
+        // Gérer la requête de recherche
+        $searchQuery = $form->get('search')->getData() ?: $request->query->get('q', '');
+    
+        // Récupérer les commandes basées sur la requête de recherche
+        $commandesQuery = $commandeRepository->findCommandesByQuery($searchQuery);
+        
+        // Récupérer les commandes pour chaque état
+        $commandesEnCours = $commandeRepository->findByEtat('en cours');
+        $commandesNonLivre = $commandeRepository->findByEtat('non livrée');
+        $commandesLivre = $commandeRepository->findByEtat('livré');
+        
+        // Paginer les commandes
+        $pagination = $paginator->paginate(
+            
+            
+            array_merge($commandesEnCours, $commandesNonLivre, $commandesLivre), // Liste concaténée de toutes les commandes
+            $request->query->getInt('page', 1), // Page par défaut
+            3 // Limite par page
+        );
+       /* $pagination = $paginator->paginate(
+    
+            $commandesQuery,
+        );*/
+        
+        return $this->render('commande/index.html.twig', [
+            'pagination' => $pagination,
+       
+            'search_form' => $form->createView(),
+            'commandesQuery'=>$commandesQuery,
+        ]);
+    }
+    
+
     public function compteur(CommandeRepository $commandeRepository, string $type): Response
     {
         $nombre = 0;
@@ -257,15 +327,26 @@ public function commandeDetails($id, CommandeRepository $commandeRepository)
 
 
     #[Route('/livre', name: 'commandes_livre')]
-    public function livre(CommandeRepository $commandeRepository): Response
-    {
+    public function livre(CommandeRepository $commandeRepository,PaginatorInterface $paginator, Request $request): Response
+    {  $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
+    
+        // Gérer la requête de recherche
+        $searchQuery = $form->get('search')->getData() ?: $request->query->get('q', '');
         $commandes = $commandeRepository->findByEtat('livré');
         $clientsFideles = $commandeRepository->trouverClientsFideles();
      
-
+        $pagination = $paginator->paginate(
+            
+            $commandes, // Query à paginer
+            $request->query->getInt('page', 1), // Numéro de page par défaut
+            3// Nombre d'éléments par page
+        );
 
         return $this->render('commande/index.html.twig', [
             'commandes' => $commandes,
+            'pagination' => $pagination,
+            'search_form' => $form->createView(),
            
             
             'clientsFideles' => $clientsFideles,
@@ -273,36 +354,54 @@ public function commandeDetails($id, CommandeRepository $commandeRepository)
     }
 
     #[Route('/nonlivre', name: 'commandes_non_livre')]
-    public function nonLivre(CommandeRepository $commandeRepository/*,PaginatorInterface $paginator, Request $request*/): Response
-    {
+    public function nonLivre(CommandeRepository $commandeRepository,PaginatorInterface $paginator, Request $request): Response
+    { $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
+    
+        // Gérer la requête de recherche
+        $searchQuery = $form->get('search')->getData() ?: $request->query->get('q', '');
         $commandes = $commandeRepository->findByEtat('Non livrée');
         $clientsFideles = $commandeRepository->trouverClientsFideles();
-        /*$pagination = $paginator->paginate(
+        $pagination = $paginator->paginate(
             $commandes, // Query à paginer
             $request->query->getInt('page', 1), // Numéro de page par défaut
-            5 // Nombre d'éléments par page
-        );*/
+            3 // Nombre d'éléments par page
+        );
 
         return $this->render('commande/index.html.twig', [
             'commandes' => $commandes,
             'clientsFideles' => $clientsFideles,
-            //'pagination' => $pagination,
+            'pagination' => $pagination,
+            'search_form' => $form->createView(),
         ]);
     }
 
 
     #[Route('/encore', name: 'commandes_en_cours')]
-    public function encore(CommandeRepository $commandeRepository): Response
-    {
+    public function encore(CommandeRepository $commandeRepository,PaginatorInterface $paginator, Request $request): Response
+    { $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
+    
+        // Gérer la requête de recherche
+        $searchQuery = $form->get('search')->getData() ?: $request->query->get('q', '');
         $commandes = $commandeRepository->findByEtat('en cours');
         $clientsFideles = $commandeRepository->trouverClientsFideles();
+        $pagination = $paginator->paginate(
+            $commandes, // Query à paginer
+            $request->query->getInt('page', 1), // Numéro de page par défaut
+            3 // Nombre d'éléments par page
+        );
+        dump($pagination);
      
 
         return $this->render('commande/index.html.twig', [
             'commandes' => $commandes,
             'clientsFideles' => $clientsFideles,
+            'pagination' => $pagination,
+            'search_form' => $form->createView(),
          
         ]);
     }
+   
 
 }
