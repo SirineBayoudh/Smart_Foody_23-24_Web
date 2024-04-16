@@ -80,6 +80,14 @@ public function findByCategory($category)
         ->getQuery()
         ->getResult();
 }
+public function findSuggestions(string $term): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.marque LIKE :term')
+            ->setParameter('term', '%' . $term . '%')
+            ->getQuery()
+            ->getResult();
+    }
 
 
 

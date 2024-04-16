@@ -28,6 +28,15 @@
     <link rel="stylesheet" href="{{asset('css/flaticon.css')}}">
     <link rel="stylesheet" href="{{asset('css/icomoon.css')}}">
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
+
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+
+
+
 	<!-- endinject -->
 	<link rel="shortcut icon" href="../../images/trans_logo.png"/>
   </head>
@@ -216,17 +225,34 @@
       </div>
   </section>
 
+
+      
 		<section class="ftco-section">
 			<div class="container">
 					<div class="row justify-content-center mb-3 pb-3">
 			  <div class="col-md-12 heading-section text-center ftco-animate">
-				<h2 class="mb-4">Nos produits</h2>
-				<p>Plongez-vous dans notre éorme gamme de produits bios</p>
+				<h2 class="mb-4 text-green">Nos produits</h2>
+				<p class="text-green">Plongez-vous dans notre éorme gamme de produits bios</p>
 			  </div>
 			</div>   		
 			</div>
-			<div class="container" >
-			<div class="row" id="product-list">
+      <div class="container">
+    <form action="{{ path('rechercher_produits') }}" method="GET" class="search-form">
+        <div class="input-group">
+            <input type="text" id="searchInput" name="term" placeholder="Tapez le produit que vous souhaitez..." class="form-control search-input rounded" >
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-primary search-button"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </form>
+    
+    <a href="{{ path('app_test') }}"><i class="fas fa-arrow-left"></i> Retourner à tous les produits</a>
+</div>
+
+    
+    <div class="container" id="product-list-container">
+        <div class="row" id="product-list">
+            <!-- Ici seront affichés les produits -->
 				{% for produit in pagination %}
 				<div class="col-md-6 col-lg-3 ftco-animate">
 					<div class="product">
@@ -527,6 +553,67 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
   <script src="{{asset('js/google-map.js')}}"></script>
   <script src="{{asset('js/main.js')}}"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+ $(document).ready(function() {
+    $("#searchInput").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: "/autocomplete",
+                dataType: "json",
+                data: {
+                    term: request.term
+                },
+                success: function(data) {
+                    response(data.map(function(item) {
+                        return {
+                            label: item.marque,
+                            value: item.marque, // Valeur à afficher dans l'input après sélection
+                            image: item.image, // Chemin de l'image
+                            prix: item.prix // Prix du produit
+                        };
+                    }));
+                }
+            });
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            // Rediriger ou afficher les détails du produit sélectionné
+            var selectedProduct = ui.item;
+            var productDetails = `
+                <div class="product-details">
+                    <img src="${selectedProduct.image}" alt="${selectedProduct.label}" class="product-image">
+                    <h3>${selectedProduct.label}</h3>
+                    <p class="product-price">${selectedProduct.prix}</p>
+                </div>
+            `;
+            $("#product-details-container").html(productDetails);
+        }
+    });
+});
+</script>
+<style>
+  .search-form {
+    margin-bottom: 20px;
+}
+
+.search-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.search-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.text-green {
+    color: green;
+}
+
+</style>
+
     
   </body>
 </html>
