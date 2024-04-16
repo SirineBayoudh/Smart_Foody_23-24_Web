@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Commande;
+use Doctrine\ORM\Query;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -18,6 +19,18 @@ class CommandeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Commande::class);
     }
+    //autocomplete
+    public function findCommandesForAutocomplete(string $query)
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.id, c.dateCommande, u.nom AS utilisateurNom')
+            ->join('c.utilisateur', 'u')
+            ->where('c.dateCommande LIKE :query OR u.nom LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
+    
 
     // Compte le nombre de commandes livrées
     public function countLivreCommandes(): int
@@ -67,6 +80,17 @@ class CommandeRepository extends ServiceEntityRepository
  * @param int $idUtilisateur L'identifiant de l'utilisateur.
  * @return Commande|null La dernière commande en cours si trouvée, sinon null.
  */
+public function findCommandesByQuery(string $query): Query
+{
+    return $this->createQueryBuilder('c')
+        ->leftJoin('c.utilisateur', 'u')  // Ensuring to join the Utilisateur entity
+        ->where('c.dateCommande LIKE :query')  // Searching by date
+        ->orWhere('u.nom LIKE :query')         // Searching by last name
+        ->orWhere('u.prenom LIKE :query')      // Searching by first name
+        ->setParameter('query', '%' . $query . '%')
+        ->getQuery();
+}
+
 public function findDerniereCommandeEnCoursParUtilisateur(int $idUtilisateur): ?Commande
 {
     return $this->createQueryBuilder('c')

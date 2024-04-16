@@ -157,17 +157,24 @@
     <div class="row mt-4">
         <div class="col-md-12">
             <!-- Formulaire de recherche -->
-            <form id="searchForm" action="{{ path('app_commandes_search') }}" method="GET">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="q" id="navbar-search-input" placeholder="Rechercher maintenant (YYYY-MM-DD)" aria-label="search" aria-describedby="search" pattern="\d{4}-\d{2}-\d{2}" title="Veuillez saisir une date au format YYYY-MM-DD ou une chaîne de caractères valide." required>
-                    <div class="input-group-append hover-cursor" id="navbar-search-icon">
-                        <span class="input-group-text" id="search" onclick="document.getElementById('searchForm').submit()">
-                            <i class="icon-search"></i>
-                        </span>
-                    </div>
-                </div>
-                <div id="searchErrors" class="text-danger"></div>
-            </form>
+           <!-- Formulaire de recherche -->
+<div class="container mt-4">
+    {{ form_start(search_form, {'attr': {'class': 'form-inline', 'novalidate': 'novalidate'}}) }}
+        <div class="form-group">
+            {{ form_widget(search_form.search, {'attr': {'class': 'form-control mr-2'}}) }}
+            {% if form_errors(search_form.search) %}
+                <div class="alert alert-danger">{{ form_errors(search_form.search) }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Search</button>
+    {{ form_end(search_form) }}
+</div> 
+
+
+
+
+
+
         </div>
     </div>
 
@@ -225,28 +232,97 @@
         <canvas id="chartClientsFideles"></canvas>
     </div>
 </div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const dateInput = document.getElementById('navbar-search-input');
-        const nomInput = document.getElementById('nom'); // Assurez-vous que l'ID 'nom' existe sur votre input de nom
-        
-        dateInput.addEventListener('input', function() {
-            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-            if (this.value.match(dateRegex)) {
-                alert('Vous avez entré une date valide : ' + this.value);
-            }
-        });
 
-        if (nomInput) {
-            nomInput.addEventListener('input', function() {
-                const digitCheck = /\d+/;
-                if (this.value.match(digitCheck)) {
-                    alert('Le nom ne devrait pas contenir de chiffres.');
-                }
-            });
+document.addEventListener('DOMContentLoaded', function () {
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('navbar-search-input');
+    const searchErrors = document.getElementById('searchErrors');
+
+    searchForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Empêche la soumission du formulaire
+
+        const searchTerm = searchInput.value.trim();
+
+        if (searchTerm === '') {
+            displayErrorMessage('Veuillez entrer quelque chose à rechercher.');
+        } else if (!isValidInput(searchTerm)) {
+            displayErrorMessage('Veuillez entrer une date au format YYYY-MM-DD ou un nom sans chiffres ni caractères spéciaux.');
+        } else {
+            clearErrorMessage();
+            // Envoyer la requête de recherche
+            searchCommandes(searchTerm);
         }
     });
+
+    function isValidInput(input) {
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        const nameRegex = /^[A-Za-z]+$/;
+        return dateRegex.test(input) || nameRegex.test(input);
+    }
+
+    function displayErrorMessage(message) {
+        searchErrors.textContent = message;
+        searchErrors.style.display = 'block';
+        searchErrors.scrollIntoView();
+    }
+
+    function clearErrorMessage() {
+        searchErrors.textContent = '';
+        searchErrors.style.display = 'none';
+    }
+
+    // Désactiver les suggestions automatiques du navigateur
+    searchInput.setAttribute('autocomplete', 'off');
+});
+
+function searchCommandes(searchTerm) {
+    // Envoyer la requête de recherche
+    // Ici, vous pouvez utiliser AJAX pour interroger le serveur et afficher les résultats de la recherche.
+    // Pour cet exemple, je vais simplement simuler une recherche réussie.
+    const searchResults = [
+        { nom: 'Exemple', date: '2024-04-01' },
+        { nom: 'Exemple', date: '2024-04-02' }
+    ];
+
+    if (searchResults.length === 0) {
+        displayErrorMessage('Aucune commande trouvée avec ces données.');
+    } else {
+        // Afficher les résultats de la recherche
+        displaySearchResults(searchResults);
+    }
+}
+
+function displaySearchResults(results) {
+    // Afficher les résultats de la recherche
+    // Vous pouvez les afficher dans une liste ou un tableau, par exemple.
+    // Pour cet exemple, je vais simplement les afficher dans la console.
+    console.log(results);
+}
+      $(document).ready(function() {
+        // Initialisez l'autocomplete personnalisé
+        $('#search-form input[data-autocomplete-url]').autocomplete({
+            source: function(request, response) {
+                $.getJSON($(this.element).data('autocomplete-url'), {
+                    q: request.term
+                }, response);
+            },
+            minLength: 2 // Nombre minimum de caractères pour déclencher l'autocomplete
+        });
+        
+        // Supprimer l'affichage de l'alerte HTML pour les champs vides
+        $('#search-form').submit(function() {
+            var inputValue = $('#search-form input').val();
+            if (inputValue === '') {
+                return false; // Empêcher la soumission du formulaire si le champ est vide
+            }
+        });
+    });
 </script>
+
+
+
+
+
 
 {% endblock %}
