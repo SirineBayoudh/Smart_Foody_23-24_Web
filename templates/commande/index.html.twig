@@ -98,6 +98,21 @@
         font-size: 14px;
         color: #666;
     }
+    .table-striped tbody tr:hover {
+        background-color: #bbddab; /* Couleur de fond au survol */
+        color: #fff; /* Couleur du texte au survol */
+    }
+    .thead-green {
+        background-color: #77bb58;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    .table-striped tbody tr:hover {
+        background-color: #bbddab; /* Couleur de fond au survol */
+        color: #fff; /* Couleur du texte au survol */
+    }
     .thead-green {
         background-color: #77bb58;
         color: white;
@@ -154,35 +169,41 @@
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <!-- Formulaire de recherche -->
-           <!-- Formulaire de recherche -->
-<div class="container mt-4">
-    {{ form_start(search_form, {'attr': {'class': 'form-inline', 'novalidate': 'novalidate'}}) }}
-        <div class="form-group">
-            {{ form_widget(search_form.search, {'attr': {'class': 'form-control mr-2'}}) }}
-            {% if form_errors(search_form.search) %}
-                <div class="alert alert-danger">{{ form_errors(search_form.search) }}</div>
-            {% endif %}
-        </div>
-        <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Search</button>
-    {{ form_end(search_form) }}
-</div> 
-
-
-
-
-
-
-        </div>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <!-- Formulaire de recherche -->
+        <form id="searchForm" action="{{ path('app_commandes_search') }}" method="GET">
+            <div class="input-group mb-3">
+                {{ form_widget(search_form.search, {'attr': {'class': 'form-control', 'placeholder': 'Rechercher maintenant (YYYY-MM-DD)', 'aria-label': 'search', 'aria-describedby': 'search', 'pattern': '\\d{4}-\\d{2}-\\d{2}', 'title': 'Veuillez saisir une date au format YYYY-MM-DD ou une chaîne de caractères valide.', 'id': 'navbar-search-input'}}) }}
+                <div class="input-group-append hover-cursor" id="navbar-search-icon">
+                    <span class="input-group-text" id="search" onclick="document.getElementById('searchForm').submit()">
+                        <i class="icon-search"></i>
+                    </span>
+                </div>
+            </div>
+            <div id="searchErrors" class="text-danger">
+                {% if form_errors(search_form.search) %}
+                    {{ form_errors(search_form.search) }}
+                {% endif %}
+            </div>
+        </form>
     </div>
+</div>
+
+
+
+
+
+
+
+
+    
 
     <div class="row">
         <div class="col-md-12" id="commandeTable">
             <div class="table-frame">
                 <div class="table-container">
-                    <table class="table table-hover">
+                    <table class="table table-striped">
                         <thead class="thead-success thead-green">
                             <tr>
                                 <th>Nom Client</th>
@@ -224,7 +245,7 @@
                     {{ knp_pagination_render(pagination, 'commande/pagination.html.twig') }}
                 </div>
             </div>
-            <a href="{{ path('commande_pdf_all') }}" class="btn btn-warning btn-icon-text" >PDF Toutes les Commandes</a>
+            <a href="{{ path('commande_pdf_all') }}" class="btn btn-warning btn-icon-text" ><i class="ti-printer"></i> Télécharger PDF</a>
         </div>
     </div>
 
@@ -281,8 +302,8 @@ function searchCommandes(searchTerm) {
     // Ici, vous pouvez utiliser AJAX pour interroger le serveur et afficher les résultats de la recherche.
     // Pour cet exemple, je vais simplement simuler une recherche réussie.
     const searchResults = [
-        { nom: 'Exemple', date: '2024-04-01' },
-        { nom: 'Exemple', date: '2024-04-02' }
+        { nom: 'Exemple exemple', date: '2024-04-01' },
+        { nom: 'Exemple exemple', date: '2024-04-02' }
     ];
 
     if (searchResults.length === 0) {
@@ -292,6 +313,15 @@ function searchCommandes(searchTerm) {
         displaySearchResults(searchResults);
     }
 }
+    document.getElementById('navbar-search-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Empêcher la soumission par défaut
+            document.getElementById('searchForm').submit();
+        }
+    });
+    document.getElementById('search').addEventListener('click', function () {
+        this.classList.add('btn-outline-success'); // Ajouter la classe pour rendre le bouton vert
+    });
 
 function displaySearchResults(results) {
     // Afficher les résultats de la recherche
