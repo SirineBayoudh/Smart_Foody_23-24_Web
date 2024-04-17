@@ -51,7 +51,7 @@ class StockController extends AbstractController
                 ->setParameter('date', new \DateTime())
                 ->getQuery(),
             $request->query->getInt('page', 1),
-            2
+            5
         );
         $futureStocks = $stockRepo->findFutureStocks();
 
@@ -110,6 +110,10 @@ class StockController extends AbstractController
         // Parcourez les stocks pour calculer et mettre à jour le coût pour chaque stock
         $this->calculerCoutStocks($stocks, $produits, $entityManager);
 
+        $totalStock = 0;
+        foreach ($stocks as $stock) {
+            $totalStock++; // Incrémentez la variable $totalStock à chaque itération
+        }
 
         // Flush toutes les entités persistées
         $entityManager->flush();
@@ -119,6 +123,7 @@ class StockController extends AbstractController
             'pagination' => $pagination,
             'stocks' => $stocks,
             'futureStocks' => $futureStocks,
+            'totalStock' => $totalStock,
         ]);
     }
 
@@ -153,14 +158,14 @@ class StockController extends AbstractController
     public function editstock(Request $req, ManagerRegistry $manager, $id, StockRepository $repo): Response
     {
         $j = $repo->find($id);
-        $form = $this->createFormBuilder($j)
-            ->add('nom', TextType::class, ['disabled' => true]) // Rend le champ 'nom' non éditable
-            // ->add('ref_produit', TextType::class, ['disabled' => true]) // Rend le champ 'ref_produit' non éditable
-            ->add('marque', TextType::class, ['disabled' => true]) // Rend le champ 'marque' non éditable
-            ->add('quantite') // Champ quantite reste éditable
-            ->add('date_arrivage') // Champ quantite reste éditable
+        $form = $this->createForm(AjouterStockType::class, $j);
+        // ->add('nom', TextType::class, ['disabled' => true]) // Rend le champ 'nom' non éditable
+        // // ->add('ref_produit', TextType::class, ['disabled' => true]) // Rend le champ 'ref_produit' non éditable
+        // ->add('marque', TextType::class, ['disabled' => true]) // Rend le champ 'marque' non éditable
+        // ->add('quantite') // Champ quantite reste éditable
+        // ->add('date_arrivage') // Champ quantite reste éditable
 
-            ->getForm();
+        // ->getForm();
         $form->handleRequest($req);
         $em = $manager->getManager();
         $emptySubmission = false;
@@ -246,10 +251,17 @@ class StockController extends AbstractController
 
 
     #[Route('/stock_venir', name: 'stock_venir')]
-    public function getFutureStocks(StockRepository $stockRepository,  PaginatorInterface $paginator, Request $request): Response
-    {
+    public function getFutureStocks(
+        StockRepository $stockRepository,
+        PaginatorInterface $paginator,
+        Request $request,
+        ProduitRepository $produitRepo,
+        EntityManagerInterface $entityManager
+    ): Response {
         // Récupérer les stocks à venir depuis le repository
         $futureStocks = $stockRepository->findFutureStocks();
+        $produits = $produitRepo->findAll();
+
         $queryBuilder = $stockRepository->createQueryBuilder('s');
 
         $pagination = $paginator->paginate(
@@ -266,43 +278,15 @@ class StockController extends AbstractController
                 $stock->setNbvendu(0);
             }
         }
+        $this->calculerCoutStocks($futureStocks, $produits, $entityManager);
+
         return $this->render('stock/future_stocks.html.twig', [
             'futureStocks' => $futureStocks,
             'pagination' => $pagination,
         ]);
     }
 
-    // #[Route('/afficher-calendrier', name: 'afficher_calendrier')]
-    // public function afficherCalendrier(StockRepository $stockRepo,  Request $request): Response
-    // {
-    //     $futureStocks = $stockRepo->findFutureStocks();
 
-    //     // Utilisez la méthode findExistantStocks avec ou sans terme de recherche
-    //     $searchTerm = $request->query->get('search');
-
-    //     // Utilisez la méthode findExistantStocks avec ou sans terme de recherche
-    //     $stocks = $stockRepo->findExistantStocks($searchTerm);
-    //     return $this->render('stock/calendar.html.twig', [
-    //         'stocks' => $stocks,
-    //         'futureStocks' => $futureStocks,
-    //     ]);
-    // }
-
-
-    // #[Route('/scatter-chart', name: 'scatter_chart')]
-    // public function scatterChart(StockRepository $stockRepository): Response
-    // {
-    //     // Récupérer les données depuis la base de données
-    //     $stocks = $stockRepository->findAll();
-
-    //     // Formater les données pour Twig
-    //     $dataForTwig = [
-    //         'stocks' => $stocks
-    //     ];
-
-    //     // Rendre le template avec les données
-    //     return $this->render('stock/index.html.twig', $dataForTwig);
-    // }
     #[Route('/update-stock-from-commande', name: 'update_stock_from_commande')]
     public function updateStockFromCommande(EntityManagerInterface $entityManager): Response
     {
@@ -437,6 +421,17 @@ class StockController extends AbstractController
             'stocks' => $stocks,
             'searchQuery' => $searchQuery,
             'pagination' => $pagination,
+        ]);
+    }
+
+    #[Route('/stat_stock', name: 'statistiques')]
+    public function afficherStatistique(StockRepository $stockRepository): Response
+    {
+        // Récupérer les stocks depuis le repository
+        $stocks = $stockRepository->findAll(); // Par exemple, récupérer tous les stocks
+
+        return $this->render('stock/statistiques.html.twig', [
+            'stocks' => $stocks, // Transmettre les stocks au modèle Twig
         ]);
     }
 }

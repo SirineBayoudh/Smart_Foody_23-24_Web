@@ -1,8 +1,6 @@
 {% extends 'base_back.html.twig' %}
 
     {% block body %}
-        {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.css" integrity="sha256-uq9PNlMzB+1h01Ij9cx7zeE2OR2pLAfRw3uUUOOPKdA=" crossorigin="anonymous">
-         #}
          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.css">
          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
         <div class="col-12 grid-margin stretch-card">
@@ -110,40 +108,7 @@
     </div> <!-- Fermeture de la div col-12 -->
     </div> <!-- Fermeture de la div content-wrapper -->
     
-    {# <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.1/main.min.js"></script> #}
-   
-   {# <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            selectable: true,
-            select: function(info) {
-                var selectedDate = info.startStr;
-                document.getElementById('date_arrivage').value = selectedDate;
-                calendarEl.style.display = 'none'; // Hide the calendar after selection
-            }
-        });
-    
-        // Show calendar when date input is clicked
-        document.getElementById('date_arrivage').addEventListener('click', function() {
-            calendarEl.style.display = 'block';
-            calendar.render(); // Render the calendar when it's displayed
-        });
-    
-        // Hide calendar when clicking outside of it
-        document.addEventListener('click', function(event) {
-            var targetElement = event.target; // Clicked element
-    
-            // Check if the clicked element is not the calendar or the date_arrivage input
-            if (targetElement.id !== 'calendar' && targetElement.id !== 'date_arrivage') {
-                calendarEl.style.display = 'none'; // Hide the calendar
-            }
-        });
-    
-        calendar.render();
-    });
-    </script> #}
+=
     <script>
         // Sélectionnez l'élément d'entrée de fichier
         const fileInput = document.getElementById('fileInput');
@@ -191,7 +156,7 @@
             });
         });
     </script>
-    
+
 {% endblock %}
 
    

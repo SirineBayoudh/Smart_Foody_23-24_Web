@@ -1,0 +1,153 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}Statistiques des Stocks{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="barChart" width="300" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <canvas id="areaChart" width="800" height="520"></canvas>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Récupération des données depuis Twig
+        const dataFromTwig = {
+            stocks: [
+                {% for stock in stocks %}
+                    {
+                        id: {{ stock.id_s }},
+                        nom: "{{ stock.nom }}",
+                        nbvendu: {{ stock.nbvendu }}
+                    },
+                {% endfor %}
+            ]
+        };
+        
+        // Générer des couleurs aléatoires pour chaque barre
+        function generateRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgba(${r}, ${g}, ${b}, 0.5)`;
+        }
+
+        // Créer un tableau de couleurs aléatoires pour chaque barre
+        const colors = Array.from({ length: dataFromTwig.stocks.length }, () => generateRandomColor());
+
+        // Création du bar chart
+        var ctx = document.getElementById('barChart').getContext('2d');
+        var barChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dataFromTwig.stocks.map(stock => stock.nom), // Utiliser les noms des stocks comme étiquettes sur l'axe x
+                datasets: [{
+                    label: 'Nombre vendu',
+                    data: dataFromTwig.stocks.map(stock => stock.nbvendu), // Utiliser les nombres vendus comme valeurs sur l'axe y
+                    backgroundColor: colors, // Utiliser les couleurs aléatoires générées
+                    borderColor: 'rgba(255,255,255,1)',
+                    borderWidth: 1 // Épaisseur de la bordure
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Stock' // Titre de l'axe des abscisses
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Nombre vendu par stock'
+                        },
+                        ticks: {
+                            stepSize: 10 // Définir l'intervalle de 10 sur l'axe y
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Nombre vendus par stock', // Titre du graphique à barres
+                    font: {
+                        size: 18 // Taille de la police du titre
+                    }
+                }
+            }
+        });
+    });
+    
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Récupération des données depuis Twig
+        const dataFromTwig = {
+            stocks: [
+                {% for stock in stocks %}
+                    {
+                        nom: "{{ stock.nom }}",
+                        quantite: {{ stock.quantite }}
+                    },
+                {% endfor %}
+            ]
+        };
+
+        // Création des étiquettes et des données pour le graphique en aires
+        const labels = dataFromTwig.stocks.map(stock => stock.nom);
+        const data = dataFromTwig.stocks.map(stock => stock.quantite);
+
+        // Création du graphique en aires
+        var ctx = document.getElementById('areaChart').getContext('2d');
+        var areaChart = new Chart(ctx, {
+            type: 'line', // Utiliser un graphique en ligne pour un graphique en aires
+            data: {
+                labels: labels, // Utiliser les noms des stocks comme étiquettes sur l'axe x
+                datasets: [{
+                    label: 'Quantité par stock',
+                    data: data, // Utiliser les quantités des stocks comme données sur l'axe y
+                    fill: true, // Remplir l'aire sous la courbe
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Couleur de fond de l'aire
+                    borderColor: 'rgba(75, 192, 192, 1)', // Couleur de la ligne
+                    borderWidth: 1 // Épaisseur de la ligne
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Stock' // Titre de l'axe des abscisses
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Quantité' // Titre de l'axe des ordonnées
+                        },
+                        ticks: {
+                            stepSize: 10 // Définir l'intervalle de 10 sur l'axe y
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Quantité par stock', // Titre du graphique en aires
+                    font: {
+                        size: 18 // Taille de la police du titre
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

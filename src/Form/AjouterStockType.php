@@ -30,8 +30,7 @@ class AjouterStockType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $marques = $this->produitRepository->findAllDistinctMarques(); // Récupérer les marques distinctes depuis StockRepository
-        var_dump($marques);
+        $marques = $this->produitRepository->findAllDistinctMarques();
         $builder
             ->add('nom')
             ->add('ref_produit')

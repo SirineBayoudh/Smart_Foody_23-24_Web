@@ -1,6 +1,32 @@
 {% extends 'base_back.html.twig' %}
 
     {% block body %}
+        <style>
+            .thead-green {
+                background-color: #77bb58;
+                color: white;
+                position: sticky;
+                top: 0;
+                width: 50px;
+                z-index: 1;
+            }
+            .table-striped tbody tr:hover {
+            background-color: #bbddab; /* Couleur de fond au survol */
+            color: #fff; /* Couleur du texte au survol */
+        }
+        .btn {
+            /* Styles normaux des boutons */
+            background-color: #56ab2f;
+            border-color: #56ab2f;
+            color: #ffffff; /* Couleur du texte */
+            transition: background-color 0.3s; /* Transition fluide pour la couleur de fond */
+        }
+    
+        /* Styles pour les boutons lorsqu'ils sont survolés */
+        .btn:hover {
+            background-color: #72c22f; /* Nouvelle couleur de fond */
+        }
+        </style>
         <div class="col-lg-20 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
@@ -15,16 +41,16 @@
                         </a>
                     </div>
                 </div> #}
-                <div class="col-md-12" style="margin-left: 590px;">
+                <div class="col-md-12" style="margin-left: 500px;">
                     <div class="card-body" style="text-align: center;">
                         <button type="button" id="showCalendarButton" class="btn btn-primary">Afficher Calendrier</button>
                     </div>
                 </div>
-                <div class="table-responsive">
-                  <table class="table table-hover" style="margin:auto">
-                    <thead>
+                <div class="table-responsive" style="margin-top: 60px;margin-right:120px;">
+                    <table class="table table-hover table-striped" style="margin:auto">
+                    <thead class="thead-success thead-green">
                       <tr> 
-                        <tr>
+                        <tr >
                             <th>Nom du stock</th>
                             <th>Marque</th>
                             <th>Quantités</th>
@@ -36,7 +62,7 @@
                                 <th>Date d'Arrivage </th>
                             {% endif %}
                             <th>Image</th>
-                            <th>Actions</th>
+                            <th colspan="3"> Actions</th>
                         </tr>
                       </tr>
                     </thead>
@@ -74,9 +100,9 @@
                     </tbody>
                   </table>
                 </div>
-                <td>
+                <td  >
                     <a href="{{ path('export_pdffuture') }}" class="export-btn">
-                        <button type="button" class="btn btn-secondary">Export PDF</button>
+                        <button type="button" class="btn btn-secondary" style="margin-top: 200px;">Export PDF</button>
                     </a>
         </td>
                 <div class="d-flex justify-content-center">

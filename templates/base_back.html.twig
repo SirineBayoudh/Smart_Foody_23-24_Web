@@ -21,6 +21,44 @@
   <link rel="stylesheet" href="{{asset('css/vertical-layout-light/style.css')}}">
   <!-- endinject -->
   <link rel="shortcut icon" href="../../images/trans_logo.png"/>
+  <style>
+			#sidebar .nav-item .nav-link:hover {
+				background-color: #77bb58;
+			}
+
+			#test:visited {
+				color: green; background-color: #77bb58;
+			}
+      /* #stocksItem a:visited .menu-title, #alertesItem a:visited .menu-title {
+    background-color: #77bb58;
+    color: green;
+} */
+#stocksItem.active .nav-link,
+#stocksItem.active .menu-title {
+    background-color: #77bb58;
+    color: white;
+}
+#alertesItem.active .nav-link,
+#alertesItem.active .menu-title {
+    background-color: #77bb58;
+    color: white;
+}
+#authItem.active .nav-link,
+#authItem.active .menu-title {
+    background-color: #77bb58;
+    color: white;
+}
+#sidebar .nav-item {
+    background-color: #ffffff;
+}
+#produitItem.active .nav-link,
+#produitItem.active .menu-title {
+    background-color: #77bb58;
+    color: white;
+}
+
+
+		</style>
 </head>
 <body>
   <div class="container-scroller">
@@ -296,7 +334,7 @@
       </div>
       <!-- partial -->
       <!-- partial:partials/_sidebar.html -->
-      <nav class="sidebar sidebar-offcanvas" id="sidebar" style="color: green; background-color: #77bb58;">
+      <nav class="sidebar sidebar-offcanvas" id="sidebar" >
         <ul class="nav">
           <li class="nav-item">
             <a class="nav-link" href="index.html">
@@ -304,72 +342,106 @@
               <span class="menu-title">Dashboard</span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-              <i class="icon-layout menu-icon"></i>
-              <span class="menu-title">UI Elements</span>
+          {# <li class="nav-item" >
+            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth" id="test">
+              <i class="icon-head menu-icon"></i>
+              <span class="menu-title" >Utilisateur</span>
               <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="ui-basic">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="pages/ui-features/buttons.html">Buttons</a></li>
-                <li class="nav-item"> <a class="nav-link" href="pages/ui-features/dropdowns.html">Dropdowns</a></li>
-                <li class="nav-item"> <a class="nav-link" href="pages/ui-features/typography.html">Typography</a></li>
+            <div class="collapse" id="auth">
+              <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
+                <li class="nav-item">
+                  <a class="nav-link" href="listUsers">
+                    Liste
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="statUsers">
+                    Statistiques
+                  </a>
+                </li>
               </ul>
             </div>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
-              <i class="icon-columns menu-icon"></i>
-              <span class="menu-title">Form elements</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="form-elements">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="pages/forms/basic_elements.html">Basic Elements</a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
-              <i class="icon-bar-graph menu-icon"></i>
-              <span class="menu-title">Stocks</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="charts">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="pages/charts/chartjs.html">stock existant</a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item" >
-            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables" style="color: green; background-color: #77bb58;">
-                <i class="icon-grid-2 menu-icon"></i>
-                <span class="menu-title" style="color: white;">Stocks</span>
-                <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="tables">
-                <ul class="nav flex-column sub-menu"style="color: green; background-color: #77bb58;">
-                    <li class="nav-item"> <a class="nav-link" href="/stock">stock existant</a></li>
-                </ul>
-                <ul class="nav flex-column sub-menu"style="color: green; background-color: #77bb58;">
-                    <li class="nav-item"> <a class="nav-link" href="/stock_venir">Stock en arrivage</a></li>
-                </ul>
-            </div>
-        </li>
+      #}
+      <li class="nav-item" id="authItem">
+    <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+        <i class="icon-head menu-icon"></i>
+        <span class="menu-title">Utilisateur</span>
+        <i class="menu-arrow"></i>
+    </a>
+    <div class="collapse" id="auth">
+        <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
+            <li class="nav-item">
+                <a class="nav-link" href="listUsers">Liste</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="statUsers">Statistiques</a>
+            </li>
+        </ul>
+    </div>
+</li>
+<li class="nav-item" id="produitItem">
+  <a class="nav-link" data-toggle="collapse" href="#produit" aria-expanded="false" aria-controls="produit" > 
+    <i class="icon-grid-2 menu-icon"></i> 
+    <span class="menu-title" >Gestion produit</span> 
+    <i class="menu-arrow"></i> 
+  </a> 
+  <div class="collapse" id="produit"> 
+    <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;"> 
+      <li class="nav-item"> 
+        <a class="nav-link" href="/objectif/all">Objectif</a>
+      </li> 
+    </ul> 
+    <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;"> 
+      <li class="nav-item"> <a class="nav-link" href="/product/all">Produit</a></li> 
+  
+    </ul> 
+  </div> 
+</li>     
 
+
+      <li class="nav-item" id="stocksItem">
+    <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+        <i class="icon-grid-2 menu-icon"></i>
+        <span class="menu-title">Stocks</span>
+        <i class="menu-arrow"></i>
+    </a> 
+    <div class="collapse" id="tables">
+        <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
+            <li class="nav-item">
+                <a class="nav-link" href="/stock">stock existant</a>
+            </li>
+        </ul>
+        <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
+            <li class="nav-item">
+                <a class="nav-link" href="/stock_venir">Stock en arrivage</a>
+            </li>
+        </ul>
+        <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
           <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons" style="color: White; background-color: #77bb58;">
-              <i class="icon-contract menu-icon"></i>
-              <span class="menu-title">Alertes</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="icons">
-              <ul class="nav flex-column sub-menu"style="color: green; background-color: #77bb58;">
-                <li class="nav-item"> <a class="nav-link" href="/alerte" >alertes</a></li>
-              </ul>
-            </div>
+              <a class="nav-link" href="/stat_stock">Statistiques</a>
           </li>
+      </ul>
+    </div>
+</li>
+
+<li class="nav-item" id="alertesItem">
+    <a class="nav-link" data-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
+        <i class="icon-contract menu-icon"></i>
+        <span class="menu-title">Alertes</span>
+        <i class="menu-arrow"></i>
+    </a>
+    <div class="collapse" id="icons">
+        <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
+            <li class="nav-item">
+                <a class="nav-link" href="/alerte">alertes</a>
+            </li>
+        </ul>
+    </div>
+</li>
+
+{#           
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
               <i class="icon-head menu-icon"></i>
@@ -401,8 +473,8 @@
               <i class="icon-paper menu-icon"></i>
               <span class="menu-title">Documentation</span>
             </a>
-          </li>
-        </ul>
+          </li> #}
+        </ul> 
       </nav>
       <!-- partial -->
       {% block body %}
@@ -1095,30 +1167,91 @@
   <script src="{{asset('js/dashboard.js')}}"></script>
   <script src="{{asset('js/Chart.roundedBarCharts.js')}}"></script>
   <!-- End custom js for this page-->
-</body>
+  <script>
+    // Fonction pour activer le lien "Stocks"
+    function activateStocksLink() {
+        $('.nav-item').removeClass('active');
+        $('#stocksItem').addClass('active');
+    }
 
-</html>
+    // Fonction pour activer le lien "Alertes"
+    function activateAlertesLink() {
+        $('.nav-item').removeClass('active');
+        $('#alertesItem').addClass('active');
+    }
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const currentPage = window.location.pathname;
+    // Fonction pour activer le lien "Produit"
+    function activateProduitLink() {
+        $('.nav-item').removeClass('active');
+        $('#produitItem').addClass('active');
+    }
 
-        // Vérifier si la page actuelle correspond à /stock ou /stock_venir
-        if (currentPage.includes('/stock') || currentPage.includes('/stock_venir')) {
-            const stockLink = document.querySelector('.nav-link[href="#tables"]');
-            const stockTitle = document.querySelector('.nav-link[href="#tables"] .menu-title');
+    // Fonction pour activer le lien "Utilisateur"
+    function activateAuthLink() {
+        $('.nav-item').removeClass('active');
+        $('#authItem').addClass('active');
+    }
 
-            stockTitle.style.fontWeight = 'bold';
-            stockTitle.style.fontSize = '30px';
+    // Fonction pour vérifier et sauvegarder l'état actif du lien dans localStorage
+    function saveActiveLinkState() {
+        if ($('#stocksItem').hasClass('active')) {
+            localStorage.setItem('activeLink', 'stocks');
+        } else if ($('#alertesItem').hasClass('active')) {
+            localStorage.setItem('activeLink', 'alertes');
+        } else if ($('#produitItem').hasClass('active')) {
+            localStorage.setItem('activeLink', 'produit');
+        } else if ($('#authItem').hasClass('active')) {
+            localStorage.setItem('activeLink', 'auth');
+        } else {
+            localStorage.removeItem('activeLink');
         }
+    }
 
-        // Vérifier si la page actuelle correspond à /alerte
-        if (currentPage.includes('/alerte')) {
-            const alertesLink = document.querySelector('.nav-link[href="#icons"]');
-            const alertesTitle = document.querySelector('.nav-link[href="#icons"] .menu-title');
-
-            alertesTitle.style.fontWeight = 'bold';
-            alertesTitle.style.fontSize = '30px';
+    // Fonction pour restaurer l'état actif du lien depuis localStorage
+    function restoreActiveLinkState() {
+        var activeLink = localStorage.getItem('activeLink');
+        if (activeLink === 'stocks') {
+            activateStocksLink();
+        } else if (activeLink === 'alertes') {
+            activateAlertesLink();
+        } else if (activeLink === 'produit') {
+            activateProduitLink();
+        } else if (activeLink === 'auth') {
+            activateAuthLink();
         }
+    }
+
+    // Exécuter la fonction de restauration lors du chargement de la page
+    $(document).ready(function() {
+        restoreActiveLinkState();
+    });
+
+    // Gérer le clic sur les liens "Stocks", "Alertes", "Produit" et "Utilisateur"
+    $('#stocksItem, #alertesItem, #produitItem, #authItem').click(function() {
+        if ($(this).attr('id') === 'stocksItem') {
+            activateStocksLink();
+        } else if ($(this).attr('id') === 'alertesItem') {
+            activateAlertesLink();
+        } else if ($(this).attr('id') === 'produitItem') {
+            activateProduitLink();
+        } else if ($(this).attr('id') === 'authItem') {
+            activateAuthLink();
+        }
+        saveActiveLinkState();
     });
 </script>
+
+
+</body>
+
+
+</html>
+{# <script>
+$(document).ready(function() {
+    $('.nav-link').click(function() {
+        $('.nav-item').removeClass('active');
+        $(this).closest('.nav-item').addClass('active');
+    });
+});
+</script> #}
+

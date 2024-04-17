@@ -63,15 +63,8 @@ class StockRepository extends ServiceEntityRepository
             ->distinct()
             ->getQuery()
             ->getResult();
-        var_dump($marques);
-        // Formater les résultats pour avoir un tableau associatif
-        $formattedMarques = [];
-        foreach ($marques as $marque) {
-            $formattedMarques[$marque['marque']] = $marque['marque'];
-        }
 
-        return $formattedMarques;
-        var_dump($formattedMarques);
+        return $marques;
     }
 
     public function findFutureStocks(): array
