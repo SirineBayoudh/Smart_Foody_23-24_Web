@@ -56,8 +56,16 @@
     background-color: #77bb58;
     color: white;
 }
-
-
+#conseilsItem.active .nav-link,
+#conseilsItem.active .menu-title {
+    background-color: #77bb58;
+    color: white
+}
+#commandeItem.active .nav-link,
+#commandeItem.active .menu-title {
+    background-color: #77bb58;
+    color: white
+}
 		</style>
 </head>
 <body>
@@ -441,39 +449,44 @@
     </div>
 </li>
 
-{#           
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-              <i class="icon-head menu-icon"></i>
-              <span class="menu-title">User Pages</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="auth">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
-                <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error">
-              <i class="icon-ban menu-icon"></i>
-              <span class="menu-title">Error pages</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="error">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html"> 404 </a></li>
-                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> 500 </a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="pages/documentation/documentation.html">
-              <i class="icon-paper menu-icon"></i>
-              <span class="menu-title">Documentation</span>
-            </a>
-          </li> #}
+
+<li class="nav-item" id="conseilsItem">
+  <a class="nav-link" data-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error" > 
+    <i class="icon-grid-2 menu-icon"></i> 
+    <span class="menu-title" >Conseils</span> 
+    <i class="menu-arrow"></i> 
+  </a> 
+  <div class="collapse" id="error"> 
+    <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;"> 
+      <li class="nav-item"> 
+        <a class="nav-link" href="/conseil_listDB">Conseils</a>
+      </li> 
+    </ul> 
+    <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;"> 
+      <li class="nav-item"> <a class="nav-link" href="/chat_listDB">FAQ</a></li> 
+  
+    </ul> 
+  </div> 
+</li>     
+<li class="nav-item" id="commandeItem">
+  <a class="nav-link" data-toggle="collapse" href="#commandeMenu" aria-expanded="false" aria-controls="commandeMenu" > 
+    <i class="icon-grid-2 menu-icon"></i> 
+    <span class="menu-title" >Commandes</span> 
+    <i class="menu-arrow"></i> 
+  </a> 
+  <div class="collapse" id="commandeMenu"> 
+    <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;"> 
+      <li class="nav-item"> 
+        <a class="nav-link" href="/app_commandes">Voir Commandes</a>
+      </li> 
+    </ul> 
+    <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;"> 
+      <li class="nav-item"> <a class="nav-link" href="/statistiques">Statistiques</a></li> 
+  
+    </ul> 
+  </div> 
+</li>    
+
         </ul> 
       </nav>
       <!-- partial -->
@@ -1168,6 +1181,12 @@
   <script src="{{asset('js/Chart.roundedBarCharts.js')}}"></script>
   <!-- End custom js for this page-->
   <script>
+    // Fonction pour activer le lien "Conseils"
+    function activateConseilsLink() {
+        $('.nav-item').removeClass('active');
+        $('#conseilsItem').addClass('active');
+    }
+
     // Fonction pour activer le lien "Stocks"
     function activateStocksLink() {
         $('.nav-item').removeClass('active');
@@ -1192,6 +1211,12 @@
         $('#authItem').addClass('active');
     }
 
+    // Fonction pour activer le lien "Commandes"
+    function activateCommandeLink() {
+        $('.nav-item').removeClass('active');
+        $('#commandeItem').addClass('active');
+    }
+
     // Fonction pour vérifier et sauvegarder l'état actif du lien dans localStorage
     function saveActiveLinkState() {
         if ($('#stocksItem').hasClass('active')) {
@@ -1202,6 +1227,10 @@
             localStorage.setItem('activeLink', 'produit');
         } else if ($('#authItem').hasClass('active')) {
             localStorage.setItem('activeLink', 'auth');
+        } else if ($('#conseilsItem').hasClass('active')) {
+            localStorage.setItem('activeLink', 'conseils');
+        } else if ($('#commandeItem').hasClass('active')) {
+            localStorage.setItem('activeLink', 'commandes');
         } else {
             localStorage.removeItem('activeLink');
         }
@@ -1218,6 +1247,10 @@
             activateProduitLink();
         } else if (activeLink === 'auth') {
             activateAuthLink();
+        } else if (activeLink === 'conseils') {
+            activateConseilsLink();
+        } else if (activeLink === 'commandes') {
+            activateCommandeLink();
         }
     }
 
@@ -1226,8 +1259,8 @@
         restoreActiveLinkState();
     });
 
-    // Gérer le clic sur les liens "Stocks", "Alertes", "Produit" et "Utilisateur"
-    $('#stocksItem, #alertesItem, #produitItem, #authItem').click(function() {
+    // Gérer le clic sur les liens "Stocks", "Alertes", "Produit", "Utilisateur", "Conseils" et "Commandes"
+    $('#stocksItem, #alertesItem, #produitItem, #authItem, #conseilsItem, #commandeItem').click(function() {
         if ($(this).attr('id') === 'stocksItem') {
             activateStocksLink();
         } else if ($(this).attr('id') === 'alertesItem') {
@@ -1236,6 +1269,10 @@
             activateProduitLink();
         } else if ($(this).attr('id') === 'authItem') {
             activateAuthLink();
+        } else if ($(this).attr('id') === 'conseilsItem') {
+            activateConseilsLink();
+        } else if ($(this).attr('id') === 'commandeItem') {
+            activateCommandeLink();
         }
         saveActiveLinkState();
     });

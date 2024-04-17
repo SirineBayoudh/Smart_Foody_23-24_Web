@@ -269,8 +269,13 @@ class StockController extends AbstractController
                 ->setParameter('date', new \DateTime())
                 ->getQuery(),
             $request->query->getInt('page', 1),
-            10
+            5
         );
+        $totalStock = 0;
+        foreach ($futureStocks as $stock) {
+            $totalStock++; // Incrémentez la variable $totalStock à chaque itération
+        }
+
         foreach ($futureStocks as $stock) {
             // Vérifiez si nbVendu est nul
             if ($stock->getNbvendu() === null) {
@@ -283,6 +288,7 @@ class StockController extends AbstractController
         return $this->render('stock/future_stocks.html.twig', [
             'futureStocks' => $futureStocks,
             'pagination' => $pagination,
+            'totalStock' => $totalStock,
         ]);
     }
 

@@ -2,45 +2,77 @@
 
     {% block body %}
         <style>
-            .thead-green {
-                background-color: #77bb58;
-                color: white;
-                position: sticky;
-                top: 0;
-                width: 50px;
-                z-index: 1;
-            }
-            .table-striped tbody tr:hover {
-            background-color: #bbddab; /* Couleur de fond au survol */
-            color: #fff; /* Couleur du texte au survol */
+        .thead-green {
+            background-color: #77bb58;
+            color: white;
+            position: sticky;
+            top: 0;
+            width: 50px;
+            z-index: 1;
         }
-        .btn {
-            /* Styles normaux des boutons */
-            background-color: #56ab2f;
-            border-color: #56ab2f;
-            color: #ffffff; /* Couleur du texte */
-            transition: background-color 0.3s; /* Transition fluide pour la couleur de fond */
-        }
-    
-        /* Styles pour les boutons lorsqu'ils sont survolés */
-        .btn:hover {
-            background-color: #72c22f; /* Nouvelle couleur de fond */
-        }
-        </style>
+        .table-striped tbody tr:hover {
+        background-color: #bbddab; /* Couleur de fond au survol */
+        color: #fff; /* Couleur du texte au survol */
+    }
+    .btn {
+        /* Styles normaux des boutons */
+        background-color: #56ab2f;
+        border-color: #56ab2f;
+        color: #ffffff; /* Couleur du texte */
+        transition: background-color 0.3s; /* Transition fluide pour la couleur de fond */
+    }
+
+    /* Styles pour les boutons lorsqu'ils sont survolés */
+    .btn:hover {
+        background-color: #72c22f; /* Nouvelle couleur de fond */
+    }
+     .card-title {
+        font-size: 18px;
+        color: white  ;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .card-clickable:hover {
+        transform: scale(1.05);
+    }
+    .card-clickable {
+        cursor: pointer;
+        transition: transform 0.2s;
+        height: 160px;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+</style>
         <div class="col-lg-20 grid-margin stretch-card">
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title"> Table Stock En arrivage</h4>
-                {# <div class="row mb-4">
-                    <div class="col text-right mb-4">
-                        <a id="addButton" href="{{ path('app_ajouter_stock') }}?mode=ajouter"class="btn btn-primary hover-effect" style="background-color: #56ab2f; border-color: #56ab2f;" 
-                           onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
-                           onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
-                            <i class="ti-plus"></i>
-                            Ajouter un stock
-                        </a>
+                <div class="row">
+                    <div class="col-md-3 mb-4 stretch-card card-clickable" onclick="window.location.href='{{ path('statistiques') }}'">
+                        <div class="card card-tale"style="background: linear-gradient(to right, #77bb58, #558e3a) !important;"
+                        >
+                            <p class="card-title " style="  font-size: 18px;
+                            color: white ;
+                            font-weight: 600;
+                            margin-bottom: 10px;
+                            text-align:center;margin-top:70px">Afficher les Statistiques</p>
+                            <p class="card-count"></p>
+                        </div>
                     </div>
-                </div> #}
+                    <div class="col-md-3 mb-4 stretch-card card-clickable" onclick="window.location.href='{{ path('stock_venir') }}'">
+                        <div class="card card-light-danger" style="background: linear-gradient(to right, #77bb58, #558e3a) !important;">
+                            <p class="card-title"style="  font-size: 18px;
+                            color: white ;
+                            font-weight: 600;
+                            margin-bottom: 10px;
+                            text-align:center;margin-top:70px">Total du Stock existant : {{ totalStock }}</p>
+                        
+                        
+                        </div>
+                    </div>
+                    
+                        </div>
                 <div class="col-md-12" style="margin-left: 500px;">
                     <div class="card-body" style="text-align: center;">
                         <button type="button" id="showCalendarButton" class="btn btn-primary">Afficher Calendrier</button>
@@ -100,15 +132,16 @@
                     </tbody>
                   </table>
                 </div>
+       <br><br>
+                <div class="d-flex justify-content-center">
+                    {% do pagination.setPageRange(2) %}
+                    {{ knp_pagination_render(pagination, 'pagination.html.twig') }}
+                </div>
                 <td  >
                     <a href="{{ path('export_pdffuture') }}" class="export-btn">
                         <button type="button" class="btn btn-secondary" style="margin-top: 200px;">Export PDF</button>
                     </a>
         </td>
-                <div class="d-flex justify-content-center">
-                    {% do pagination.setPageRange(2) %}
-                    {{ knp_pagination_render(pagination, 'pagination.html.twig') }}
-                </div>
                 {# <div class="col-md-12" style="margin-top: 70px;">
                     <div class="card-body" style="text-align: center;">
                         <a href="{{ path('app_ajouter_stock') }}?mode=ajouter"> <button type="button" id="addButton" class="btn btn-success" >Ajouter</button></a>
@@ -123,7 +156,6 @@
           </div>
       
 
-    
     {% for flash_message in app.session.flashbag.get('danger') %}
         <div class="alert alert-danger" role="alert">
             {{ flash_message }}
