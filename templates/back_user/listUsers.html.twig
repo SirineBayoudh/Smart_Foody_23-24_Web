@@ -20,7 +20,7 @@
 		.cards-container {
 			display: flex;
 			gap: 20px; /* Espacement entre les cartes */
-			margin-left: 400px;
+			margin-left: 155px;
 		}
 
 		.card2 {
@@ -78,29 +78,47 @@
 			position: absolute;
 			z-index: 999;
 		}
+
+		#icon {
+			color:white;
+		}
+
+		#filtre {
+			color:white;
+		}
+		
 	</style>
 
 	<div class="col-lg-10 grid-margin stretch-card">
 		<div class="card">
 			<div class="anchor-pane">
-				<div class="col-lg-2">
-					<form action="{{ path('usersList') }}" method="GET">
-						<select name="role" class="form-control" onchange="this.form.submit()">
-							<option value="">Tous</option>
-							<option value="Client">Client</option>
-							<option value="Conseiller">Conseiller</option>
-						</select>
-					</form>
-				</div>
-				<a href="{{ path('export_pdf') }}" class="export-btn">
-					<button type="button" class="btn btn-secondary">Export PDF</button>
-				</a>
+
 				{% for flash_message in app.flashes('success') %}
 					<div class="alert alert-success" id="successMessage" role="alert">
 						{{ flash_message }}
 					</div>
 				{% endfor %}
 
+				<div class="col-lg-2" style="margin-top:150px;">
+					<form action="{{ path('usersList') }}" method="GET">
+						<select name="role" class="form-control" onchange="this.form.submit()" style="background-color:#aad597" id="filtre">
+							<option value="">Tous</option>
+							<option value="Client">Client</option>
+							<option value="Conseiller">Conseiller</option>
+						</select>
+					</form>
+				</div>
+
+				<form method="get" action="{{ path('user_search') }}" style="margin-top:150px;">
+					<div class="input-group mb-3" style="width:200px;">
+						<input type="text" class="form-control" name="q" id="searchInput" placeholder="Rechercher" aria-label="Rechercher" aria-describedby="search" value="{{ searchQuery ?? '' }}">
+						<div class="input-group-append hover-cursor" id="navbar-search-icon" >
+							<button class="btn btn-outline-secondary" type="submit" style="background-color:#aad597">
+								<i class="icon-search" id="icon"></i>
+							</button>
+						</div>
+					</div>
+				</form>
 
 				<script>
 					// Masquer l'alerte après 5 secondes
@@ -235,12 +253,28 @@ document.getElementById('successMessage').style.display = 'none';
 											{{ user.poids }}
 										</td>
 										<td>
-											<a href="{{ path('conseiller_update', {'id': user.idUtilisateur}) }}" class="btn btn-warning btn-sm">
-												<i class="ti-pencil menu-icon"></i>
-											</a>
-											<a class="btn btn-danger btn-sm" onclick="confirmSuppression('{{ path('conseiller_delete', {'id': user.idUtilisateur}) }}')">
-												<i class="icon-trash menu-icon"></i>
-											</a>
+											{% if user.role == 'Client' %}
+												<button href="{{ path('conseiller_update', {'id': user.idUtilisateur}) }}" class="btn btn-warning btn-sm" disabled>
+													<i class="ti-pencil menu-icon"></i>
+												</button>
+											{% endif %}
+											{% if user.role == 'Conseiller' %}
+												<a href="{{ path('conseiller_update', {'id': user.idUtilisateur}) }}" class="btn btn-warning btn-sm">
+													<i class="ti-pencil menu-icon"></i>
+												</a>
+											{% endif %}
+
+											{% if user.role == 'Client' %}
+												<button class="btn btn-danger btn-sm" onclick="confirmSuppression('{{ path('conseiller_delete', {'id': user.idUtilisateur}) }}')" disabled>
+													<i class="icon-trash menu-icon"></i>
+												</button>
+											{% endif %}
+											{% if user.role == 'Conseiller' %}
+												<a class="btn btn-danger btn-sm" onclick="confirmSuppression('{{ path('conseiller_delete', {'id': user.idUtilisateur}) }}')">
+													<i class="icon-trash menu-icon"></i>
+												</a>
+											{% endif %}
+
 										</td>
 									</tr>
 								{% endfor %}
@@ -278,5 +312,36 @@ window.location.href = url;
 }
 	</script>
 
+	<script>
+		// Fonction pour filtrer les résultats du tableau en fonction de la saisie de l'utilisateur
+function filterTable() {
+var input,
+filter,
+table,
+tr,
+td,
+i,
+txtValue;
+input = document.getElementById("searchInput");
+filter = input.value.toUpperCase();
+table = document.getElementById("userTable");
+tr = table.getElementsByTagName("tr");
+
+for (i = 0; i < tr.length; i++) {
+td = tr[i].getElementsByTagName("td")[1]; // Modifier l'index en fonction de la colonne que vous souhaitez rechercher
+if (td) {
+txtValue = td.textContent || td.innerText;
+if (txtValue.toUpperCase().indexOf(filter) > -1) {
+tr[i].style.display = "";
+} else {
+tr[i].style.display = "none";
+}
+}
+}
+}
+
+// Ajoutez un écouteur d'événements pour déclencher la recherche à chaque fois que l'utilisateur tape quelque chose dans la barre de recherche
+document.getElementById("searchInput").addEventListener("keyup", filterTable);
+	</script>
 
 {% endblock %}

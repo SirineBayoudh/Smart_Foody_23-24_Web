@@ -16,12 +16,20 @@
 		<link
 		rel="stylesheet" href="../../css/vertical-layout-light/style.css"> <!-- endinject -->
 		<link rel="shortcut icon" href="../../images/trans_logo.png"/>
+
+		<style>
+			.inscri:hover {
+				text-decoration: none;
+			}
+		</style>
 	</head>
 	<body>
 		<div>
 			<div>
 				{% if error %}
-				<h1> error </h1>
+					<div class="alert alert-danger" role="alert">
+						Email ou mot de passe incorrect!
+					</div>
 				{% endif %}
 				{% if app.user %}
 					<div class="mb-3">
@@ -40,10 +48,10 @@
 											<img src="../../images/trans_logo.png" alt="logo">
 										</div>
 										<div style="display: flex; justify-content:center; margin-top:-20px">
-											<p style="margin-right: 80px; color:#56ab2f; font-weight:bold; text-decoration:underline">
-												Se connecter</p>
-											<p style="font-weight:bold;">
-												S'inscrire</p>
+											<a style="margin-right: 80px; color:#56ab2f; font-weight:bold; text-decoration:underline">
+												Se connecter</a>
+											<a style="font-weight:bold;color:black" href="signup" class="inscri">
+												S'inscrire</a>
 										</div>
 										<form class="pt-3" method="post">
 											<div class="form-group">

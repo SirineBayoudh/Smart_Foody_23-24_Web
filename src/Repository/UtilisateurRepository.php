@@ -70,6 +70,15 @@ class UtilisateurRepository extends ServiceEntityRepository
         return $this->findOneBy(['email' => $email]);
     }
 
+    public function searchUsers($searchQuery)
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.nom LIKE :query')
+            ->setParameter('query', '%' . $searchQuery . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Utilisateur[] Returns an array of Utilisateur objects
     //     */

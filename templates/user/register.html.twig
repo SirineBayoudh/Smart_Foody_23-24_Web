@@ -22,6 +22,12 @@
 		<!-- Inclure Bootstrap -->
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
+		<style>
+			.inscri:hover {
+				text-decoration: none;
+			}
+		</style>
+
 	</head>
 
 	<body>
@@ -35,10 +41,10 @@
 									<img src="../../images/trans_logo.png" alt="logo">
 								</div>
 								<div style="display: flex; justify-content:center; margin-top:-20px">
-									<p style="margin-right: 80px; font-weight:bold">
-										Se connecter</p>
-									<p style="color:#56ab2f; font-weight:bold; text-decoration:underline">
-										S'inscrire</p>
+									<a style="margin-right: 80px; font-weight:bold; color:black	" class="inscri">
+										Se connecter</a>
+									<a style="color:#56ab2f; font-weight:bold; text-decoration:underline">
+										S'inscrire</a>
 								</div>
 								<div class="pt-3">
 									{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
@@ -89,12 +95,7 @@
 											{{ form_errors(f.photo) }}
 										</div>
 										<div class="mb-4">
-											<div class="form-check form-check-success">
-												<label class="form-check-label text-muted">
-													<input type="checkbox" class="form-check-input">
-													I agree to all Terms & Conditions
-												</label>
-											</div>
+											
 											<div class="mt-3">
 												<a class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" style="background-color:#56ab2f; border-color:#56ab2f;">Continuer</a>
 											</div>

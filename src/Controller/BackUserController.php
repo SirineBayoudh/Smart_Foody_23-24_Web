@@ -36,6 +36,7 @@ class BackUserController extends AbstractController
     {
 
         $roleFilter = $request->query->get('role');
+        $query = $request->query->get('query'); 
 
         if ($roleFilter) {
             $list = $repo->findByRole($roleFilter);
@@ -74,6 +75,7 @@ class BackUserController extends AbstractController
 
         $photo = $repo->getAdminImage();
 
+        $query = $request->query->get('query');
 
         return $this->render('back_user/listUsers.html.twig', [
             'users' => $list,
@@ -81,9 +83,75 @@ class BackUserController extends AbstractController
             'totalClients' => $clientsCount,
             'totalConseillers' => $conseillersCount,
             'pagination' => $pagination,
-            'photo' => $photo
+            'photo' => $photo,
+            'query' => $query
         ]);
     }
+
+    #[Route('/userSearch', name: 'user_search')]
+    public function search(UtilisateurRepository $repo, Request $request, PaginatorInterface $paginator): Response
+    {
+        $searchQuery = $request->query->get('q');
+
+        if ($searchQuery) {
+            // Effectuer la recherche avec le terme spécifié
+            $queryBuilder = $repo->createQueryBuilder('u');
+            $queryBuilder->where('u.nom LIKE :searchQuery')
+                ->orwhere('u.prenom LIKE :searchQuery')
+                ->setParameter('searchQuery', '%' . $searchQuery . '%');
+
+            $pagination = $paginator->paginate(
+                $queryBuilder->getQuery(),
+                $request->query->getInt('page', 1),
+                2
+            );
+
+            // Récupérer les stocks paginés
+            $users = $pagination;
+        } else {
+            // Si aucune requête de recherche n'est spécifiée, récupérer tous les stocks
+            $pagination = $paginator->paginate(
+                $repo->findAll(),
+                $request->query->getInt('page', 1),
+                2
+            );
+
+            // Récupérer les stocks paginés
+            $users = $pagination;
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+
+        // Récupérer le nombre de clients
+        $clientsCount = $entityManager->getRepository(Utilisateur::class)
+            ->createQueryBuilder('u')
+            ->select('COUNT(u)')
+            ->where('u.role = :role')
+            ->setParameter('role', 'client')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Récupérer le nombre de conseillers
+        $conseillersCount = $entityManager->getRepository(Utilisateur::class)
+            ->createQueryBuilder('u')
+            ->select('COUNT(u)')
+            ->where('u.role = :role')
+            ->setParameter('role', 'conseiller')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $photo = $repo->getAdminImage();
+
+        return $this->render('back_user/listUsers.html.twig', [
+            'users' => $users,
+            'searchQuery' => $searchQuery,
+            'pagination' => $pagination,
+            'photo' => $photo,
+            'totalClients' => $clientsCount,
+            'totalConseillers' => $conseillersCount,
+        ]);
+    }
+
 
     #[Route('/statUsers', name: 'stat_Users')]
     public function statistiques(UtilisateurRepository $repo): Response
