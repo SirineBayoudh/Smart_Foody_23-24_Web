@@ -76,7 +76,7 @@
             </li>
 	          <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
 	          <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
-	          <li class="nav-item active"><a href="contact.html" class="nav-link">Reclamation</a></li>
+	          <li class="nav-item active"><a href="{{ path('addRec')}}" class="nav-link">Reclamation</a></li>
 	          <li class="nav-item cta cta-colored"><a href="cart.html" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
 
 	        </ul>
@@ -122,7 +122,7 @@
           </div>
         </div>
         <div class="row block-9">
-                        <div class="col-md-6 order-md-last d-flex">
+                      <div class="col-md-6 order-md-last d-flex">
                           <form action="{{ path('addRec') }}" method="post" id="myForm" class="bg-white p-5 contact-form" novalidate>
                               {{ form_start(form) }}
                               <div class="form-group">
@@ -198,8 +198,8 @@
                             <p><strong>Titre:</strong> {{ reclamation.titre }}</p>
                             <p><strong>Description:</strong> {{ reclamation.description }}</p>
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-primary mr-2" onclick="window.location='{{ path('modifierRec', {'id': reclamation.id}) }}'">Modifier</button>
-                                <button type="button" class="btn btn-danger" onclick="window.location='{{ path('suppRec', {'id': reclamation.id}) }}'">Supprimer</button>                            </div>
+                              <button type="button" class="btn btn-primary mr-2" onclick="confirmModifier('{{ path('modifierRec', {'id': reclamation.id}) }}')">Modifier</button>
+                                <button type="button" class="btn btn-danger" onclick="confirmSuppression('{{ path('suppRec', {'id': reclamation.id}) }}')">Supprimer</button>                            </div>
                             <hr style="border-top: 1px solid black; width: 100%;" />
                         {% endfor %}
                     </div>
@@ -373,6 +373,41 @@
           handleSubmit(event);
       });
   });
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmModifier(url) {
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Voulez-vous modifier la réclamation ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'Oui, Modifer!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    function confirmSuppression(url) {
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Voulez-vous supprimer cette Reclamation ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'Oui, supprimer!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
 </script>
 
      

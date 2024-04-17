@@ -1,96 +1,83 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier Réclamation{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/reclamationCss/ajoutRec.css') }}">
+{% endblock %}
 
 {% block body %}
-    <h1>Modifier Réclamation</h1>   
-    {{ form_start(form) }}
-    {{ form_errors(form) }}
-    {{ form_row(form.nom) }}
-    {{ form_row(form.prenom) }}
-    {{ form_row(form.email) }}
-    {{ form_row(form.type) }}
-    {{ form_row(form.titre) }}
-    {{ form_row(form.description) }}
-    
-    <button type="submit" class="btn btn-primary">Modifier</button>
-    {{ form_end(form) }}
+<h1>Modification de la Réclamation</h1>
+            
+<form method="post" id="myForm" novalidate>
+  {{ form_start(form) }}
+        {{ form_errors(form) }}
+        <div class="form-group">   
+            {{ form_label(form.nom) }}
+            {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.nom) ? ' is-invalid' : '')}}) }}
+            {% if form_errors(form.nom) %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.nom) }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">   
+            {{ form_label(form.prenom) }}
+            {{ form_widget(form.prenom, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.prenom) ? ' is-invalid' : ''), 'readonly': 'readonly'}}) }}
+            {% if form_errors(form.prenom) %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.prenom) }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.email) }}
+            {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.email) ? ' is-invalid' : ''), 'readonly': 'readonly'}}) }}
+            {% if form_errors(form.email) %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.email) }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.type) }}
+            {{ form_widget(form.type, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.type) ? ' is-invalid' : '')}}) }}
+            {% if form_errors(form.type) %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.type) }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.titre) }}
+            {{ form_widget(form.titre, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.titre) ? ' is-invalid' : '')}}) }}
+            {% if form_errors(form.titre) %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.titre) }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control form-control-lg cadreDesc' ~ (form_errors(form.description) ? ' is-invalid' : '')}}) }}
+            {% if form_errors(form.description) %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.description) }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary py-3 px-5">Appliquer</button> 
+            <button type="button" class="btn btn-secondary py-3 px-5" onclick="annuler()">Retour</button> 
+        </div>
+        {{ form_end(form) }}  
+       
+</form>
 
-    <style>
-        body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
+<script>
+  function annuler() {
+      window.location.href = "{{ path('addRec') }}";
+  }
+</script>
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
 
-h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-h2 {
-    font-size: 20px;
-    margin-top: 40px;
-    margin-bottom: 10px;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    margin-bottom: 10px;
-}
-
-/* Style formulaire */
-form {
-    margin-bottom: 40px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-input[type="text"],
-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-button[type="submit"] {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button[type="submit"]:hover {
-    background-color: #0056b3;
-}
-    </style>
 {% endblock %}

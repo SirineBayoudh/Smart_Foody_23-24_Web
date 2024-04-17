@@ -229,6 +229,7 @@ class ReclamationController extends AbstractController
         $reclamations = $reclamationRepository->findBy(['id_client' => $user, 'statut' => 'Attente']);
 
 
+        $emptySubmission = false;
         if ($form->isSubmitted() && $form->isValid()) {
             // Créer une nouvelle réclamation avec les données du formulaire
             $nouvelleReclamation = new Reclamation();
@@ -353,7 +354,6 @@ public function modifierRec(Request $request, int $id, ReclamationRepository $re
     return $this->render('reclamation/modifier_rec.html.twig', [
         'form' => $form->createView(),
         'reclamations' => $reclamations, // Passer les réclamations au template
-        
     ]);
 }
 
