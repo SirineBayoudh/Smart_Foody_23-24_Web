@@ -29,6 +29,9 @@
     <link rel="stylesheet" href="{{asset('css/icomoon.css')}}">
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
 
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+
     <link rel="shortcut icon" href="../../images/trans_logo.png"/>
   </head>
   <body class="goto-here">
@@ -86,49 +89,61 @@
     
 
     <section class="ftco-section">
-        <div class="container">
-            <div class="row">
-                
-                    <div class="col-md-12 text-center">
-                        <h2>Nos produits recommandés</h2>
-                    </div>
-                
-                {% for produit in produits %}
-                <div class="col-md-6 col-lg-3 ftco-animate">
-                    <div class="product">
-                        <a href="#" class="img-prod"><img class="img-fluid" src="{{ asset('images/' ~ produit.image)}}" alt="{{ produit.marque }}" style="width: 100%; height: 200px; object-fit: cover;">
-                            <div class="overlay"></div>
-                        </a>
-                        <div class="text py-3 pb-4 px-3 text-center">
-                            <h3><a href="#">{{ produit.marque }}</a></h3>
-                            <div class="d-flex">
-                                <div class="pricing">
-                                    <p class="price"><span>{{ produit.prix }}</span></p>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1>Nos produits recommandés</h1>
+            </div>
+            <div class="col-md-12">
+                <div class="product-scroll d-flex flex-nowrap overflow-auto" id="productScroll">
+                    {% for produit in produits %}
+                    <div class="col-md-6 col-lg-3 ftco-animate">
+                        <div class="product">
+                            <a href="#" class="img-prod">
+                                <img class="img-fluid" src="{{ asset('images/' ~ produit.image)}}" alt="{{ produit.marque }}" style="width: 100%; height: 200px; object-fit: cover;">
+                                <div class="overlay"></div>
+                            </a>
+                            <div class="text py-3 pb-4 px-3 text-center">
+                                <h3><a href="#">{{ produit.marque }}</a></h3>
+                                <div class="d-flex">
+                                    <div class="pricing">
+                                        <p class="price"><span>{{ produit.prix }}</span></p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="bottom-area d-flex px-3">
-                                <div class="m-auto d-flex">
-                                    <a href="#" class="add-to-cart d-flex justify-content-center align-items-center text-center">
-                                        <span><i class="ion-ios-menu"></i></span>
-                                    </a>
-                                    <a href="#" class="buy-now d-flex justify-content-center align-items-center mx-1">
-                                        <span><i class="ion-ios-cart"></i></span>
-                                    </a>
-                                    <a href="#" class="heart d-flex justify-content-center align-items-center ">
-                                        <span><i class="ion-ios-heart"></i></span>
-                                    </a>
+                                <div class="bottom-area d-flex px-3">
+                                    <div class="m-auto d-flex">
+                                        <a href="#" class="add-to-cart d-flex justify-content-center align-items-center text-center">
+                                            <span><i class="ion-ios-menu"></i></span>
+                                        </a>
+                                        <a href="#" class="buy-now d-flex justify-content-center align-items-center mx-1">
+                                            <span><i class="ion-ios-cart"></i></span>
+                                        </a>
+                                        <a href="#" class="heart d-flex justify-content-center align-items-center ">
+                                            <span><i class="ion-ios-heart"></i></span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary mr-2" onclick="scrollProducts(-100)">←</button>
+                    <button class="btn btn-primary" onclick="scrollProducts(100)">→</button>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
     
     
-    
+<div class="video-container">
+  <iframe width="300" height="315" src="https://www.youtube.com/embed/3O-HdPqqK4A" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+
 
 		<section class="ftco-section ftco-no-pt ftco-no-pb py-5 bg-light">
       <div class="container py-4">
@@ -244,14 +259,47 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
   <script src="{{ asset('js/google-map.js')}}"></script>
   <script src="{{ asset('js/main.js')}}"></script>
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    function scrollProducts(amount) {
+        var productScroll = document.getElementById('productScroll');
+        productScroll.scrollLeft += amount;
+    }
+</script>
 
   <style>
-    h2 {
+   h1 {
     color: #56ab2f; /* Couleur du texte */
     font-size: 24px; /* Taille de la police */
     font-weight: bold; /* Gras */
     margin-bottom: 20px; /* Marge en bas pour l'espacement */
+    animation: bounce 1s ease infinite; /* Ajoute une animation de rebondissement */
 }
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0); /* Aucun déplacement */
+    }
+    40% {
+        transform: translateY(-20px); /* Déplacement vers le haut */
+    }
+    60% {
+        transform: translateY(-10px); /* Déplacement vers le haut */
+    }
+}
+#productScroll {
+  overflow-x: hidden !important; /* Masquer le défilement horizontal */
+    white-space: nowrap; /* Empêcher le renvoi à la ligne des éléments enfants */
+}
+
+.video-container {
+    margin-bottom: 20px; /* Marge entre chaque vidéo */
+}
+
+.video-container iframe {
+    width: 50%; /* Utilisez la largeur totale du conteneur */
+}
+
   </style>
     
   </body>
