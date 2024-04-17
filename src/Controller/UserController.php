@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -189,16 +190,16 @@ class UserController extends AbstractController
 
         if ($form2->isSubmitted()) {
             if ($form2->isValid()) {
-                if(md5($ancMDP) == $mdpActuel){
+                if (md5($ancMDP) == $mdpActuel) {
 
                     $plainPassword = $user->getMotDePasse();
                     $hashedPassword = md5($plainPassword);
                     $user->setMotDePasse($hashedPassword);
-    
+
                     $em2->persist($user);
                     $em2->flush();
                     return $this->redirectToRoute("login");
-                }else {
+                } else {
                     $error = true;
                 }
             }
@@ -283,16 +284,16 @@ class UserController extends AbstractController
 
         if ($form2->isSubmitted()) {
             if ($form2->isValid()) {
-                if(md5($ancMDP) == $mdpActuel){
+                if (md5($ancMDP) == $mdpActuel) {
 
                     $plainPassword = $user->getMotDePasse();
                     $hashedPassword = md5($plainPassword);
                     $user->setMotDePasse($hashedPassword);
-    
+
                     $em2->persist($user);
                     $em2->flush();
                     return $this->redirectToRoute("login");
-                }else {
+                } else {
                     $error = true;
                 }
             }
