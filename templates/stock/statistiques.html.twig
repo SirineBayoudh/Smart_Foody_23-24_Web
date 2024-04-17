@@ -3,20 +3,197 @@
 {% block title %}Statistiques des Stocks{% endblock %}
 
 {% block body %}
-
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <canvas id="barChart" width="300" height="200"></canvas>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="barChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="areaChart" width="800" height="520"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
-            <canvas id="areaChart" width="800" height="520"></canvas>
+    
+        <div class="row ">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="mixedChart1" width="300" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+          
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="mixedChart2" width="800" height="520"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js"></script>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
+        <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Récupération des données depuis Twig
+    const dataFromTwig = {
+        stocks: [
+            {% for stock in stocks %}
+                {
+                    nom: "{{ stock.nom }}",
+                    dateArrivage: "{{ stock.dateArrivage|date('Y-m-d') }}",
+                    quantite: {{ stock.quantite }}
+                },
+            {% endfor %}
+        ]
+    };
+
+    // Date actuelle
+    const currentDate = new Date();
+
+    // Filtrer les stocks en fonction de la date d'arrivage par rapport à la date actuelle
+    const pastStocks = dataFromTwig.stocks.filter(stock => new Date(stock.dateArrivage) < currentDate);
+    const futureStocks = dataFromTwig.stocks.filter(stock => new Date(stock.dateArrivage) > currentDate);
+
+    // Calcul des quantités totales pour les stocks passés
+    const totalQuantityPast = pastStocks.reduce((total, stock) => total + stock.quantite, 0);
+
+    // Calcul des quantités totales pour les stocks futurs
+    const totalQuantityFuture = futureStocks.reduce((total, stock) => total + stock.quantite, 0);
+
+    // Création du graphique en barres pour les quantités totales en fonction de la date d'arrivage
+    var ctx = document.getElementById('mixedChart2').getContext('2d');
+    var mixedChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Stocks Existants', 'Stocks En arrivage'],
+            datasets: [{
+                label: 'Quantité totale',
+                data: [totalQuantityPast, totalQuantityFuture],
+                backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            title: {
+                display: true,
+                text: 'Quantité totale en fonction de la date d\'arrivage',
+                font: {
+                    size: 18
+                }
+            }
+        }
+    });
+});
+
+</script>
+        <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Récupération des données depuis Twig
+    const dataFromTwig = {
+        stocks: [
+            {% for stock in stocks %}
+                {
+                    nom: "{{ stock.nom }}",
+                    dateArrivage: "{{ stock.dateArrivage|date('Y-m-d') }}",
+                    quantite: {{ stock.quantite }}
+                },
+            {% endfor %}
+        ]
+    };
+
+    // Création d'un objet pour stocker les quantités par mois
+    const quantitiesByMonth = {};
+
+    // Parcourir les stocks pour calculer les quantités totales par mois
+    dataFromTwig.stocks.forEach(stock => {
+        const month = new Date(stock.dateArrivage).getMonth();
+        if (!quantitiesByMonth[month]) {
+            quantitiesByMonth[month] = 0;
+        }
+        quantitiesByMonth[month] += stock.quantite;
+    });
+
+    // Création des labels pour l'axe x (les mois)
+    const labels = [];
+    for (let month = 0; month < 12; month++) {
+        labels.push(getMonthName(month));
+    }
+
+    // Création du dataset pour la quantité par mois
+    const data = [];
+    for (let month = 0; month < 12; month++) {
+        data.push(quantitiesByMonth[month] || 0);
+    }
+
+    // Création du graphique en barres pour la quantité par mois
+    var ctx = document.getElementById('mixedChart1').getContext('2d');
+    var mixedChart = new Chart(ctx, {
+        type: 'bar', // Utiliser un graphique en barres
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Quantité par mois',
+                data: data,
+                backgroundColor: 'rgba(255, 99, 132, 0.5)', // Couleur de fond
+                borderColor: 'rgba(255, 99, 132, 1)', // Couleur de la bordure
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Mois d\'arrivage' // Titre de l'axe des abscisses
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Quantité' // Titre de l'axe des ordonnées
+                    },
+                    ticks: {
+                        beginAtZero: true // Commencer l'axe y à zéro
+                    }
+                }
+            },
+            title: {
+                display: true,
+                text: 'Quantité totale par mois', // Titre du graphique en barres
+                font: {
+                    size: 18 // Taille de la police du titre
+                }
+            }
+        }
+    });
+
+    // Fonction pour obtenir le nom complet du mois à partir de son numéro
+    function getMonthName(month) {
+        const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        return monthNames[month];
+    }
+});
+
+        </script>
+        
+        
+        {# <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> #}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Récupération des données depuis Twig
