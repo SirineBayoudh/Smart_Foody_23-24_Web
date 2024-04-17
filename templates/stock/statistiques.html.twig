@@ -33,12 +33,23 @@
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-body">
+                      
                         <canvas id="mixedChart2" width="800" height="520"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js"></script>
+        <div class="row ">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <p style="font-size:15px;margin-left:170px ; ">Coût de chaque stock</p>
+                        <canvas id="doughnutChart" width="400" height="400" ></canvas>
+
+        </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
@@ -325,6 +336,80 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+</script>
+<script>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Récupération des données depuis Twig ou tout autre source de données
+    const dataFromTwig = {
+      stocks: [
+        {% for stock in stocks %}
+          {
+            nom: "{{ stock.nom }}",
+            cout: {{ stock.cout }}
+          },
+        {% endfor %}
+      ]
+    };
+
+    // Extraction des noms et des coûts des stocks
+    const labels = dataFromTwig.stocks.map(stock => stock.nom);
+    const costs = dataFromTwig.stocks.map(stock => stock.cout);
+
+    // Création du graphique Doughnut
+    var ctx = document.getElementById('doughnutChart').getContext('2d');
+    var doughnutChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Coût des stocks',
+          data: costs,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+            'rgba(255, 159, 64, 0.5)'
+            // Ajoutez plus de couleurs si nécessaire
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+            // Ajoutez plus de couleurs si nécessaire
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Coût de chaque stock'
+          },
+          
+          legend: {
+            display: true,
+            position: 'bottom'
+          },
+          datalabels: {
+            color: '#fff',
+            formatter: function(value, context) {
+              return context.chart.data.labels[context.dataIndex] + ': ' + value;
+            }
+          }
+        }
+      }
+    });
+  });
+
 </script>
 
 {% endblock %}
