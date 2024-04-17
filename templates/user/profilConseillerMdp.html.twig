@@ -1,7 +1,7 @@
-{% extends 'user/profilClient.html.twig' %}
+{% extends 'user/profilConseiller.html.twig' %}
 
 {% block href %}
-	href="/profilClient/{{user.idUtilisateur}}"
+	href="/profilConseiller/{{user.idUtilisateur}}"
 {% endblock %}
 
 {% block contenu %}
@@ -16,7 +16,6 @@
 							Le mot de passe actuel est incorrect!
 						</div>
 					{% endif %}
-
 					<h4 class="card-title">Modifier votre mot de passe</h4>
 
 					<div class="forms-sample">

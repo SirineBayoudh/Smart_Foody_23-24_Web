@@ -65,6 +65,19 @@ class UtilisateurRepository extends ServiceEntityRepository
         return $result['photo'] ?? null;
     }
 
+    public function getPasswordByEmail(string $email): ?string
+    {
+        $query = $this->createQueryBuilder('u')
+            ->select('u.mot_de_passe')
+            ->andWhere('u.email = :email')
+            ->setParameter('email', $email)
+            ->getQuery();
+
+        $result = $query->getOneOrNullResult();
+
+        return $result['mot_de_passe'] ?? null;
+    }
+
     public function findByEmail($email)
     {
         return $this->findOneBy(['email' => $email]);

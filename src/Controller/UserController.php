@@ -108,7 +108,7 @@ class UserController extends AbstractController
                     $em->flush();
 
                     $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
-                    
+
 
                     return $this->redirectToRoute("login");
                 } else {
@@ -119,7 +119,7 @@ class UserController extends AbstractController
 
         return $this->renderform('user/register.html.twig', ['f' => $form]);
     }
-    
+
     /** Profil Client */
 
     #[Route('/profilClient/{id}', name: 'client_profile')]
@@ -171,6 +171,8 @@ class UserController extends AbstractController
     public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
     {
 
+        $error = false;
+
         $user = $repo->find($id);
         $form2 = $this->createForm(MdpClientType::class, $user);
 
@@ -178,26 +180,34 @@ class UserController extends AbstractController
 
         $form2->handleRequest($req);
 
-        $incorrect = false;
-
         $ancMDP = $req->request->get('ancienMDP');
+        dump($ancMDP);
 
-        if ($ancMDP == $user->getMotDePasse()) {
-            if ($form2->isSubmitted() && $form2->isValid()) {
-                $em2->persist($user);
-                $em2->flush();
-                return $this->redirectToRoute("login");
+        $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
+        dump($mdpActuel);
+
+
+        if ($form2->isSubmitted()) {
+            if ($form2->isValid()) {
+                if(md5($ancMDP) == $mdpActuel){
+
+                    $plainPassword = $user->getMotDePasse();
+                    $hashedPassword = md5($plainPassword);
+                    $user->setMotDePasse($hashedPassword);
+    
+                    $em2->persist($user);
+                    $em2->flush();
+                    return $this->redirectToRoute("login");
+                }else {
+                    $error = true;
+                }
             }
-        } else {
-            $incorrect = false;
         }
-
-
 
         return $this->renderform('user/profilClientMDP.html.twig', [
             'f2' => $form2,
             'user' => $user,
-            'incorrect' => $incorrect ?? false,
+            'error' => $error
         ]);
     }
 
@@ -245,22 +255,53 @@ class UserController extends AbstractController
             }
         }
 
+        return $this->renderform('user/profilConseiller.html.twig', [
+            'f' => $form,
+            'user' => $user,
+        ]);
+    }
+
+
+    #[Route('/profilConseillerMDP/{id}', name: 'conseiller_profileMDP')]
+    public function updateConseillerMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
+    {
+        $error = false;
+
+        $user = $repo->find($id);
         $form2 = $this->createForm(MdpConseillerType::class, $user);
 
         $em2 = $manager->getManager();
 
         $form2->handleRequest($req);
-        if ($form2->isSubmitted()) {
 
-            $em2->persist($user);
-            $em2->flush();
-            return $this->redirectToRoute("login");
+        $ancMDP = $req->request->get('ancienMDP');
+        dump($ancMDP);
+
+        $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
+        dump($mdpActuel);
+
+
+        if ($form2->isSubmitted()) {
+            if ($form2->isValid()) {
+                if(md5($ancMDP) == $mdpActuel){
+
+                    $plainPassword = $user->getMotDePasse();
+                    $hashedPassword = md5($plainPassword);
+                    $user->setMotDePasse($hashedPassword);
+    
+                    $em2->persist($user);
+                    $em2->flush();
+                    return $this->redirectToRoute("login");
+                }else {
+                    $error = true;
+                }
+            }
         }
 
-        return $this->renderform('user/profilConseiller.html.twig', [
-            'f' => $form,
+        return $this->renderform('user/profilConseillerMDP.html.twig', [
             'f2' => $form2,
             'user' => $user,
+            'error' => $error
         ]);
     }
 
