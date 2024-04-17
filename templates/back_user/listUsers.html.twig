@@ -80,24 +80,26 @@
 		}
 
 		#icon {
-			color:white;
+			color: white;
 		}
 
 		#filtre {
-			color:white;
+			color: white;
 		}
-		
 	</style>
 
 	<div class="col-lg-10 grid-margin stretch-card">
 		<div class="card">
-			<div class="anchor-pane">
+			<button type="button" class="btn btn-inverse-success btn-fw" style="margin-top:80px; width:300px; margin-left:30px" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
+
+			<div class="anchor-pane" style="margin-top:-90px;">
 
 				{% for flash_message in app.flashes('success') %}
 					<div class="alert alert-success" id="successMessage" role="alert">
 						{{ flash_message }}
 					</div>
 				{% endfor %}
+
 
 				<div class="col-lg-2" style="margin-top:150px;">
 					<form action="{{ path('usersList') }}" method="GET">
@@ -112,7 +114,7 @@
 				<form method="get" action="{{ path('user_search') }}" style="margin-top:150px;">
 					<div class="input-group mb-3" style="width:200px;">
 						<input type="text" class="form-control" name="q" id="searchInput" placeholder="Rechercher" aria-label="Rechercher" aria-describedby="search" value="{{ searchQuery ?? '' }}">
-						<div class="input-group-append hover-cursor" id="navbar-search-icon" >
+						<div class="input-group-append hover-cursor" id="navbar-search-icon">
 							<button class="btn btn-outline-secondary" type="submit" style="background-color:#aad597">
 								<i class="icon-search" id="icon"></i>
 							</button>
@@ -288,7 +290,7 @@ document.getElementById('successMessage').style.display = 'none';
 					</div>
 				</div>
 			</div>
-			<button type="button" class="btn btn-inverse-success btn-fw" style="margin-top:20px; width:300px; margin-left:900px;" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
+
 		</div>
 
 	</div>
