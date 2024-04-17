@@ -14,7 +14,7 @@ class EmailService
         $this->mailer = $mailer;
     }
 
-    public function sendResetPasswordEmail(string $to, string $subject, string $prenom)
+    public function sendWelcomeEmail(string $to, string $subject, string $prenom)
     {
 
         $email = (new Email())

@@ -107,15 +107,8 @@ class UserController extends AbstractController
                     $em->persist($user);
                     $em->flush();
 
-                    $email = (new Email())
-                        ->from('smartfoody.2024@gmail.com')
-                        ->to($user->getEmail())
-                        ->subject('Bienvenue sur notre site')
-                        ->html('<p>Bienvenue sur notre site!</p>');
-
-                    $mailer->send($email);
-
-                    $emailService->sendResetPasswordEmail($user->getEmail(), 'Réinitialisation du mot de passe', $user->getPrenom());
+                    $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
+                    
 
                     return $this->redirectToRoute("login");
                 } else {
@@ -124,10 +117,9 @@ class UserController extends AbstractController
             }
         }
 
-
         return $this->renderform('user/register.html.twig', ['f' => $form]);
     }
-
+    
     /** Profil Client */
 
     #[Route('/profilClient/{id}', name: 'client_profile')]
@@ -161,7 +153,7 @@ class UserController extends AbstractController
                         return $this->redirectToRoute("accueil");
                     }
                 }
-            }elseif ($form->isValid()) {
+            } elseif ($form->isValid()) {
 
                 $em->persist($user);
                 $em->flush();
@@ -245,7 +237,7 @@ class UserController extends AbstractController
                         return $this->redirectToRoute("accueil");
                     }
                 }
-            }elseif ($form->isValid()) {
+            } elseif ($form->isValid()) {
 
                 $em->persist($user);
                 $em->flush();
