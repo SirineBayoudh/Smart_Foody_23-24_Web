@@ -79,7 +79,7 @@
             </li>
 	          <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
 	          <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
-	          <li class="nav-item"><a href="addRec" class="nav-link">Reclamation</a></li>
+	          <li class="nav-item"><a href="{{'addRec'}}" class="nav-link">Reclamation</a></li>
 	          <li class="nav-item cta cta-colored"><a href="cart.html" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
 
 	        </ul>
@@ -216,8 +216,8 @@
 										
 										{# Contrôle de validation pour nb_etoiles #}
 										<div class="form-group">
-											{{ form_label(form.nb_etoiles) }}
-											{{ form_widget(form.nb_etoiles, {'attr': {'class': 'rating form-control ' ~ (form_errors(form.nb_etoiles) ? ' is-invalid' : ''), 'style': 'border-color: black; border-width: 1px;'}}) }}
+											{{ form_label(form.nb_etoiles, 'Note :') }}
+											{{ form_widget(form.nb_etoiles, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.nb_etoiles) ? 'is-invalid' : '')}}) }}
 											{% if form_errors(form.nb_etoiles) %}
 												<div class="invalid-feedback">
 													{{ form_errors(form.nb_etoiles) }}
@@ -259,10 +259,10 @@
 									<p><strong>Date :</strong> {{ avis.dateAvis|date('d-m-Y') }}</p>
 									<div class="text-right"> <!-- div pour aligner les boutons à droite -->
 										{% if user and user.id == avis.idClient.id %}
-											<button class="btn btn-primary mr-2" onclick="window.location='{{ path('modifier_avis', {'id': avis.id}) }}'">Modifier</button>
-											<button class="btn btn-danger" onclick="if(confirm('Êtes-vous sûr de vouloir supprimer cet avis ?')) { window.location='{{ path('supprimer_avis', {'id': avis.id}) }}' }">Supprimer</button>
+											<button class="btn btn-primary mr-2" onclick="confirmModifier('{{ path('modifier_avis', {'id': avis.id}) }}')">Modifier</button>
+											<button class="btn btn-danger" onclick="confirmSuppression('{{ path('supprimer_avis', {'id': avis.id}) }}')">Supprimer</button>
 										{% else %}
-											<button class="btn btn-danger" onclick="window.location='{{ path('signaler_avis', {'id': avis.id}) }}'">Signaler</button>
+											<button class="btn btn-danger" onclick="confirmerSignaler('{{ path('signaler_avis', {'id': avis.id}) }}')">Signaler</button>
 										{% endif %}
 									</div>
 									<hr style="border-top: 1px solid black; width: 100%;" />
@@ -530,6 +530,57 @@
 		    
 		});
 	</script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmModifier(url) {
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Voulez-vous modifier l'avis ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'Oui, Modifer!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    function confirmSuppression(url) {
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Voulez-vous supprimer l'avis ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'Oui, supprimer!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+	function confirmerSignaler(url) {
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Voulez-vous signaler ce commentaire ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'Oui, signaler!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
     
   </body>
 </html>

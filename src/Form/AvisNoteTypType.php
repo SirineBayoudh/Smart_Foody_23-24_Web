@@ -9,19 +9,23 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Form\Type\StarRangeType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class AvisNoteTypType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nb_etoiles', IntegerType::class, [
-                'label' => 'Notes : ',
-                'attr' => [
-                    'min' => 1,
-                    'max' => 5,
-                ],
-            ])
+        ->add('nb_etoiles', ChoiceType::class, [
+            'label' => 'Note : ',
+            'choices' => [
+                '1' => 1,
+                '2' => 2,
+                '3' => 3,
+                '4' => 4,
+                '5' => 5,
+            ],
+        ])
             ->add('commentaire', TextareaType::class, [
                 'label' => 'Commentaire : ',
                 'attr' => ['class' => 'form-control']

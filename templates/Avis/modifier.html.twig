@@ -1,87 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier l'avis{% endblock %}
 
 {% block stylesheets %}
-    <style>
-        /* Styles spécifiques pour la page de modification de l'avis */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        form {
-            margin-top: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-
-        textarea {
-            height: 150px;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/reclamationCss/ajoutRec.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="container">
-        <h1>Modifier l'avis</h1>
-        {{ form_start(form) }}
-            <div>
-                {{ form_row(form.nb_etoiles, {'attr': {'class': 'form-control'}}) }}
-            </div>
-            <div>
-                {{ form_row(form.commentaire, {'attr': {'class': 'form-control'}}) }}
-            </div>
-            <div>
-                <button type="submit" class="btn btn-primary">Modifier</button>
-            </div>
-        {{ form_end(form) }}
-    </div>
+<h1>Modification de l'avis</h1>
+            
+<form method="post" id="myForm" novalidate>
+  {{ form_start(form) }}
+        <div class="form-group">   
+            {{ form_label(form.nb_etoiles) }}
+            {{ form_widget(form.nb_etoiles, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.nb_etoiles) ? ' is-invalid' : ''), 'readonly': 'readonly'}}) }}
+            {% if form_errors(form.nb_etoiles) %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.nb_etoiles) }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">   
+            {{ form_label(form.commentaire) }}
+            {{ form_widget(form.commentaire, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.commentaire) ? ' is-invalid' : ''), 'readonly': 'readonly'}}) }}
+            {% if form_errors(form.commentaire) %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.commentaire) }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary py-3 px-5">Appliquer</button> 
+            <button type="button" class="btn btn-secondary py-3 px-5" >Retour</button> 
+        </div>
+        {{ form_end(form) }}  
+       
+</form>
+
+
+
 {% endblock %}

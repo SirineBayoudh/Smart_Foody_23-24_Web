@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -21,7 +22,9 @@ use Symfony\Component\Security\Core\Security;
 
 class AjoutAvisController extends AbstractController
 {
+    
 
+  
         //---------------------------------------------------------------- Partie Back ---------------------------------------------------------------------------
      
         /**
@@ -197,14 +200,20 @@ public function modifierAvis(Request $request, int $id): Response
 
     // Créer le formulaire de modification d'avis
     $form = $this->createFormBuilder($avis)
-        ->add('nb_etoiles', IntegerType::class, [
-            'label' => 'Note : '
-        ])
-        ->add('commentaire', TextareaType::class, [
-            'label' => 'Commentaire : '
-        ])
-        //->add('save', SubmitType::class, ['label' => 'Modifier'])
-        ->getForm();
+    ->add('nb_etoiles', ChoiceType::class, [
+        'label' => 'Note : ',
+        'choices' => [
+            '1' => 1,
+            '2' => 2,
+            '3' => 3,
+            '4' => 4,
+            '5' => 5,
+        ],
+    ])
+    ->add('commentaire', TextareaType::class, [
+        'label' => 'Commentaire : '
+    ])
+    ->getForm();
 
     $form->handleRequest($request);
 

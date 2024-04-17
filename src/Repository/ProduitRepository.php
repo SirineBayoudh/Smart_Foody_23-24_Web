@@ -60,4 +60,5 @@ public function findFourSimilarProducts(Produit $produit)
         ->getResult();
 }
 
+
 }

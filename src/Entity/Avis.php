@@ -21,11 +21,6 @@ class Avis
 
     #[ORM\Column]
     #[Assert\NotBlank(message: "Le champ obligatoire")]
-    #[Assert\Range(
-        min: 1,
-        max: 5,
-        notInRangeMessage: "La valeur doit être comprise entre {{ min }} et {{ max }}"
-    )]
     private ?int $nb_etoiles = null;
 
     #[ORM\Column(length: 255)]
