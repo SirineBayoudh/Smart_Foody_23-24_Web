@@ -40,7 +40,7 @@
                 </div>
             {% endfor %}
             <span class="error-message">{{ form_errors(form.listCritere) }}</span>
-            <button type="submit" class="btn btn-primary mr-2" id="submitBtn">Ajouter</button>
+            <button type="submit" class="btn btn-primary mr-2" id="submitBtn" onclick="confirmSubmit()" >Ajouter</button>
             {{ form_end(form) }}
         </div>
     </div>
@@ -69,7 +69,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-    document.getElementById('submitBtn').addEventListener('click', function() {
+    var formSubmitted = false; // Variable pour contrôler les soumissions multiples
+
+document.getElementById('submitBtn').addEventListener('click', function() {
+    if (!formSubmitted) { // Vérifie si le formulaire n'a pas encore été soumis
         Swal.fire({
             title: "Est-ce que vous êtes sûr?",
             text: "Voulez-vous vraiment ajouter cet objectif?",
@@ -83,9 +86,16 @@
             allowEscapeKey: false // Empêcher la fermeture en appuyant sur la touche Escape
         }).then((result) => {
             if (result.isConfirmed) {
+                formSubmitted = true; // Marque le formulaire comme soumis
                 document.getElementById('objectif-form').submit();
             }
         });
-    });
+    }
+});
+function confirmSubmit() {
+    document.getElementById('submitBtn').setAttribute('disabled', 'disabled');
+}
+
 </script>
+
 {% endblock %}

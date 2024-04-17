@@ -37,6 +37,13 @@
         top: 0;
         z-index: 1;
     }
+    .text-green {
+    color: green !important;
+}
+.bg-custom-green {
+        background-color: #56ab2f !important; /* votre nouvelle couleur verte */
+        color: white;
+    }
 </style>
 
 
@@ -44,7 +51,12 @@
 <div class="col-lg-10 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title">Table des objectifs :</h4>
+            <h4 class="card-title text-green"></h4>
+            <div class="card-header bg-success bg-custom-green text-white" >
+                Table des objectifs :
+                </div>
+                <div class="row mb-4" style="margin-bottom: 20px;"></div>
+                <div class="row mb-4" style="margin-bottom: 20px;"></div>
             <div class="col text-right mb-4">
                 <a href="{{ path('add_object') }}" class="btn btn-primary btn-sm mr-5">
                     <i class="ti-plus"></i>
@@ -56,15 +68,17 @@
                         <option value="{{ critere }}">{{ critere }}</option>
                     {% endfor %}
                 </select>
-                <input type="text" name="search" id="searchInput" class="mr-5" placeholder="Rechercher par libelle...">
+                <input type="text" name="search" id="searchInput" class="mr-2" placeholder="Rechercher par marque...">
 
                     <button class="btn btn-primary btn-sm mr-5" onclick="filterByLibelle()">
                         <i class="fas fa-search"></i> Rechercher
                     </button>
             </div>
+            <div class="row mb-4" style="margin-bottom: 20px;"></div>
+            <div class="row mb-4" style="margin-bottom: 20px;"></div>
             <div class="table-responsive ">
                 <table class="table table-striped ">
-                    <thead class="thead-green">
+                    <thead class="bg-custom-green">
                         <tr>
                             <th>Libelle</th>
                             <th>ListCritere</th>

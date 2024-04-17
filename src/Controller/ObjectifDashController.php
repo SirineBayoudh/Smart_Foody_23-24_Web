@@ -52,7 +52,7 @@ public function addProduct(Request $request): Response
 
     $emptySubmission = false;
 
-    if ($form->isSubmitted()) {
+    if ($form->isSubmitted()&&$form->isValid()) {
         // Récupérer les données du formulaire
         $selectedCriteres = $form->get('listCritere')->getData();
         

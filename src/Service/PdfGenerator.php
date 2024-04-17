@@ -28,6 +28,7 @@ class PdfGenerator
 
         // Entête du tableau
         $header = array('Marque', 'Catégorie', 'Prix', 'Critère');
+        
 
         // Style des cellules
         $pdf->SetFont('helvetica', 'B', 12);
@@ -41,17 +42,27 @@ class PdfGenerator
         // Ajouter le titre au milieu de la page
         $pdf->Cell(0, 10, 'Liste des produits', 0, 1, 'C');
 
+        // Ajouter l'en-tête du tableau avec un fond vert
+        $pdf->SetFillColor(86, 171, 47); // Vert pour l'en-tête
+        $pdf->SetTextColor(255); // Texte en blanc pour l'en-tête
+        foreach ($header as $col) {
+            $pdf->Cell(45, 10, $col, 1, 0, 'C', 1);
+        }
+        $pdf->Ln();
+        
         // Ajouter les données des produits dans le tableau
-        foreach ($products as $key => $product) {
+        $pdf->SetFillColor(255, 255, 255); // Blanc pour les autres lignes
+        $pdf->SetTextColor(0); // Texte en noir pour les autres lignes
+        foreach ($products as $product) {
             $data = array(
                 $product->getMarque(),
                 $product->getCategorie(),
                 $product->getPrix() . ' DT',
                 $this->getCritereLabel($product->getCritere()), 
             );
-
+        
             $pdf->SetFont('helvetica', '', 10);
-            $this->addRow($pdf, $data, $columnWidths, $key === 0); // Passer true si c'est la première ligne
+            $this->addRow($pdf, $data, $columnWidths);
         }
 
         // Ajouter la date de téléchargement
@@ -80,7 +91,7 @@ class PdfGenerator
         // Ajoutez d'autres correspondances au besoin
     ];
 
-    private function addRow($pdf, $data, $columnWidths, $isFirstRow)
+    private function addRow($pdf, $data, $columnWidths)
     {
         $nbColumns = count($data);
         $columnWidth = array_sum($columnWidths);
@@ -90,16 +101,8 @@ class PdfGenerator
         $y = $pdf->GetY();
         $pdf->SetFont('helvetica', '', 10);
 
-        // Définir la couleur de remplissage en vert pour la première ligne
-        if ($isFirstRow) {
-            $pdf->SetFillColor(86, 171, 47); // Vert en code RGB
-        } else {
-            $pdf->SetFillColor(255, 255, 255); // Blanc pour les autres lignes
-        }
-
         // Dessiner les cellules
         for ($i = 0; $i < $nbColumns; ++$i) {
-            $pdf->SetTextColor(0);
             $pdf->SetLineWidth(0.1);
             $pdf->MultiCell($columnWidths[$i], $rowHeight, $data[$i], 1, 'C', 1, 0, '', '', true);
             $pdf->SetXY($x + $columnWidths[$i], $y);

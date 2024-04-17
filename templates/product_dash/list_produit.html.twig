@@ -68,15 +68,19 @@
 .text-green {
     color: green !important;
 }
-
+.bg-custom-green {
+        background-color: #56ab2f !important; /* votre nouvelle couleur verte */
+        color: white;
+    }
 </style>
 
 <div class="example-wrapper">
     <div class="col-lg-24 grid-margin stretch-card">
         <div class="card"> 
-            <div class="card-header bg-success text-white">
-                <i class="fas fa-chart-bar mr-2"></i> Nombre des produits par chaque catégorie : 
+            <div class="card-header bg-success bg-custom-green text-white">
+                Nombre des produits par chaque catégorie : 
             </div>
+            <div class="row mb-4" style="margin-bottom: 20px;"></div>
             <div class="card-body">
                 <canvas id="myChart" width="500" height="100"></canvas>
             </div>
@@ -98,8 +102,12 @@
                     </div>
                 </div>
             </div>
+            <div class="row mb-4" style="margin-bottom: 20px;"></div>
           <div class="card-body">
-            <h1 class="card-title text-green">Table des produits : </h1>
+            <div class="card-header bg-success bg-custom-green text-white" >
+            Table des produits : 
+            </div>
+            <div class="row mb-4" style="margin-bottom: 20px;"></div>
             <div class="row mb-4">
                 <div class="col text-right mb-4">
                     <a href="{{ path('add_product') }}" class="btn btn-primary btn-sm mr-5 hover-effect" style="background-color: #56ab2f; border-color: #56ab2f;" 
@@ -127,10 +135,10 @@
                     </a>
                 </div>
             </div>
-            
+            <div class="row mb-4" style="margin-bottom: 20px;"></div>
             <div class="table-responsive">
               <table id="productTable" class="table table-striped custom-table-width">
-                <thead class="thead-green">
+                <thead class="bg-custom-green">
                   <tr>
                     <th>Image</th>
                     <th>Marque</th>
