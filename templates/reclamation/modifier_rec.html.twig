@@ -1,83 +1,146 @@
 {% extends 'base.html.twig' %}
 
-
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/reclamationCss/ajoutRec.css') }}">
-{% endblock %}
-
 {% block body %}
+<style>
+  body, html {
+    background-color: aliceblue;
+    height: 100%; /* Assurez-vous que le body et l'html ont une hauteur de 100% pour centrer correctement */
+    margin: 2; /* Supprimez les marges par défaut du body */
+}
+
+h1 {
+    font-size: 50px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.form-group {
+    margin: 20px;
+    font-size: 25px;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 7px 20px;
+    margin-right: 40px;
+    margin-left: 50%;
+    background-color: green;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #224412;
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 5px 20px;
+    background-color: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #c82333;
+}
+
+.cadre {
+    font-size: 15px;
+    height: 3vh;
+    width: 60vh;
+}
+
+.cadreDesc {
+    width: 70vh;
+    height: 20vh;
+    font-size: 15px;
+}
+</style>
+
 <h1>Modification de la Réclamation</h1>
-            
+
 <form method="post" id="myForm" novalidate>
-  {{ form_start(form) }}
-        {{ form_errors(form) }}
-        <div class="form-group">   
-            {{ form_label(form.nom) }}
-            {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.nom) ? ' is-invalid' : '')}}) }}
-            {% if form_errors(form.nom) %}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.nom) }}
-                </div>
-            {% endif %}
-        </div>
-        <div class="form-group">   
-            {{ form_label(form.prenom) }}
-            {{ form_widget(form.prenom, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.prenom) ? ' is-invalid' : ''), 'readonly': 'readonly'}}) }}
-            {% if form_errors(form.prenom) %}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.prenom) }}
-                </div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form_label(form.email) }}
-            {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.email) ? ' is-invalid' : ''), 'readonly': 'readonly'}}) }}
-            {% if form_errors(form.email) %}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.email) }}
-                </div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form_label(form.type) }}
-            {{ form_widget(form.type, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.type) ? ' is-invalid' : '')}}) }}
-            {% if form_errors(form.type) %}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.type) }}
-                </div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form_label(form.titre) }}
-            {{ form_widget(form.titre, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.titre) ? ' is-invalid' : '')}}) }}
-            {% if form_errors(form.titre) %}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.titre) }}
-                </div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form_label(form.description) }}
-            {{ form_widget(form.description, {'attr': {'class': 'form-control form-control-lg cadreDesc' ~ (form_errors(form.description) ? ' is-invalid' : '')}}) }}
-            {% if form_errors(form.description) %}
-                <div class="invalid-feedback">
-                    {{ form_errors(form.description) }}
-                </div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary py-3 px-5">Appliquer</button> 
-            <button type="button" class="btn btn-secondary py-3 px-5" onclick="annuler()">Retour</button> 
-        </div>
-        {{ form_end(form) }}  
-       
+    {{ form_start(form) }}
+    {{ form_errors(form) }}
+    <div class="form-group">
+        {{ form_label(form.nom) }}
+        {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.prenom) }}
+        {{ form_widget(form.prenom, {'attr': {'class': 'form-control form-control-lg', 'readonly': 'readonly'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg', 'readonly': 'readonly'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.type) }}
+        {{ form_widget(form.type, {'attr': {'class': 'form-control form-control-lg'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.titre) }}
+        {{ form_widget(form.titre, {'attr': {'class': 'form-control form-control-lg'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.description) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control form-control-lg cadreDesc'}}) }}
+    </div>
+    <div class="form-group">
+        <button type="button" onclick="validateForm()" class="btn btn-primary py-3 px-5">Appliquer</button>
+        <button type="button" class="btn btn-secondary py-3 px-5" onclick="annuler()">Retour</button>
+    </div>
+    {{ form_end(form) }}
+
 </form>
 
+
+<script src="path/to/alertify.min.js"></script>
 <script>
   function annuler() {
       window.location.href = "{{ path('addRec') }}";
   }
+
+  function validateForm() {
+      var titre = document.getElementById("{{ form.titre.vars.id }}");
+      var description = document.getElementById("{{ form.description.vars.id }}");
+
+      if (titre.value.trim() === '') {
+          titre.classList.add('is-invalid');
+      } else {
+          titre.classList.remove('is-invalid');
+      }
+
+      if (description.value.trim() === '') {
+          description.classList.add('is-invalid');
+      } else {
+          description.classList.remove('is-invalid');
+      }
+
+      if (titre.value.trim() === '' || description.value.trim() === '') {
+          alert('Veuillez remplir tous les champs.');
+      } else {
+          document.getElementById("myForm").submit();
+      }
+  }
+
+  // Ajoutez des écouteurs d'événements pour déclencher la vérification lors de la saisie de l'utilisateur
+  document.getElementById("{{ form.titre.vars.id }}").addEventListener('input', validateForm);
+  document.getElementById("{{ form.description.vars.id }}").addEventListener('input', validateForm);
 </script>
 
+<style>
+  .is-invalid {
+      border-color: red !important;
+  }
+</style>
 
 {% endblock %}

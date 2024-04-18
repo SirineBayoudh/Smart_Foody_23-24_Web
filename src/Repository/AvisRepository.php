@@ -90,6 +90,25 @@ class AvisRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getResult();
         }
+
+   //stat pour chaque notes
+        public function countAvisByRating(int $rating): int
+            {
+                return $this->createQueryBuilder('a')
+                    ->select('COUNT(a.id_avis)')
+                    ->andWhere('a.nb_etoiles = :rating')
+                    ->setParameter('rating', $rating)
+                    ->getQuery()
+                    ->getSingleScalarResult();
+            }
+  // le nombre total des avis
+            public function countTotalAvis(): int
+                {
+                    return $this->createQueryBuilder('a')
+                        ->select('COUNT(a.id_avis)')
+                        ->getQuery()
+                        ->getSingleScalarResult();
+                }
     
 //    /**
 //     * @return Avis[] Returns an array of Avis objects

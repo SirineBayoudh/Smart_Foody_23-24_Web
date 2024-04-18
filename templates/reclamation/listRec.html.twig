@@ -8,6 +8,49 @@
 {% endblock %}
 
 {% block body %}
+
+<style>
+  .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+ .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+
+ /* CSS pour l'effet hover sur les lignes de tableau */
+ .table-striped tbody tr:hover {
+     background-color: #bbddab; /* Couleur de fond au survol */
+     color: #fff; /* Couleur du texte au survol */
+ }
+
+ /* Styles pour les boutons */
+ .btn {
+     /* Styles normaux des boutons */
+     background-color: #56ab2f;
+     border-color: #56ab2f;
+     color: #ffffff; /* Couleur du texte */
+     transition: background-color 0.3s; /* Transition fluide pour la couleur de fond */
+ }
+
+ /* Styles pour les boutons lorsqu'ils sont survolés */
+ .btn:hover {
+     background-color: #72c22f; /* Nouvelle couleur de fond */
+ }
+ .btn.dropdown-toggle:focus {
+ background-color: #ffffff; /* Couleur de fond du bouton lorsqu'il est ouvert */
+ color: #000000; /* Couleur du texte du bouton lorsqu'il est ouvert */
+}
+.thead-green {
+     background-color: #77bb58;
+     color: white;
+     position: sticky;
+     top: 0;
+     z-index: 1;
+ }
+ .text-green {
+ color: green !important;
+}
+.bg-custom-green {
+     background-color: #56ab2f !important; /* votre nouvelle couleur verte */
+     color: white;
+ }
+</style>
 <div>
     <br>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="50" height="40"  style="fill: currentColor; vertical-align: middle;" class="liste"  id="toggleButton" onclick="toggleList()">
@@ -16,8 +59,8 @@
       </svg>
     <div class="table-responsive" id="reclamationsTable">
         <h1 class="card-title">Liste des réclamations</h1>
-        <table class="table table-hover" class="table">
-            <thead>
+        <table class="table table-striped">
+            <thead class="bg-custom-green">
                 <tr class="text-center">
                     <th>Id Reclamation</th>
                     <th>Id Client</th>
@@ -39,22 +82,18 @@
                     <td>{{ reclamation.statut }}</td>
                     <td>{{ reclamation.type }}</td>
                     <td>{{ reclamation.dateReclamation|date('d-m-Y') }}</td>
-                    <td style="position: relative;">
-                        {% if reclamation.statut == 'Attente' %}
-                            <!-- Premier SVG remplacé -->
-                            <svg id="repondre-{{ reclamation.id }}" xmlns="http://www.w3.org/2000/svg" onclick="showForm({{ reclamation.id }})" viewBox="0 0 512 512" class="button-svg">                                
-                                <!-- Code SVG remplacé -->
-                                <path d="M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4l0 0 0 0 0 0 0 0 .3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z" fill="green"/>
-                            </svg>  
+                    <td>
+                        {% if reclamation.statut == 'Attente' %}         
+                            <button class="btn btn-success btn-sm" onclick="showForm({{ reclamation.id }})" title="Répondre">
+                              <i class="ti-email"></i>
+                          </button>
                         {% endif %}                      
+
+                        <button class="btn btn-danger btn-sm" onclick="confirmArchive('{{ path('archiverRec', {'id': reclamation.id}) }}')" title="Archiver">
+                          <i class="ti-trash"></i>
+                      </button>                    
                     </td>
-                    <td style="position: relative;">
-                        <!-- Deuxième SVG remplacé -->
-                        <svg xmlns="http://www.w3.org/2000/svg" onclick="window.location='{{ path('archiverRec', {'id': reclamation.id}) }}'" viewBox="0 0 512 512" class="button-svg">
-                            <!-- Code SVG remplacé -->
-                            <path d="M32 32H480c17.7 0 32 14.3 32 32V96c0 17.7-14.3 32-32 32H32C14.3 128 0 113.7 0 96V64C0 46.3 14.3 32 32 32zm0 128H480V416c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V160zm128 80c0 8.8 7.2 16 16 16H336c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z" fill="red"/>
-                        </svg> 
-                    </td>
+                    
                     </tr>
                 {% endfor %}
             </tbody>
@@ -69,8 +108,8 @@
 
     <div class="table-responsive" id="archivesTable" style="display:none;">
         <h1 class="card-title">Liste des archives</h1>
-        <table class="table table-hover">
-            <thead>
+        <table class="table table-striped">
+            <thead class="bg-custom-green">
                 <tr class="text-center">
                     <th>Id Reclamation</th>
                     <th>Id Client</th>
@@ -91,17 +130,13 @@
                     <td>{{ archives.titre }}</td>
                     <td>{{ archives.statut }}</td>
                     <td>{{ archives.type }}</td>
-                    <td>{{ archives.dateReclamation|date('d-m-Y') }}</td>
-                    <td style="position: relative;">                      
+                    <td>{{ archives.dateReclamation|date('d-m-Y') }}</td>                
+                    <td style="position: relative;"> 
+                        <button class="btn btn-danger btn-sm" onclick="confirmDearchive('{{ path('desarchiverRec', {'id': archives.id}) }}')" title="Desarchiver">
+                          <i class="ti-trash"></i>
+                      </button>
                     </td>
-                    <td style="position: relative;">
-                        <!-- Deuxième SVG remplacé -->
-                        <svg xmlns="http://www.w3.org/2000/svg" onclick="window.location='{{ path('desarchiverRec', {'id': archives.id}) }}'" viewBox="0 0 512 512" class="button-svg">
-                            <!-- Code SVG remplacé -->
-                            <path d="M32 32H480c17.7 0 32 14.3 32 32V96c0 17.7-14.3 32-32 32H32C14.3 128 0 113.7 0 96V64C0 46.3 14.3 32 32 32zm0 128H480V416c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V160zm128 80c0 8.8 7.2 16 16 16H336c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z" fill="green"/>
-                        </svg> 
-                    </td>
-                    </tr>
+                  </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -157,9 +192,9 @@
                       <div class="col-md-12 col-xl-3 d-flex flex-column justify-content-start">
                         <div class="ml-xl-4 mt-3">
                         <p class="card-title">Details sur les réclamations</p>
-                          <h1 class="text-primary">{{ nombreRec }}</h1>
-                          <h3 class="font-weight-500 mb-xl-4 text-primary">Nombre Total</h3>
-                          <p class="mb-2 mb-xl-0">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
+                          <h1 class="text-success" >{{ nombreRec }}</h1>
+                          <h3 class="font-weight-500 mb-xl-4 text-success">Nombre Total</h3>
+                          <p class="mb-2 mb-xl-0">Les informations sur le nombre de réclamation reçu par rapport à chaque type</p>
                         </div>  
                         </div>
                       <div class="col-md-12 col-xl-9">
@@ -171,7 +206,7 @@
                                   <td class="text-muted">Réclamation</td>
                                   <td class="w-100 px-0">
                                     <div class="progress progress-md mx-4">
-                                      <div class="progress-bar bg-primary" role="progressbar" style="width: {{ moyTypeRec }}%" aria-valuenow="{{ moyTypeRec }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                      <div class="progress-bar bg-success" role="progressbar" style="width: {{ moyTypeRec }}%" aria-valuenow="{{ moyTypeRec }}" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                   </td>
                                   <td><h5 class="font-weight-bold mb-0">{{ nbTypeRec }}</h5></td>
@@ -235,6 +270,59 @@
           </div>
         </div>
       </div>
+
+      <!-- Boite de dialogue -->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmRepondre(url) {
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Répondre à la réclamation ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'Oui, Répondre!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    function confirmArchive(url) {
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Voulez-vous archiver cette réclamation?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'Oui, archiver!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    function confirmDearchive(url) {
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Voulez-vous désarchiver cette réclamation?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#28a745',
+            confirmButtonText: 'Oui, désarchiver!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+
 
 
     
@@ -300,8 +388,10 @@
                     datasets: [{
                     fill: false,
                     lineTension: 0,
-                    backgroundColor: "rgba(0,0,255,1.0)",
-                    borderColor: "rgba(0,0,255,0.1)",
+                    //backgroundColor: "rgba(0,0,255,1.0)",
+                    //borderColor: "rgba(0,0,255,0.1)",
+                    pointBackgroundColor: 'green', // Couleur verte pour les points
+                    borderColor: 'green', // Couleur de la ligne
                     data: yValues
                     }]
                 },

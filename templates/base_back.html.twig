@@ -294,6 +294,45 @@
         </div>
       </div>
       <!-- partial -->
+
+      <style>
+        #sidebar .nav-item .nav-link:hover {
+          background-color: #77bb58;
+        }
+  
+        #test:visited {
+          color: green; background-color: #77bb58;
+        }
+        /* #stocksItem a:visited .menu-title, #alertesItem a:visited .menu-title {
+      background-color: #77bb58;
+      color: green;
+  } */
+  #stocksItem.active .nav-link,
+  #stocksItem.active .menu-title {
+      background-color: #77bb58;
+      color: white;
+  }
+  #alertesItem.active .nav-link,
+  #alertesItem.active .menu-title {
+      background-color: #77bb58;
+      color: white;
+  }
+  #authItem.active .nav-link,
+  #authItem.active .menu-title {
+      background-color: #77bb58;
+      color: white;
+  }
+  #sidebar .nav-item {
+      background-color: #ffffff;
+  }
+  #reclamationItem.active .nav-link,
+  #reclamationItem.active .menu-title {
+      background-color: #77bb58;
+      color: white;
+  }
+  
+  
+      </style>
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -397,13 +436,13 @@
               <span class="menu-title">Documentation</span>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="reclamationItem">
             <a class="nav-link" href="{{'reclamations'}}">
               <i class="icon-paper menu-icon"></i>
               <span class="menu-title">Réclamation</span>
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" id="reclamationItem">
             <a class="nav-link" href="{{'avisBack'}}">
               <i class="icon-paper menu-icon"></i>
               <span class="menu-title">Avis</span>

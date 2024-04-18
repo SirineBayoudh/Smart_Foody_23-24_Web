@@ -168,7 +168,7 @@
 				{% for produit in similar_products %}
 				<div class="col-md-6 col-lg-3 ftco-animate">
 					<div class="product">
-						<a href="{{ path('avis_nouveau', {'ref': produit.ref}) }}" class="img-prod">
+						<a href="{{ path('produit_aff', {'ref': produit.ref}) }}" class="img-prod">
 							<img class="img-fluid" src="{{ asset('images/' ~ produit.image) }}" alt="{{ produit.marque }}">
 						</a>						<div class="text py-3 pb-4 px-3 text-center">
 							<h3><a href="#">{{ produit.marque }}</a></h3>
