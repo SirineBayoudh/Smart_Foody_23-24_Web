@@ -1,0 +1,49 @@
+{# template: statistiques/index.html.twig #}
+{% block body %}
+<button id="afficherStatistiques">Afficher les Statistiques</button>
+<canvas id="chartClientsFideles" width="400" height="400" style="display:none;"></canvas>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('afficherStatistiques').addEventListener('click', function() {
+            const canvas = document.getElementById('chartClientsFideles');
+            canvas.style.display = 'block'; // Rend le canevas visible
+            const ctx = canvas.getContext('2d');
+            
+            if (window.monGraphique) {
+                window.monGraphique.destroy();
+            }
+
+            window.monGraphique = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: {{ clientsFideles|map(client => 'Client ' ~ client.idClient)|json_encode|raw }},
+                    datasets: [{
+                        label: 'Total des Commandes',
+                        data: {{ clientsFideles|map(client => client.totalCommande)|json_encode|raw }},
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Nombre de Commandes',
+                        data: {{ clientsFideles|map(client => client.nombreCommandes)|json_encode|raw }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

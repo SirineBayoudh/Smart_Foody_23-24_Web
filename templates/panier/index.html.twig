@@ -50,8 +50,9 @@
                 </tbody>
             </table>
         </div>
-        <div class="text-right mb-5">
-            <button id="vider-panier-btn" class="btn btn-warning py-3 px-4" onclick="confirmViderPanier('{{ path('vider_panier') }}')">Vider le Panier</button>
+      
+         <div class="text-right mb-5">
+            <a href="#" id="vider-panier-btn" class="btn btn-primary py-3 px-4" onclick="confirmViderPanier('{{ path('vider_panier') }}')">Vider le Panier</a>
         </div>
         <div class="row justify-content-center">
             <div class="col-lg-10 mt-5 cart-wrap ftco-animate">
@@ -79,37 +80,41 @@
 </div>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function confirmViderPanier(url) {
-        Swal.fire({
-            title: 'Êtes-vous sûr?',
-            text: "Vous êtes sur le point de vider le panier!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#28a745',
-            confirmButtonText: 'Oui, vider le panier!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = url;
-            }
-        });
-    }
+ function confirmViderPanier(url) {
+    Swal.fire({
+        title: 'Êtes-vous sûr?',
+        text: "Vous êtes sur le point de vider le panier!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#28a745',
+        confirmButtonText: 'Oui, vider le panier!',
+        cancelButtonText: 'Annuler' // Remplacer "Cancel" par "Annuler"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+}
 
-    function confirmSuppression(url) {
-        Swal.fire({
-            title: 'Êtes-vous sûr?',
-            text: "Vous êtes sur le point de supprimer cet article du panier!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#28a745',
-            confirmButtonText: 'Oui, supprimer!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = url;
-            }
-        });
-    }
+
+ function confirmSuppression(url) {
+    Swal.fire({
+        title: 'Êtes-vous sûr?',
+        text: "Vous êtes sur le point de supprimer cet article du panier!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#28a745',
+        confirmButtonText: 'Oui, supprimer!',
+        cancelButtonText: 'Annuler' // Remplacer "Cancel" par "Annuler"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+}
+
 
   function decrementerQuantite(idLigneCommande, quantiteActuelle) {
     if (quantiteActuelle > 1) {
