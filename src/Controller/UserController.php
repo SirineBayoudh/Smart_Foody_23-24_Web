@@ -9,9 +9,12 @@ use App\Form\MdpClientType;
 use App\Form\MdpConseillerType;
 use App\Form\ProfilClientType;
 use App\Form\ProfilConseillerType;
+use App\Form\ResetPasswordType;
+use App\Form\SendEmailType;
 use App\Form\UtilisateurType;
 use App\Repository\UtilisateurRepository;
 use App\Service\EmailService;
+use Doctrine\ORM\Mapping\Id;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,6 +73,81 @@ class UserController extends AbstractController
         // Afficher le formulaire de connexion avec éventuellement un message d'erreur
         return $this->render('security/login.html.twig', [
             'error' => $error,
+        ]);
+    }
+
+    #[Route('/forgotPassword', name: 'app_forgot_password')]
+    public function forgotPassword(ManagerRegistry $manager, Request $request, MailerInterface $mailer, UtilisateurRepository $repo)
+    {
+        $form = $this->createForm(SendEmailType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $email = $form->getData()['email'];
+
+            $user = $repo->findOneByEmail($email);
+
+            if ($user) {
+
+                // Envoi de l'e-mail
+                $message = (new Email())
+                    ->from('smartfoody.2024@gmail.com')
+                    ->to($user->getEmail())
+                    ->subject('Reset password')
+                    ->html(
+                        $this->renderView(
+                            'user/email.html.twig',
+                            [
+                                'user' => $user
+                            ]
+                        ),
+                        'text/html'
+                    );
+
+                $mailer->send($message);
+
+                $this->addFlash('success', 'Un email de réinitialisation de mot de passe a été envoyé.');
+                return $this->redirectToRoute('login');
+            }
+
+            $this->addFlash('danger', 'Aucun utilisateur trouvé avec cet email.');
+        }
+
+        return $this->render('security/forgot_password.html.twig', [
+            'emailForm' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/resetPassword/{id}', name: 'app_reset_password')]
+    public function resetPassword(Request $request, $id, UtilisateurRepository $repo)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $user = $repo->find($id);
+
+        if (!$user) {
+            $this->addFlash('danger', 'Utilisateur introuvable.');
+            return $this->redirectToRoute('login');
+        }
+
+        $form = $this->createForm(ResetPasswordType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            if ($data['password'] === $data['confirm_password']) {
+                $p = $data['password'];
+                $user->setMotDePasse(md5($p));
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Votre mot de passe a été réinitialisé.');
+                return $this->redirectToRoute('login');
+            } else {
+                $this->addFlash('danger', 'Les mots de passe ne correspondent pas.');
+            }
+        }
+
+        return $this->render('security/reset_password.html.twig', [
+            'form' => $form->createView()
         ]);
     }
 

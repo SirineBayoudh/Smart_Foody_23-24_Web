@@ -12,9 +12,9 @@
 			font-size: 24px;
 			font-family: "Roboto", sans-serif;
 		}
+
 	</style>
 
-	
 
 	<div class="col-md-6 grid-margin stretch-card">
 		<div class="card">
@@ -29,53 +29,95 @@
 					{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
 					<div class="form-group">
 						<label for="exampleInputNom1">{{ form_label(f.nom) }}</label>
-						{{ form_widget(f.nom, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-						{{ form_errors(f.nom) }}
+						{{ form_widget(f.nom, {'attr': {'class': 'form-control' ~ (form_errors(f.nom) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+						{% if form_errors(f.nom) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.nom) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputPrenom1">{{ form_label(f.prenom) }}</label>
-						{{ form_widget(f.prenom, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
-						{{ form_errors(f.prenom) }}
+						{{ form_widget(f.prenom, {'attr': {'class': 'form-control' ~ (form_errors(f.prenom) ? ' is-invalid' : ''), 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+						{% if form_errors(f.prenom) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.prenom) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputEmail1">{{ form_label(f.email) }}</label>
-						{{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Email'}}) }}
-						{{ form_errors(f.email) }}
+						{{ form_widget(f.email, {'attr': {'class': 'form-control' ~ (form_errors(f.email) ? ' is-invalid' : ''), 'id': 'exampleInputEmail1', 'placeholder': 'Email'}}) }}
+						{% if form_errors(f.email) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.email) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputPassword1">{{ form_label(f.motDePasse) }}</label>
-						{{ form_widget(f.motDePasse, {'attr': {'class': 'form-control', 'id': 'exampleInputPassword1', 'placeholder': 'Mot de passe'}}) }}
-						{{ form_errors(f.motDePasse) }}
+						{{ form_widget(f.motDePasse, {'attr': {'class': 'form-control' ~ (form_errors(f.motDePasse) ? ' is-invalid' : ''), 'id': 'exampleInputPassword1', 'placeholder': 'Mot de passe'}}) }}
+						{% if form_errors(f.motDePasse) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.motDePasse) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.genre) }}</label>
-						{{ form_widget(f.genre, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Genre'}}) }}
-						{{ form_errors(f.genre) }}
+						{{ form_widget(f.genre, {'attr': {'class': 'form-control' ~ (form_errors(f.genre) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Genre'}}) }}
+						{% if form_errors(f.genre) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.genre) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
-						{{ form_widget(f.numTel, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Numéro de téléphone'}}) }}
-						{{ form_errors(f.numTel) }}
+						{{ form_widget(f.numTel, {'attr': {'class': 'form-control' ~ (form_errors(f.numTel) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Numéro de téléphone'}}) }}
+						{% if form_errors(f.numTel) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.numTel) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputMatricule1">{{ form_label(f.matricule) }}</label>
-						{{ form_widget(f.matricule, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Matricule'}}) }}
-						{{ form_errors(f.matricule) }}
+						{{ form_widget(f.matricule, {'attr': {'class': 'form-control' ~ (form_errors(f.matricule) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Matricule'}}) }}
+						{% if form_errors(f.matricule) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.matricule) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.attestation) }}</label>
-						{{ form_widget(f.attestation, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
-						{{ form_errors(f.attestation) }}
+						{{ form_widget(f.attestation, {'attr': {'class': 'form-control' ~ (form_errors(f.attestation) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+						{% if form_errors(f.attestation) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.attestation) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
-						{{ form_widget(f.photo, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Photo'}}) }}
-						{{ form_errors(f.photo) }}
+						<div class="custom-file">
+							{{ form_widget(f.photo, {'attr': {'class': 'custom-file-input' ~ (form_errors(f.photo) ? ' is-invalid' : ''), 'id': 'customFile'}}) }}
+							<label class="custom-file-label" for="customFile" id="customFileLabel">Choisir un fichier</label>
+						</div>
+						{% if form_errors(f.photo) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.photo) }}
+							</div>
+						{% endif %}
 					</div>
+					
 					{{ form_end(f) }}
 					<button class="btn btn-light" style="margin-left:130px; margin-top:-70px;" onclick="window.location.href='listUsers';">Cancel</button>
 				</div>
 			</div>
 		</div>
 	</div>
+	
+
 {% endblock %}

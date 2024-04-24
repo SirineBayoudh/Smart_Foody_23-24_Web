@@ -6,6 +6,7 @@ use App\Entity\Utilisateur;
 use League\OAuth2\Client\Grant\Password;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -81,7 +82,14 @@ class ConseillerType extends AbstractType
                     ])
                 ]
             ])
-            ->add('photo')
+            ->add('photo', FileType::class, [
+                'label' => 'Photo (fichier image)',
+                'required' => false,
+                
+                'attr' => [
+                    'accept' => 'image/*', // Cela limite le gestionnaire de fichiers à montrer seulement les images
+                ]
+            ])
             ->add('Ajouter', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-success mr-2']
             ]);;

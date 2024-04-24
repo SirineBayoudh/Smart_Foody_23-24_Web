@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Knp\Component\Pager\PaginatorInterface;
 use Knp\Snappy\Pdf;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class BackUserController extends AbstractController
 {
@@ -36,7 +37,7 @@ class BackUserController extends AbstractController
     {
 
         $roleFilter = $request->query->get('role');
-        $query = $request->query->get('query'); 
+        $query = $request->query->get('query');
 
         if ($roleFilter) {
             $list = $repo->findByRole($roleFilter);
@@ -206,6 +207,25 @@ class BackUserController extends AbstractController
 
 
         if ($form->isSubmitted()) {
+
+            $imageFile = $form->get('photo')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                // Déplace le fichier dans le répertoire où sont stockées les images
+                try {
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // Gérer l'exception si le fichier ne peut pas être déplacé
+                }
+                // Met à jour le nom de l'image dans l'entité Produit
+                $user->setPhoto($newFilename);
+            }
+
             $email = $form->get('email')->getData();
 
             $existingUser = $repo->findByEmail($email);
