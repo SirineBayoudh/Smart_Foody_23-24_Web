@@ -136,11 +136,13 @@
         </div>
     </div>
 </section>
-    
-    
-<div class="video-container">
-  <iframe width="300" height="315" src="https://www.youtube.com/embed/3O-HdPqqK4A" frameborder="0" allowfullscreen></iframe>
+ 
+<div class="col-md-12 text-center">
+<h1>Propositions des recettes :</h1>  
+<div class="video-container" id="video-container">
+  <!-- Les vidéos seront chargées ici -->
 </div>
+
 
 
 
@@ -266,6 +268,51 @@
         productScroll.scrollLeft += amount;
     }
 </script>
+<script>
+  // Liste des IDs de vidéos YouTube
+  var videoIds = ["1N6hbRbyAeQ", "AYXfaVD5o40", "KB0NansInGA"];
+
+  // Votre clé API YouTube
+  var apiKey = "AIzaSyCXEBk9FVXu4vD2dJUIEDd2GDgVxxtnuMM";
+
+  // Fonction pour charger les vidéos
+  function loadVideos() {
+    var container = document.getElementById("video-container");
+
+    // Pour chaque ID de vidéo, récupérer les informations de la vidéo
+    videoIds.forEach(function(videoId) {
+      var apiUrl = "https://www.googleapis.com/youtube/v3/videos?id=" + videoId + "&key=" + apiKey + "&part=status";
+      
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          // Vérifier si la vidéo peut être intégrée
+          var embeddable = data.items[0].status.embeddable;
+          if (embeddable) {
+            // Si la vidéo peut être intégrée, créer un iframe pour charger la vidéo
+            var iframe = document.createElement("iframe");
+            iframe.width = "300";
+            iframe.height = "168.75";
+            iframe.src = "https://www.youtube.com/embed/" + videoId;
+            iframe.frameborder = "0";
+            iframe.allowfullscreen = true;
+
+            var videoDiv = document.createElement("div");
+            videoDiv.className = "video";
+            videoDiv.appendChild(iframe);
+
+            container.appendChild(videoDiv);
+          } else {
+            console.log("La vidéo avec l'ID " + videoId + " ne peut pas être intégrée.");
+          }
+        })
+        .catch(error => console.error("Erreur lors de la récupération des informations de la vidéo:", error));
+    });
+  }
+
+  // Charger les vidéos lorsque la page est prête
+  document.addEventListener("DOMContentLoaded", loadVideos);
+</script>
 
   <style>
    h1 {
@@ -298,6 +345,24 @@
 
 .video-container iframe {
     width: 50%; /* Utilisez la largeur totale du conteneur */
+}
+.video-container {
+  display: flex;
+  justify-content: space-between;
+  overflow-x: auto; /* Pour permettre le défilement horizontal si nécessaire */
+  margin-bottom: 20px; /* Marge entre la vidéo et le contenu suivant */
+}
+
+.video {
+  flex: 0 0 auto; /* Empêche le redimensionnement des vidéos */
+  width: 450px; /* Largeur fixe de chaque vidéo */
+  height: 280px;
+}
+
+/* Style pour les vidéos si vous souhaitez ajuster */
+.video iframe {
+  width: 100%;
+  height: 100%;
 }
 
   </style>
