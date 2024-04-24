@@ -33,7 +33,7 @@ class UserController extends AbstractController
 {
 
     #[Route('/login', name: 'login')]
-    public function login(Request $request, ManagerRegistry $manager): Response
+    public function login(Request $request, ManagerRegistry $manager, SessionInterface $session): Response
     {
         $error = '';
 
@@ -50,11 +50,11 @@ class UserController extends AbstractController
                 if ($user->getMotDePasse() == md5($password)) {
                     dump("we found it");
 
-                    if ($user->getRole() == 'Admin') {
+                    $session->set('utilisateur', ['idUtilisateur' => $user->getIdUtilisateur(), 'email' => $user->getEmail(), 'role' => $user->getRole()]);
 
+                    if ($user->getRole() == 'Admin') {
                         return $this->redirectToRoute('app_back');
                     } else {
-
                         return $this->redirectToRoute('accueil');
                     }
                 } else {

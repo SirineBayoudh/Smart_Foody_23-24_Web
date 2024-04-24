@@ -90,9 +90,8 @@
 
 	<div class="col-lg-10 grid-margin stretch-card">
 		<div class="card">
-			<button type="button" class="btn btn-inverse-success btn-fw" style="margin-top:80px; width:300px; margin-left:30px" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
 
-			<div class="anchor-pane" style="margin-top:-90px;">
+			<div class="anchor-pane">
 
 				{% for flash_message in app.flashes('success') %}
 					<div class="alert alert-success" id="successMessage" role="alert">
@@ -290,6 +289,7 @@ document.getElementById('successMessage').style.display = 'none';
 					</div>
 				</div>
 			</div>
+			<button type="button" class="btn btn-inverse-success btn-fw" style="margin-top:80px; width:300px; margin-left:30px" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
 
 		</div>
 

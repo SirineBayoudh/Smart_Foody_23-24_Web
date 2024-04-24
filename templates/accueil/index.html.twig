@@ -1,5 +1,22 @@
 {% extends 'base_accueil.html.twig' %}
 
-{% block title %}Accueil{% endblock %}
+{% block title %}Accueil
+{% endblock %}
 
 
+{% block profile %}
+	{% if role == 'Client' %}
+		href="{{ path('client_profile', {'id': userId}) }}"
+	{% elseif role == 'Conseiller' %}
+		href="{{ path('conseiller_profile', {'id': userId}) }}"
+	{% endif %}
+{% endblock %}
+
+
+{% block dashboard %}
+	{% if role == 'Admin' %}
+		<li class="nav-item active dashboard-link-hidden">
+			<a href="back" class="nav-link">Dashboard</a>
+		</li>
+	{% endif %}
+{% endblock %}
