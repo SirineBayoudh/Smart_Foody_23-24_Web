@@ -136,6 +136,19 @@
         </div>
     </div>
 </section>
+
+<div>
+  <label for="ingredient">Ingrédient :</label>
+  <input type="text" id="ingredient" placeholder="Entrez un ingrédient">
+  <button onclick="searchRecipes()">Rechercher</button>
+</div>
+
+<div id="recipe-container">
+  <!-- Les recettes seront affichées ici -->
+</div>
+
+
+
  
 <div class="col-md-12 text-center">
 <h1>Propositions des recettes :</h1>  
@@ -312,6 +325,80 @@
 
   // Charger les vidéos lorsque la page est prête
   document.addEventListener("DOMContentLoaded", loadVideos);
+</script>
+
+<script>
+  // Fonction pour rechercher les recettes
+function searchRecipes() {
+  // Récupérer l'ingrédient saisi par l'utilisateur
+  var ingredient = document.getElementById("ingredient").value;
+
+  // Vérifier si l'ingrédient est vide
+  if (ingredient.trim() === "") {
+    alert("Veuillez saisir un ingrédient !");
+    return;
+  }
+
+  // Effacer les recettes précédentes
+  document.getElementById("recipe-container").innerHTML = "";
+
+  // Votre clé API Spoonacular
+  var apiKey = "7a54d73f23c24bbab743375dbe147451";
+
+  // URL de l'API Spoonacular pour rechercher des recettes par ingrédient
+  var apiUrl = "https://api.spoonacular.com/recipes/findByIngredients?apiKey=" + apiKey + "&ingredients=" + encodeURIComponent(ingredient) + "&number=5";
+
+  // Faire une requête GET à l'API Spoonacular
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      // Pour chaque recette, obtenir les détails de la recette
+      data.forEach(function(recipe) {
+        var recipeId = recipe.id;
+        var recipeTitle = recipe.title;
+        var recipeImage = recipe.image;
+
+        // URL de l'API Spoonacular pour obtenir les détails de la recette par son ID
+        var recipeDetailsUrl = "https://api.spoonacular.com/recipes/" + recipeId + "/information?apiKey=" + apiKey;
+
+        // Faire une autre requête GET pour obtenir les détails de la recette
+        fetch(recipeDetailsUrl)
+          .then(response => response.json())
+          .then(recipeData => {
+            // Afficher la recette avec ses détails
+            displayRecipe(recipeTitle, recipeImage, recipeData);
+          })
+          .catch(error => console.error("Erreur lors de la récupération des détails de la recette:", error));
+      });
+    })
+    .catch(error => console.error("Erreur lors de la récupération des recettes:", error));
+}
+
+// Fonction pour afficher une recette avec ses détails
+function displayRecipe(title, image, recipeData) {
+  var recipeDiv = document.createElement("div");
+  recipeDiv.className = "recipe";
+
+  var recipeTitle = document.createElement("h3");
+  recipeTitle.textContent = title;
+
+  var recipeImage = document.createElement("img");
+  recipeImage.src = image;
+
+  var recipeInstructions = document.createElement("ol");
+  recipeData.analyzedInstructions[0].steps.forEach(function(step) {
+    var instructionItem = document.createElement("li");
+    instructionItem.textContent = step.step;
+    recipeInstructions.appendChild(instructionItem);
+  });
+
+  recipeDiv.appendChild(recipeTitle);
+  recipeDiv.appendChild(recipeImage);
+  recipeDiv.appendChild(recipeInstructions);
+
+  document.getElementById("recipe-container").appendChild(recipeDiv);
+}
+
 </script>
 
   <style>
