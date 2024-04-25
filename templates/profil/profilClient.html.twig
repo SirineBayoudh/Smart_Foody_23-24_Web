@@ -1,0 +1,125 @@
+{% extends 'base_accueil.html.twig' %}
+
+{% block title %}Profil
+{% endblock %}
+
+{% block stylesheets %}
+	<style>
+
+
+		.infos a,
+		.infos a:hover {
+			text-decoration: none;
+			color: black;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="page">
+		<div classname="nn"></div>
+		<div class="cont" style="position: fixed; width: 380px; height: 500px; margin-left: 50px; border-radius: 8px;">
+			<div class="infos" style="position: relative; inset: 2px; border-radius: 8px; z-index: 10; padding: 50px 40px; display: flex; flex-direction: column;">
+				
+				<div>
+					<a
+						{% block href %}
+							href=""
+						{% endblock %}	
+						style="text-decoration: none; color: black;"> 
+												Données personnelles et adresses</a>
+					<br/>
+					
+					<br/>
+					<a href="" style="text-decoration: none; color: black;">
+						Historique des commandes</a>
+				</div>
+				<br/><br/>
+				<a id="deconn" href="" style="font-weight: bold;">
+					Se déconnecter</a>
+			</div>
+
+
+		</div>
+		{% block contenu %}
+			<div class="side" id="donnéesClient" style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;display:block;">
+				<div class="col-md-6 grid-margin stretch-card">
+					<div class="card">
+						<div class="card-body">
+							<h4 class="card-title">Accédez à votre compte</h4>
+
+							<div class="forms-sample">
+								{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
+								<div class="form-group">
+									<label for="exampleInputUsername1">{{ form_label(f.nom) }}</label>
+									{{ form_widget(f.nom, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+									{{ form_errors(f.nom) }}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputEmail1">{{ form_label(f.prenom) }}</label>
+									{{ form_widget(f.prenom, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+									{{ form_errors(f.prenom) }}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputEmail1">{{ form_label(f.email) }}</label>
+									{{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+									{{ form_errors(f.email) }}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputUsername1">{{ form_label(f.objectif) }}</label>
+									{{ form_widget(f.objectif, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+									{{ form_errors(f.objectif) }}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputUsername1">{{ form_label(f.genre) }}</label>
+									{{ form_widget(f.genre, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+									{{ form_errors(f.genre) }}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
+									{{ form_widget(f.numTel, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+									{{ form_errors(f.numTel) }}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputUsername1">{{ form_label(f.adresse) }}</label>
+									{{ form_widget(f.adresse, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+									{{ form_errors(f.adresse) }}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
+									<div class="custom">
+										{{ form_widget(f.photo, {'attr': {'class': 'form-control' ~ (form_errors(f.photo) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+									</div>
+									{% if form_errors(f.photo) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.photo) }}
+										</div>
+									{% endif %}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputUsername1">{{ form_label(f.taille) }}</label>
+									{{ form_widget(f.taille, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+									{{ form_errors(f.taille) }}
+								</div>
+								<div class="form-group">
+									<label for="exampleInputUsername1">{{ form_label(f.poids) }}</label>
+									<div class="custom">
+										{{ form_widget(f.poids, {'attr': {'class': 'form-control' ~ (form_errors(f.poids) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+									</div>
+									{% if form_errors(f.poids) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.poids) }}
+										</div>
+									{% endif %}
+								</div>
+								{{ form_end(f) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		{% endblock %}
+	</div>
+
+{% endblock %}

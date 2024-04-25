@@ -1,3 +1,4 @@
+{% extends 'profil/profilClient.html.twig' %}
 
 {% block contenu %}
 <style>
@@ -9,58 +10,76 @@
         color: white;
         border-color: #388E3C;
         animation: slideInUp 1s ease forwards;
+        padding: 6px 12px; /* Ajustement de la taille des boutons */
+        font-size: 14px; /* Ajustement de la taille de la police des boutons */
+        line-height: 1.5; /* Ajustement de la hauteur de ligne */
+        font-family: Arial, sans-serif; /* Utilisation de la police Arial ou une police sans-serif */
+    }
+    /* Style pour la forme de la commande */
+    .commande {
+        border: 1px solid #4CAF50; /* Bordure verte */
+        border-radius: 6px; /* Réduction de la bordure arrondie */
+        padding: 6px; /* Réduction de la taille de la commande */
+        margin-bottom: 15px; /* Réduction de l'espacement entre les commandes */
+        transition: transform 0.3s ease;
+        position: relative; /* Ajout de position relative pour le positionnement du bouton */
+    }
+    .commande:hover {
+        transform: translateY(-5px);
+    }
+    .total-commande {
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    .btn-details-wrapper {
+        position: absolute; /* Positionnement absolu pour le bouton */
+        bottom: 0; /* Alignement en bas */
+        right: 0; /* Alignement à droite */
+        margin: 10px; /* Marge autour du bouton */
+    }
+    .btn-details {
+        padding: 8px 16px; /* Ajustement de la taille du bouton */
+    }
+    .commande p {
+        text-align: left; /* Alignement des données de la commande à gauche */
+    }
+    /* Style pour le bouton lorsqu'il est cliqué */
+    .btn-details:active {
+        background-color: #388E3C;
+        border-color: #388E3C;
     }
 </style>
-    <div id="commande-container" class="side" style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;">
-        <div class="container mt-3">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Historique des commandes</h2>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Commande ID</th>
-                                <th>Date de commande</th>
-                                <th>État de commande</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for commande in historiqueCommandes %}
-                                <tr>
-                                    <td>{{ commande.id }}</td>
-                                    <td>{{ commande.dateCommande|date('Y-m-d') }}</td>
-                                    <td>{{ commande.etat }}</td>
-                                    <td>
-                                            <a href="{{ path('commande_details', {'id': commande.id}) }}" class="btn btn-warning btn-sm">
-                                                <img src="{{ asset('images/icons8-eye-100.png') }}" alt="Votre image" width="15" height="15">
-                                            </a>
-                                        </td> 
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <div class="container mt-3 hidden" id="details-container">
-            <div class="row">
-                
-                      
-                        <table class="table table-hover">
-                            <thead class="thead-primary">
-                                
-                            </thead>
-                            <tbody id="details-body">
-                               
-                            </tbody>
-                        </table>
-                  
+
+	<div class="side" id="commande-container" style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;">
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-12 text-center"> <!-- Centrage du contenu -->
+                <h2>Historique des commandes</h2>
+                {% for commande in historiqueCommandes %}
+                    <div class="commande">
+                        <p><strong>Commande ID:</strong> {{ commande.id }}</p>
+                        <p><strong>Date de commande:</strong> {{ commande.dateCommande|date('Y-m-d') }}</p>
+                        <p class="total-commande"><strong>Total de la commande:</strong> {{ commande.totaleCommande }} TND</p>
+                        <div class="btn-details-wrapper">
+                            <a href="{{ path('commande_details', {'id': commande.id}) }}" class="btn btn-warning btn-sm btn-details">
+                                Voir les détails
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 
-
-
+    <div class="container mt-3 hidden" id="details-container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Détails de la commande</h2>
+                <div id="details-body">
+                    <!-- Les détails de la commande seront affichés ici -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

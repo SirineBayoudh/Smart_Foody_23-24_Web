@@ -16,16 +16,20 @@ class ProfilController extends AbstractController
     public function index(int $id, CommandeRepository $commandeRepository): Response
     {
         $id_client = 14;
+       
 
-
+        
         $commande = $commandeRepository->find($id);
+        $remise = $commande->getRemise(); 
+        $prixTotalAvecRemise = $commande->getTotaleCommande() - $remise;
 
         // Récupérer l'historique des commandes du client avec l'ID passé en paramètre
         $historiqueCommandes = $commandeRepository->findHistoriqueCommandesByClientId($id_client);
 
         return $this->render('profil/index.html.twig', [
             'historiqueCommandes' => $historiqueCommandes,
-            'commande'=>$commande,  // Passer les commandes au template
+            'commande'=>$commande,
+            'prixTotalAvecRemise' => $prixTotalAvecRemise,  // Passer les commandes au template
         ]);
     }
 
@@ -35,6 +39,9 @@ class ProfilController extends AbstractController
     public function commandeDetails($id, CommandeRepository $commandeRepository)
     {
         $commande = $commandeRepository->find($id);
+        $remise = $commande->getRemise(); 
+        $prixTotalAvecRemise = $commande->getTotaleCommande() - $remise;
+
 
         if (!$commande) {
             throw $this->createNotFoundException('La commande demandée n\'existe pas');
@@ -46,7 +53,8 @@ class ProfilController extends AbstractController
         // Passer les données nécessaires au template Twig
         return $this->render('profil/details_commande.html.twig', [
             'commande' => $commande,
-            'qrCode' => $qrCode, // Passer le QR code au template
+            'qrCode' => $qrCode,
+            'prixTotalAvecRemise' => $prixTotalAvecRemise, // Passer le QR code au template
         ]);
     }
 
