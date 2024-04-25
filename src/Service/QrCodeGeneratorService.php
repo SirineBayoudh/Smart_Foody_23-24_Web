@@ -41,7 +41,8 @@ class QrCodeGeneratorService extends AbstractController // Correction du nom de 
 
         return $this->render('qr_code_generator/index.html.twig', [
             'qrCodeImage' => $qrCodeImage,
-            'commande' => $commande
+            'commande' => $commande, 
+            
         ]);
     }
 }
