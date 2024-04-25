@@ -1,0 +1,195 @@
+
+
+{% block title %}Détails de la Commande{% endblock %}
+
+{% block contenu %}
+<style>
+    /* Styles existants */
+    .font-weight-bold {
+        color: #4CAF50;
+        text-align: center;
+        margin-bottom: 20px;
+        animation: slideInLeft 1s ease forwards; /* Animation pour le titre */
+    }
+    .form-control {
+        border: 1px solid #66BB6A;
+    }
+    .btn-icon-text {
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-icon-text i {
+        margin-right: 5px;
+    }
+    .centered-buttons {
+        display: flex;
+        justify-content: center; /* Centrer les boutons */
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .table thead {
+        background-color: #4CAF50;
+        animation: fadeInDown 1s ease forwards; /* Animation pour l'en-tête du tableau */
+    }
+    .table .total {
+        color: #66BB6A;
+    }
+    .btn-primary, .btn-warning {
+        background-color: #4CAF50;
+        color: white;
+        border-color: #388E3C;
+        animation: slideInUp 1s ease forwards; /* Animation pour les boutons */
+    }
+    .btn-warning:hover {
+        background-color: #388E3C;
+    }
+      .table thead th {
+        color: white; /* Couleur du texte en blanc */
+    }
+    .img {
+        width: 60px;
+        height: 60px;
+        background-size: cover;
+        background-position: center center;
+        border-radius: 50%;
+    }
+    .table-bordered td, .table-bordered th {
+        border-color: #81C784;
+    }
+
+    /* Ajout pour espacement et alignement */
+    .cart-list {
+        margin-bottom: 30px; /* Décalage supplémentaire vers le bas */
+        margin-top: 40px; /* Ajout de marge en haut */
+        animation: borderAnimation 1s ease forwards; /* Animation pour le cadre */
+    }
+    .form-group.address {
+        grid-column: 1 / -1; /* Étendre l'adresse sur toute la largeur */
+    }
+
+    /* Inversion des colonnes */
+    @media (min-width: 768px) {
+        .flex-md-first {
+            order: 1; /* Rétablissement de l'ordre */
+        }
+        .flex-md-last {
+            margin-left: auto;
+        }
+    }
+
+    /* Définition des animations */
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    /* Nouveau style pour le cadre avec des couleurs changeantes dans les nuances du vert */
+    .cart-list {
+        margin-bottom: 30px;
+        margin-top: 40px;
+        padding: 20px;
+        border-radius: 10px; /* Bordures arrondies */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ombre */
+        transition: all 0.3s ease; /* Animation de transition */
+        background-color: rgba(76, 175, 80, 0.1); /* Couleur de fond dans une nuance de vert (ici vert clair) */
+    }
+
+    /* Effet de survol pour le cadre */
+    .cart-list:hover {
+        transform: translateY(-5px); /* Légère translation vers le haut */
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée */
+        background-color: rgba(76, 175, 80, 0.2); /* Couleur de fond plus foncée lors du survol */
+    }       /* Nouveau style pour le cadre */
+    .cart-list {
+        margin-bottom: 30px;
+        margin-top: 40px;
+        padding: 20px;
+        border-radius: 10px; /* Bordures arrondies */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ombre */
+        transition: all 0.3s ease; /* Animation de transition */
+    }
+
+    /* Effet de survol pour le cadre */
+    .cart-list:hover {
+        transform: translateY(-5px); /* Légère translation vers le haut */
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée */
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes borderAnimation {
+        from {
+            border: 1px solid transparent; /* Bordure transparente au début */
+        }
+        to {
+            border: 1px solid #4CAF50; /* Bordure solide à la fin */
+        }
+    }
+</style>
+<div class="side" id="mdpClient" style="position: relative; width: 1500px; height: 1500px; border-radius: 8px; overflow: hidden; margin-left: 600px; margin-top: 100px;">
+    <div class="row">
+        
+            
+        
+
+        <div class="col-md-6 ftco-animate flex-md-first">
+            <div class="cart-list">
+                <h3 class="font-weight-bold">Produits Achetés</h3>
+                <table class="table table-hover">
+                    <thead class="thead-primary">
+                        <tr class="text-center">
+                            <th>&nbsp;</th>
+                        
+                            <th>Produit</th>
+                            <th>Prix</th>
+                            <th>Quantité</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ligneCommande in commande.getLignesCommande() %}
+                        <tr class="text-center">
+                            <td class="image-prod">
+                                <div class="img" style="background-image:url('{{ asset(ligneCommande.produit.image) }}');"></div>
+                            </td>
+
+                            <td class="product-name">{{ ligneCommande.produit.marque }}</td>
+
+                            <td class="price">{{ ligneCommande.produit.prix }} TND</td>
+                            <td class="quantity">{{ ligneCommande.quantite }}</td>
+                            <td class="total">{{ ligneCommande.quantite * ligneCommande.produit.prix }} TND</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
