@@ -13,6 +13,15 @@
 			font-family: "Roboto", sans-serif;
 		}
 
+		.custom-file-upload {
+			border: 1px solid #ccc;
+			display: inline-block;
+			padding: 6px 12px;
+			cursor: pointer;
+			background-color: #f8f8f8;
+			border-radius: 5px;
+			margin-top: 10px;
+		}
 	</style>
 
 
@@ -92,7 +101,9 @@
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.attestation) }}</label>
-						{{ form_widget(f.attestation, {'attr': {'class': 'form-control' ~ (form_errors(f.attestation) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+						<div class="custom">
+							{{ form_widget(f.attestation, {'attr': {'class': 'form-control' ~ (form_errors(f.attestation) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+						</div>
 						{% if form_errors(f.attestation) %}
 							<div class="invalid-feedback">
 								{{ form_errors(f.attestation) }}
@@ -101,9 +112,8 @@
 					</div>
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
-						<div class="custom-file">
-							{{ form_widget(f.photo, {'attr': {'class': 'custom-file-input' ~ (form_errors(f.photo) ? ' is-invalid' : ''), 'id': 'customFile'}}) }}
-							<label class="custom-file-label" for="customFile" id="customFileLabel">Choisir un fichier</label>
+						<div class="custom">
+							{{ form_widget(f.photo, {'attr': {'class': 'form-control' ~ (form_errors(f.photo) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
 						</div>
 						{% if form_errors(f.photo) %}
 							<div class="invalid-feedback">
@@ -111,13 +121,13 @@
 							</div>
 						{% endif %}
 					</div>
-					
+
 					{{ form_end(f) }}
 					<button class="btn btn-light" style="margin-left:130px; margin-top:-70px;" onclick="window.location.href='listUsers';">Cancel</button>
 				</div>
 			</div>
 		</div>
 	</div>
-	
+
 
 {% endblock %}

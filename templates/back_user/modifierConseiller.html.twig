@@ -43,13 +43,25 @@
 					</div>
                     <div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.attestation) }}</label>
-						{{ form_widget(f.attestation, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
-						{{ form_errors(f.attestation) }}
+						<div class="custom">
+							{{ form_widget(f.attestation, {'attr': {'class': 'form-control' ~ (form_errors(f.attestation) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+						</div>
+						{% if form_errors(f.attestation) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.attestation) }}
+							</div>
+						{% endif %}
 					</div>
-                    <div class="form-group">
+					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
-						{{ form_widget(f.photo, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Photo'}}) }}
-						{{ form_errors(f.photo) }}
+						<div class="custom">
+							{{ form_widget(f.photo, {'attr': {'class': 'form-control' ~ (form_errors(f.photo) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+						</div>
+						{% if form_errors(f.photo) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.photo) }}
+							</div>
+						{% endif %}
 					</div>
 					{{ form_end(f) }}
                     <button class="btn btn-light" style="margin-left:200px; margin-top:-80px; width:180px; height: 65px;" onclick="window.location.href='/listUsers';">Cancel</button>

@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -75,19 +76,33 @@ class ConseillerType extends AbstractType
                     ])
                 ]
             ])
-            ->add('attestation', TextType::class, [
+            ->add('attestation', FileType::class, [
+                'data_class' => null,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'champ obligatoire',
+                    ]),
+                    new File([
+                        'maxSize' => '1024k',  // Taille maximale du fichier
+                        'mimeTypes' => [
+                            'application/pdf',  // Type MIME pour les fichiers PDF
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger un fichier PDF valide',
                     ])
+                ],
+                'attr' => [
+                    'accept' => '.pdf',  // Restreindre les téléchargements aux fichiers .pdf dans l'interface utilisateur
+                    'class' => 'custom-file-input'
                 ]
             ])
             ->add('photo', FileType::class, [
+                'data_class' => null,
                 'label' => 'Photo (fichier image)',
                 'required' => false,
-                
+
                 'attr' => [
                     'accept' => 'image/*', // Cela limite le gestionnaire de fichiers à montrer seulement les images
+                    'class' => 'custom-file-input' 
                 ]
             ])
             ->add('Ajouter', SubmitType::class, [

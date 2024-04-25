@@ -51,8 +51,8 @@ class Utilisateur
     #[ORM\Column(type: "string", length: 255, name: "matricule")]
     private $matricule;
 
-    #[ORM\Column(type: "string", length: 255, name: "attestation")]
-    private $attestation;
+    #[ORM\Column(type: "string", length: 255, name: "attestation",nullable: true)]
+    private $attestation = null;
 
     #[ORM\Column(type: "string", length: 255, name: "adresse")]
     private $adresse;
@@ -66,9 +66,8 @@ class Utilisateur
     #[ORM\Column(type: "float", name: "poids")]
     private $poids;
 
-    #[ORM\Column(type: "string", length: 255, name: "photo")]
-    #[Assert\NotBlank(message: "champ obligatoire")]
-    private $photo;
+    #[ORM\Column(type: "string", length: 255, name: "photo",nullable: true)]
+    private $photo =null;
 
     #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
     #[ORM\JoinColumn(name: "objectif", referencedColumnName: "id_obj")]

@@ -79,7 +79,7 @@ class BackUserController extends AbstractController
         $query = $request->query->get('query');
 
         return $this->render('back_user/listUsers.html.twig', [
-            'users' => $list,
+            'users' => $pagination,
             'role' => $roleFilter,
             'totalClients' => $clientsCount,
             'totalConseillers' => $conseillersCount,
@@ -208,6 +208,33 @@ class BackUserController extends AbstractController
 
         if ($form->isSubmitted()) {
 
+            $file = $form->get('attestation')->getData();  
+            if ($file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
+                $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
+
+                // Assurez-vous que l'extension est correcte pour un PDF
+                if ($file->guessExtension() !== 'pdf') {
+                    throw new \Exception("Le fichier n'est pas un PDF valide.");
+                }
+
+                // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
+                try {
+                    $file->move(
+                        $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // Gérer l'exception si le fichier ne peut pas être déplacé
+                    // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
+                }
+
+                // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
+                $user->setAttestation($newFilename);
+            }
+
+
             $imageFile = $form->get('photo')->getData();
             if ($imageFile) {
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -286,6 +313,50 @@ class BackUserController extends AbstractController
         $form->handleRequest($req);
 
         if ($form->isSubmitted()) {
+            $file = $form->get('attestation')->getData();  
+            if ($file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
+                $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
+
+                // Assurez-vous que l'extension est correcte pour un PDF
+                if ($file->guessExtension() !== 'pdf') {
+                    throw new \Exception("Le fichier n'est pas un PDF valide.");
+                }
+
+                // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
+                try {
+                    $file->move(
+                        $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // Gérer l'exception si le fichier ne peut pas être déplacé
+                    // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
+                }
+
+                // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
+                $user->setAttestation($newFilename);
+            }
+
+
+            $imageFile = $form->get('photo')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                // Déplace le fichier dans le répertoire où sont stockées les images
+                try {
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // Gérer l'exception si le fichier ne peut pas être déplacé
+                }
+                // Met à jour le nom de l'image dans l'entité Produit
+                $user->setPhoto($newFilename);
+            }
 
             $emailNV = $user->getEmail();
 

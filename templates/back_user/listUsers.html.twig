@@ -203,14 +203,15 @@ document.getElementById('successMessage').style.display = 'none';
 										Poids
 									</th>
 									<th>
-										Actions</th>
+										Actions
+									</th>
 								</tr>
 							</thead>
 							<tbody>
 								{% for user in users %}
 									<tr>
 										<td class="py-1">
-											<img src={{ user.photo }} alt="image"/>
+											<img src="{{ asset('images/' ~ user.photo) }}" alt="Image">
 										</td>
 										<td>
 											{{ user.nom }}

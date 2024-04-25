@@ -25,6 +25,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -74,6 +76,14 @@ class UserController extends AbstractController
         return $this->render('security/login.html.twig', [
             'error' => $error,
         ]);
+    }
+
+    #[Route('/logout', name: 'logout')]
+    public function logout(SessionInterface $session): Response
+    {
+        $session->clear();
+
+        return $this->redirectToRoute('login');
     }
 
     #[Route('/forgotPassword', name: 'app_forgot_password')]
@@ -165,6 +175,26 @@ class UserController extends AbstractController
 
 
         if ($form->isSubmitted()) {
+
+            $imageFile = $form->get('photo')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                // Déplace le fichier dans le répertoire où sont stockées les images
+                try {
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // Gérer l'exception si le fichier ne peut pas être déplacé
+                }
+                // Met à jour le nom de l'image dans l'entité Produit
+                $user->setPhoto($newFilename);
+            }
+
+
             $email = $form->get('email')->getData();
 
             $existingUser = $repo->findByEmail($email);
@@ -215,6 +245,24 @@ class UserController extends AbstractController
         $form->handleRequest($req);
 
         if ($form->isSubmitted()) {
+
+            $imageFile = $form->get('photo')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                // Déplace le fichier dans le répertoire où sont stockées les images
+                try {
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // Gérer l'exception si le fichier ne peut pas être déplacé
+                }
+                // Met à jour le nom de l'image dans l'entité Produit
+                $user->setPhoto($newFilename);
+            }
 
             $emailNV = $user->getEmail();
 
@@ -300,6 +348,7 @@ class UserController extends AbstractController
     {
 
         $user = $repo->find($id);
+
         $form = $this->createForm(ProfilConseillerType::class, $user);
 
         $emailExistant = $user->getEmail();
@@ -309,6 +358,50 @@ class UserController extends AbstractController
         $form->handleRequest($req);
 
         if ($form->isSubmitted()) {
+
+            $file = $form->get('attestation')->getData();
+            if ($file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
+                $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
+
+                // Assurez-vous que l'extension est correcte pour un PDF
+                if ($file->guessExtension() !== 'pdf') {
+                    throw new \Exception("Le fichier n'est pas un PDF valide.");
+                }
+
+                // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
+                try {
+                    $file->move(
+                        $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // Gérer l'exception si le fichier ne peut pas être déplacé
+                    // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
+                }
+
+                // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
+                $user->setAttestation($newFilename);
+            }
+
+            $imageFile = $form->get('photo')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                // Déplace le fichier dans le répertoire où sont stockées les images
+                try {
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // Gérer l'exception si le fichier ne peut pas être déplacé
+                }
+                // Met à jour le nom de l'image dans l'entité Produit
+                $user->setPhoto($newFilename);
+            }
 
             $emailNV = $user->getEmail();
 

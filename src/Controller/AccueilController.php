@@ -17,6 +17,7 @@ class AccueilController extends AbstractController
 
         $userId = $session->get('utilisateur')['idUtilisateur'];
         
+        dump($session);
 
         $user = $repo->find($userId);
 

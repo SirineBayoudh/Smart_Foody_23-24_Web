@@ -9,6 +9,7 @@ use League\OAuth2\Client\Grant\Password;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -101,7 +102,16 @@ class ClientType extends AbstractType
                 ],
                 'data' => 70
             ])
-            ->add('photo')
+            ->add('photo', FileType::class, [
+                'data_class' => null,
+                'label' => 'Photo (fichier image)',
+                'required' => false,
+
+                'attr' => [
+                    'accept' => 'image/*', // Cela limite le gestionnaire de fichiers à montrer seulement les images
+                    'class' => 'custom-file-input' 
+                ]
+            ])
             ->add('Inscription', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn', 'id' => 'submitBtn', 'style' => 'background-color: #56ab2f; border-color:#56ab2f']
             ])

@@ -16,20 +16,24 @@
 {% endblock %}
 
 {% block body %}
-<div class="page">
-	<div classname="nn"></div>
-	<div class="cont" style="position: fixed; width: 380px; height: 500px; margin-left: 50px; border-radius: 8px;">
-		<div class="infos" style="position: relative; inset: 2px; border-radius: 8px; z-index: 10; padding: 50px 40px; display: flex; flex-direction: column;">
-			<h2 classname="name" style="margin-left: -2px;">
-				Bonjour
-				{{user.prenom}}
-			</h2>
-			<p>
-				{{user.email}}</p>
-			<br/><br/>
-			<div>
-					<a {% block href %} href=""  {% endblock %} style="text-decoration: none; color: black;">
-						Données personnelles et adresses</a>
+	<div class="page">
+		<div classname="nn"></div>
+		<div class="cont" style="position: fixed; width: 380px; height: 500px; margin-left: 50px; border-radius: 8px;">
+			<div class="infos" style="position: relative; inset: 2px; border-radius: 8px; z-index: 10; padding: 50px 40px; display: flex; flex-direction: column;">
+				<h2 classname="name" style="margin-left: -2px;">
+					Bonjour
+					{{user.prenom}}
+				</h2>
+				<p>
+					{{user.email}}</p>
+				<br/><br/>
+				<div>
+					<a
+						{% block href %}
+							href=""
+						{% endblock %}	
+						style="text-decoration: none; color: black;"> 
+												Données personnelles et adresses</a>
 					<br/>
 					<a href="/profilClientMDP/{{user.idUtilisateur}}" id="linkPassword" style="text-decoration: none; color: black;">
 						Mot de passe</a>
@@ -90,8 +94,14 @@
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
-									{{ form_widget(f.photo, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-									{{ form_errors(f.photo) }}
+									<div class="custom">
+										{{ form_widget(f.photo, {'attr': {'class': 'form-control' ~ (form_errors(f.photo) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+									</div>
+									{% if form_errors(f.photo) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.photo) }}
+										</div>
+									{% endif %}
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.taille) }}</label>
@@ -100,8 +110,14 @@
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.poids) }}</label>
-									{{ form_widget(f.poids, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-									{{ form_errors(f.poids) }}
+									<div class="custom">
+										{{ form_widget(f.poids, {'attr': {'class': 'form-control' ~ (form_errors(f.poids) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+									</div>
+									{% if form_errors(f.poids) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.poids) }}
+										</div>
+									{% endif %}
 								</div>
 								{{ form_end(f) }}
 							</div>

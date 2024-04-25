@@ -5,12 +5,14 @@ namespace App\Form;
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -23,7 +25,7 @@ class ProfilConseillerType extends AbstractType
             ->add('nom')
             ->add('prenom')
             ->add('genre', ChoiceType::class, [
-                'choices' => 
+                'choices' =>
                 [
                     'Femme' => 'Femme',
                     'Homme' => 'Homme',
@@ -63,18 +65,37 @@ class ProfilConseillerType extends AbstractType
                     new NotBlank([
                         'message' => 'champ obligatoire',
                     ])
-                ]])
-            ->add('attestation', TextType::class, [
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'champ obligatoire',
-                    ])
-                ]])
-            ->add('photo')
-            ->add('Modifier', SubmitType::class, [
-                'attr' => ['class' => 'btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn', 'id' => 'submitBtn' ,'style' => 'background-color: #56ab2f; border-color:#56ab2f; width:180px']
+                ]
             ])
-        ;
+            ->add('attestation', FileType::class, [
+                'data_class' => null,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',  // Taille maximale du fichier
+                        'mimeTypes' => [
+                            'application/pdf',  // Type MIME pour les fichiers PDF
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger un fichier PDF valide',
+                    ])
+                ],
+                'attr' => [
+                    'accept' => '.pdf',  // Restreindre les téléchargements aux fichiers .pdf dans l'interface utilisateur
+                    'class' => 'custom-file-input'
+                ]
+            ])
+            ->add('photo', FileType::class, [
+                'data_class' => null,
+                'label' => 'Photo (fichier image)',
+                'required' => false,
+
+                'attr' => [
+                    'accept' => 'image/*', // Cela limite le gestionnaire de fichiers à montrer seulement les images
+                    'class' => 'custom-file-input'
+                ]
+            ])
+            ->add('Modifier', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn', 'id' => 'submitBtn', 'style' => 'background-color: #56ab2f; border-color:#56ab2f; width:180px']
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
