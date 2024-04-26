@@ -3,10 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Form\AdminType;
 use App\Form\ConseillerType;
+use App\Form\MdpAdminType;
 use App\Form\ProfilConseillerType;
 use App\Repository\UtilisateurRepository;
+use App\Service\EmailService;
 use Doctrine\Persistence\ManagerRegistry;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -233,7 +238,7 @@ class BackUserController extends AbstractController
     /* Ajouter un Conseiller */
 
     #[Route('/ajouterConseiller', name: 'addConseiller')]
-    public function addConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, SessionInterface $session): Response
+    public function addConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, SessionInterface $session, EmailService $emailService): Response
     {
 
         $userId = $session->get('utilisateur')['idUtilisateur'];
@@ -331,6 +336,8 @@ class BackUserController extends AbstractController
 
 
                         $this->addFlash('success', 'Conseiller ajouté avec succès');
+
+                        $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
 
                         return $this->redirectToRoute("usersList");
                     } else {
@@ -479,7 +486,7 @@ class BackUserController extends AbstractController
             $user = $repo->find($id);
 
             $em = $manager->getManager();
-    
+
             $em->remove($user);
             $em->flush();
             return $this->redirectToRoute("usersList");
@@ -489,8 +496,6 @@ class BackUserController extends AbstractController
 
             ]);
         }
-
-        
     }
 
     #[Route('/rechercherUsers', name: 'rechercher_utilisateurs')]
@@ -508,7 +513,7 @@ class BackUserController extends AbstractController
 
             $entityManager = $this->getDoctrine()->getManager();
             $userRepository = $entityManager->getRepository(Utilisateur::class);
-    
+
             if (empty($searchText)) {
                 $users = $userRepository->findAll();
             } else {
@@ -518,7 +523,7 @@ class BackUserController extends AbstractController
                     ->getQuery()
                     ->getResult();
             }
-    
+
             // Convertit les utilisateurs en tableau associatif pour une sortie JSON
             $response = [];
             foreach ($users as $user) {
@@ -540,7 +545,7 @@ class BackUserController extends AbstractController
                     'idUtilisateur' => $user->getIdUtilisateur(), // Ajoute l'ID de l'utilisateur pour les liens d'édition et de suppression
                 ];
             }
-    
+
             return $this->json([
                 'users' => $users,
             ]);
@@ -550,33 +555,204 @@ class BackUserController extends AbstractController
 
             ]);
         }
-
-        
     }
 
-    #[Route('/pdfUsers', name: 'export_pdf')]
-    public function usersListPdf(Pdf $pdf, UtilisateurRepository $repo, SessionInterface $session): Response
+    #[Route('/profilAdmin/{id}', name: 'admin_profile')]
+    public function updateAdmin(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
     {
-        // Récupérer tous les utilisateurs depuis la base de données
-        //$userRepository = $this->getDoctrine()->getRepository(Utilisateur::class);
-        $users = $repo->findAll();
 
-        // Rendre la vue Twig pour le contenu PDF
-        $html = $this->renderView('back_user/users_pdf.html.twig', [
-            'users' => $users,
+        $userId = $session->get('utilisateur')['idUtilisateur'];
+
+        $userco = $repo->find($userId);
+
+        $role = $userco->getRole();
+        $photo = $repo->getAdminImage();
+
+        if ($role == 'Admin') {
+
+            $user = $repo->find($id);
+
+            $form = $this->createForm(AdminType::class, $user);
+
+            $emailExistant = $user->getEmail();
+
+            $em = $manager->getManager();
+
+            $form->handleRequest($req);
+
+            if ($form->isSubmitted()) {
+
+                $imageFile = $form->get('photo')->getData();
+                if ($imageFile) {
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                    // Déplace le fichier dans le répertoire où sont stockées les images
+                    try {
+                        $imageFile->move(
+                            $this->getParameter('images_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        // Gérer l'exception si le fichier ne peut pas être déplacé
+                    }
+                    // Met à jour le nom de l'image dans l'entité Produit
+                    $user->setPhoto($newFilename);
+                }
+
+                $emailNV = $user->getEmail();
+
+                if ($emailExistant != $emailNV) {
+
+                    $existingUser = $repo->findByEmail($emailNV);
+
+                    if ($existingUser) {
+                        $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                    } else {
+                        if ($form->isValid()) {
+
+                            $em->persist($user);
+                            $em->flush();
+                            return $this->redirectToRoute("accueil");
+                        }
+                    }
+                } elseif ($form->isValid()) {
+
+                    $em->persist($user);
+                    $em->flush();
+                    return $this->redirectToRoute("app_back");
+                }
+            }
+
+            return $this->renderform('back_user/profilAdmin.html.twig', [
+                'f' => $form,
+                'user' => $user,
+                'photo' => $photo
+            ]);
+        } else {
+            return $this->renderform('accueil/introuvable.html.twig', []);
+        }
+    }
+
+    #[Route('/profilAdminMDP/{id}', name: 'admin_profileMDP')]
+    public function updateAdminMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
+    {
+        $userId = $session->get('utilisateur')['idUtilisateur'];
+
+        $userco = $repo->find($userId);
+
+        $role = $userco->getRole();
+
+        if ($role == 'Admin') {
+            $error = false;
+
+            $user = $repo->find($id);
+            $form2 = $this->createForm(MdpAdminType::class, $user);
+
+            $em2 = $manager->getManager();
+
+            $form2->handleRequest($req);
+
+            $ancMDP = $req->request->get('ancienMDP');
+            dump($ancMDP);
+
+            $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
+            dump($mdpActuel);
+
+
+            if ($form2->isSubmitted()) {
+                if ($form2->isValid()) {
+                    if (md5($ancMDP) == $mdpActuel) {
+
+                        $plainPassword = $user->getMotDePasse();
+                        $hashedPassword = md5($plainPassword);
+                        $user->setMotDePasse($hashedPassword);
+
+                        $em2->persist($user);
+                        $em2->flush();
+                        return $this->redirectToRoute("login");
+                    } else {
+                        $error = true;
+                    }
+                }
+            }
+
+            return $this->renderform('back_user/profilAdminMDP.html.twig', [
+                'f' => $form2,
+                'user' => $user,
+                'error' => $error
+            ]);
+        } else {
+            return $this->renderform('accueil/introuvable.html.twig', []);
+        }
+    }
+
+    #[Route('/pdfClients', name: 'clients_pdf')]
+    public function clientsPdf(UtilisateurRepository $repo): Response
+    {
+        // Récupération des utilisateurs
+        $clients = $repo->findByRole('Client');
+
+        // Options de Dompdf
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->setIsRemoteEnabled(true);
+
+        // Instanciation de Dompdf avec les options
+        $dompdf = new Dompdf($pdfOptions);
+        
+        // Rendu du HTML avec le template Twig
+        $html = $this->renderView('back_user/clients_pdf.html.twig', [
+            'clients' => $clients
         ]);
+        
+        // Chargement du HTML dans Dompdf
+        $dompdf->loadHtml($html);
+        
+        // Paramétrage (A4 en portrait par défaut)
+        $dompdf->setPaper('A4', 'portrait');
+        
+        // Rendu du PDF
+        $dompdf->render();
+        
+        // Envoi du fichier PDF au navigateur
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="liste_des_utilisateurs.pdf"'
+        ]);
+    }
 
-        // Générer le PDF à partir du HTML
-        $pdfContent = $pdf->getOutputFromHtml($html);
+    #[Route('/pdfConseillers', name: 'conseillers_pdf')]
+    public function conseillersPdf(UtilisateurRepository $repo): Response
+    {   
+        // Récupération des utilisateurs
+        $conseillers = $repo->findByRole('Conseiller');
+        // Options de Dompdf
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->setIsRemoteEnabled(true);
 
-        // Créer une réponse PDF
-        $response = new Response($pdfContent);
-        $response->headers->set('Content-Type', 'application/pdf');
-
-        // Télécharger le PDF ou l'afficher dans le navigateur selon vos besoins
-        // Par exemple, pour le télécharger :
-        $response->headers->set('Content-Disposition', 'attachment; filename="users_list.pdf"');
-
-        return $response;
+        // Instanciation de Dompdf avec les options
+        $dompdf = new Dompdf($pdfOptions);  
+        
+        // Rendu du HTML avec le template Twig
+        $html = $this->renderView('back_user/conseillers_pdf.html.twig', [
+            'conseillers' => $conseillers
+        ]);
+        
+        // Chargement du HTML dans Dompdf
+        $dompdf->loadHtml($html);
+        
+        // Paramétrage (A4 en portrait par défaut)
+        $dompdf->setPaper('A4', 'portrait');
+        
+        // Rendu du PDF
+        $dompdf->render();
+        
+        // Envoi du fichier PDF au navigateur
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="liste_des_utilisateurs.pdf"'
+        ]);
     }
 }

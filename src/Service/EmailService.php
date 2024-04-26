@@ -54,7 +54,7 @@ class EmailService
                 <body>
                     <div class='container'>
                         <div class='header'>
-                            <img src='../../../images/trans_logo.png' alt='Smart Foody Logo' class='logo'>
+                            <img href='https://drive.google.com/file/d/1jwa-Zi-XvdVZ4XaNIFJg6raCS32xb119/view?usp=sharing' alt='Smart Foody Logo' class='logo'>
                             <h1>Bienvenue sur Smart Foody !</h1>
                         </div>
                         <p class='content'>

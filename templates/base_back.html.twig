@@ -19,7 +19,21 @@
 		<!-- inject:css -->
 		<link
 		rel="stylesheet" href="{{asset('css/vertical-layout-light/style.css')}}"> <!-- endinject -->
+		
+
+
+		<link rel="stylesheet" href="../../vendors/feather/feather.css">
+		<link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
+		<link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
+		<!-- endinject -->
+		<!-- Plugin css for this page -->
+		<link
+		rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css"> <!-- inject:css -->
+		<link
+		rel="stylesheet" href="../../css/vertical-layout-light/style.css">
+		<!-- endinject -->
 		<link rel="shortcut icon" href="../../images/trans_logo.png"/>
+
 
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -32,6 +46,7 @@
 				color: green;
 				background-color: #77bb58;
 			}
+
 			/* #stocksItem a:visited .menu-title, #alertesItem a:visited .menu-title {
     background-color: #77bb58;
     color: green;
@@ -39,17 +54,22 @@
 			#stocksItem.active .nav-link,
 			#stocksItem.active .menu-title {
 				background-color: #77bb58;
-				color: green;
+				color: white;
 			}
 			#alertesItem.active .nav-link,
 			#alertesItem.active .menu-title {
 				background-color: #77bb58;
-				color: green;
+				color: white;
 			}
 			#authItem.active .nav-link,
 			#authItem.active .menu-title {
 				background-color: #77bb58;
-				color: green;
+				color: white;
+			}
+			#profileItem.active .nav-link,
+			#profileItem.active .menu-title {
+				background-color: #77bb58;
+				color: white;
 			}
 			#sidebar .nav-item:active {
 				background-color: #77bb58;
@@ -134,7 +154,7 @@
 						</li>
 						<li class="nav-item nav-profile dropdown">
 							<a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-								<img src={{photo}} alt="profile"/>
+								<img src="{{ asset('images/' ~ photo) }}" alt="Image">
 							</a>
 							<div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
 								<a class="dropdown-item">
@@ -350,7 +370,7 @@
 								<span class="menu-title">Accueil</span>
 							</a>
 						</li>
-						
+
 
 						<li class="nav-item" id="authItem">
 							<a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth" id="test">
@@ -359,12 +379,12 @@
 								<i class="menu-arrow"></i>
 							</a>
 							<div class="collapse" id="auth">
-								<ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
+								<ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58; margin-left:-10px">
 									<li class="nav-item">
-										<a class="nav-link" href="listUsers">Liste</a>
+										<a class="nav-link" href="listUsers" style="color:white">Liste</a>
 									</li>
 									<li class="nav-item">
-										<a class="nav-link" href="statUsers">Statistiques</a>
+										<a class="nav-link" href="statUsers" style="color:white">Statistiques</a>
 									</li>
 								</ul>
 							</div>
@@ -404,40 +424,60 @@
 								</ul>
 							</div>
 						</li>
+						<li class="nav-item" id="profileItem">
+							<a class="nav-link" id="test" data-toggle="collapse" href="#profile" aria-expanded="false" aria-controls="profile">
+								<i class="mdi mdi-account-key"></i>
+								<span class="menu-title" style="margin-left:20px;">Profil</span>
+								<i class="menu-arrow"></i>
+							</a>
+							<div class="collapse" id="profile">
+								<ul class="nav flex-column sub-menu" style="color: white; background-color: #77bb58; margin-left:-10px">
+									<li class="nav-item">
+										<a class="nav-link" href="/profilAdmin/66" style="color:white">Données personnelles</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" href="/profilAdminMDP/66" style="color:white">Mot de passe</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" href="{{ path('logout') }}" style="color:white">Se déconnecter</a>
+									</li>
+								</ul>
+							</div>
+						</li>
 
 						{#           
-																								          <li class="nav-item">
-																								            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-																								              <i class="icon-head menu-icon"></i>
-																								              <span class="menu-title">User Pages</span>
-																								              <i class="menu-arrow"></i>
-																								            </a>
-																								            <div class="collapse" id="auth">
-																								              <ul class="nav flex-column sub-menu">
-																								                <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
-																								                <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
-																								              </ul>
-																								            </div>
-																								          </li>
-																								          <li class="nav-item">
-																								            <a class="nav-link" data-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error">
-																								              <i class="icon-ban menu-icon"></i>
-																								              <span class="menu-title">Error pages</span>
-																								              <i class="menu-arrow"></i>
-																								            </a>
-																								            <div class="collapse" id="error">
-																								              <ul class="nav flex-column sub-menu">
-																								                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html"> 404 </a></li>
-																								                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> 500 </a></li>
-																								              </ul>
-																								            </div>
-																								          </li>
-																								          <li class="nav-item">
-																								            <a class="nav-link" href="pages/documentation/documentation.html">
-																								              <i class="icon-paper menu-icon"></i>
-																								              <span class="menu-title">Documentation</span>
-																								            </a>
-																								          </li> #}
+																																																						          <li class="nav-item">
+																																																						            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+																																																						              <i class="icon-head menu-icon"></i>
+																																																						              <span class="menu-title">User Pages</span>
+																																																						              <i class="menu-arrow"></i>
+																																																						            </a>
+																																																						            <div class="collapse" id="auth">
+																																																						              <ul class="nav flex-column sub-menu">
+																																																						                <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
+																																																						                <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
+																																																						              </ul>
+																																																						            </div>
+																																																						          </li>
+																																																						          <li class="nav-item">
+																																																						            <a class="nav-link" data-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error">
+																																																						              <i class="icon-ban menu-icon"></i>
+																																																						              <span class="menu-title">Error pages</span>
+																																																						              <i class="menu-arrow"></i>
+																																																						            </a>
+																																																						            <div class="collapse" id="error">
+																																																						              <ul class="nav flex-column sub-menu">
+																																																						                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html"> 404 </a></li>
+																																																						                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> 500 </a></li>
+																																																						              </ul>
+																																																						            </div>
+																																																						          </li>
+																																																						          <li class="nav-item">
+																																																						            <a class="nav-link" href="pages/documentation/documentation.html">
+																																																						              <i class="icon-paper menu-icon"></i>
+																																																						              <span class="menu-title">Documentation</span>
+																																																						            </a>
+																																																						          </li> #}
 					</ul>
 				</nav>
 				<!-- partial -->
@@ -1228,6 +1268,13 @@ $('.nav-item').removeClass('active');
 $('#authItem').addClass('active');
 }
 
+function activateProfileLink() { // Supprimer la classe 'active' de tous les éléments avec la classe 'nav-item'
+$('.nav-item').removeClass('active');
+
+// Ajouter la classe 'active' à l'élément parent du lien "Utilisateur"
+$('#profileItem').addClass('active');
+}
+
 // Fonction pour vérifier si le lien "Stocks" est actif et le sauvegarder dans localStorage
 function saveActiveLinkState() {
 if ($('#stocksItem').hasClass('active')) {
@@ -1236,7 +1283,9 @@ localStorage.setItem('activeLink', 'stocks');
 localStorage.setItem('activeLink', 'alertes');
 } else if ($('#authItem').hasClass('active')) {
 localStorage.setItem('activeLink', 'auth');
-} else {
+} else if ($('#profileItem').hasClass('active')) {
+localStorage.setItem('activeLink', 'profile');
+}else {
 localStorage.removeItem('activeLink');
 }
 }
@@ -1250,6 +1299,8 @@ activateStocksLink();
 activateAlertesLink();
 } else if (activeLink === 'auth') {
 activateAuthLink();
+} else if (activeLink === 'profile') {
+activateProfileLink();
 }
 }
 
@@ -1271,6 +1322,11 @@ saveActiveLinkState();
 // Gérer le clic sur le lien "Utilisateur"
 $('#authItem .nav-link').click(function () {
 activateAuthLink();
+saveActiveLinkState();
+});
+
+$('#profileItem .nav-link').click(function () {
+activateProfileLink();
 saveActiveLinkState();
 });
 		</script>

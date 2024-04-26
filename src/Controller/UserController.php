@@ -116,11 +116,11 @@ class UserController extends AbstractController
 
                 $mailer->send($message);
 
-                $this->addFlash('success', 'Un email de réinitialisation de mot de passe a été envoyé.');
-                return $this->redirectToRoute('login');
+                $this->addFlash('envoye', 'Un email de réinitialisation de mot de passe a été envoyé.');
+                
             }
 
-            $this->addFlash('danger', 'Aucun utilisateur trouvé avec cet email.');
+            $this->addFlash('nonenvoye', 'Aucun utilisateur trouvé avec cet email.');
         }
 
         return $this->render('security/forgot_password.html.twig', [

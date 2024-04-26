@@ -26,7 +26,8 @@ class BackController extends AbstractController
 
             return $this->render('back/index.html.twig', [
                 'controller_name' => 'BackController',
-                'photo' => $photo
+                'photo' => $photo,
+                'user' => $user
             ]);
         } else {
             return $this->render('accueil/introuvable.html.twig', [

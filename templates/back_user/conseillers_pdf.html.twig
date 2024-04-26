@@ -1,0 +1,55 @@
+{# templates/users/users_pdf.html.twig #}
+
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Liste des clients</title>
+		<style>
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+			th,
+			td {
+				border: 1px solid black;
+				padding: 8px;
+				text-align: left;
+			}
+			img {
+				height: 50px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1 style="color:#56ab2f; text-align:center; font-style: italic;">
+			Liste des conseillers
+		</h1>
+		<table>
+			<thead style="color:white; background-color:#56ab2f; margin-right:10px;">
+				<tr>
+					<th>Nom</th>
+					<th>Prénom</th>
+					<th>Genre</th>
+					<th>Email</th>
+					<th>Numéro de téléphone</th>
+					<th>Matricule</th>
+					<th>Attestation</th>
+				</tr>
+			</thead>
+			<tbody style="margin-right:10px;">
+				{% for user in conseillers %}
+					<tr>
+						<td>{{ user.nom }}</td>
+						<td>{{ user.prenom }}</td>
+						<td>{{ user.genre }}</td>
+						<td>{{ user.email }}</td>
+						<td>{{ user.numTel }}</td>
+						<td>{{ user.matricule }}</td>
+						<td>{{ user.attestation }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</body>
+</html>

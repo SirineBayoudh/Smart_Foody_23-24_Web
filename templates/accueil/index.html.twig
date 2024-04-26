@@ -9,7 +9,12 @@
 		href="{{ path('client_profile', {'id': userId}) }}"
 	{% elseif role == 'Conseiller' %}
 		href="{{ path('conseiller_profile', {'id': userId}) }}"
+	{% elseif role == 'Admin' %}
+		href="{{ path('admin_profile', {'id': userId}) }}"
+	{% else %}
+		href="{{ path('login') }}"
 	{% endif %}
+
 {% endblock %}
 
 

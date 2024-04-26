@@ -20,7 +20,7 @@
 		.cards-container {
 			display: flex;
 			gap: 20px; /* Espacement entre les cartes */
-			margin-left: 155px;
+			margin-left: -30px;
 		}
 
 		.card2 {
@@ -92,6 +92,7 @@
 		<div class="card">
 
 			<div class="anchor-pane">
+				<button type="button" class="btn btn-inverse-success btn-fw" style="margin-top:50px; width:300px; margin-left:30px; height:60px" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
 
 				{% for flash_message in app.flashes('success') %}
 					<div class="alert alert-success" id="successMessage" role="alert">
@@ -100,7 +101,7 @@
 				{% endfor %}
 
 
-				<div class="col-lg-2" style="margin-top:150px;">
+				<div class="col-lg-2" style="margin-top:150px; margin-left:-370px">
 					<form action="{{ path('usersList') }}" method="GET">
 						<select name="role" class="form-control" onchange="this.form.submit()" style="background-color:#aad597" id="filtre">
 							<option value="">Tous</option>
@@ -140,6 +141,14 @@ setTimeout(function () {
 document.getElementById('successMessage').style.display = 'none';
 }, 5000); // 5000 millisecondes = 5 secondes
 				</script>
+
+				<a href="{{ path('clients_pdf') }}" class="btn btn-inverse-success btn-fw" target="_blank" style="width:180px; height:50px; margin-top:80px; ">
+					Exporter Clients en PDF
+				</a>
+
+				<a href="{{ path('conseillers_pdf') }}" class="btn btn-inverse-success btn-fw" target="_blank" style="width:180px; height:50px; margin-top:145px; margin-right:45px; margin-left:-200px;">
+					Exporter Conseillers en PDF
+				</a>
 
 				<div class="cards-container">
 					<div class="card2" id="cardClient">
@@ -290,7 +299,7 @@ document.getElementById('successMessage').style.display = 'none';
 					</div>
 				</div>
 			</div>
-			<button type="button" class="btn btn-inverse-success btn-fw" style="margin-top:80px; width:300px; margin-left:30px" onclick="window.location.href='ajouterConseiller';">Ajouter un conseiller</button>
+
 
 		</div>
 

@@ -15,13 +15,22 @@ class AccueilController extends AbstractController
     public function index(SessionInterface $session, ManagerRegistry $manager, UtilisateurRepository $repo): Response
     {
 
-        $userId = $session->get('utilisateur')['idUtilisateur'];
-        
-        dump($session);
 
-        $user = $repo->find($userId);
-        
-        $role = $user->getRole();
+       $userInfo = $session->get('utilisateur', []);
+
+        // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
+        $userId = $userInfo['idUtilisateur'] ?? null;
+
+        if ($userId) {
+            // Trouve l'utilisateur uniquement si $userId n'est pas null
+            $user = $repo->find($userId);
+
+            // Vérifie si l'utilisateur a été trouvé et récupère le rôle
+            $role = $user ? $user->getRole() : 'invité';
+        } else {
+            // Aucun utilisateur trouvé ou non connecté, attribuer un rôle par défaut
+            $role = 'invité';
+        }
         
         return $this->render('accueil/index.html.twig', [
             'controller_name' => 'AccueilController',

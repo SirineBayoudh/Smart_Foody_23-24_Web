@@ -65,6 +65,15 @@ class UtilisateurRepository extends ServiceEntityRepository
         return $result['photo'] ?? null;
     }
 
+    public function findByRole(string $role)
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.role = :val')
+            ->setParameter('val', $role)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getPasswordByEmail(string $email): ?string
     {
         $query = $this->createQueryBuilder('u')
@@ -82,6 +91,7 @@ class UtilisateurRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['email' => $email]);
     }
+
 
     public function searchUsers($searchQuery)
     {
