@@ -246,8 +246,7 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <label>Remise de la Commande</label>
-                     {% set pourcentageRemise = ((commande.totaleCommande - prixTotalAvecRemise) / commande.totaleCommande) * 100 %} 
-                    <input type="text" class="form-control" value="{{pourcentageRemise}} % " readonly>
+                    <input type="text" class="form-control" value="{{ commande.remise }}" readonly>
                 </div>
             </div>
             <div class="col-md-12">

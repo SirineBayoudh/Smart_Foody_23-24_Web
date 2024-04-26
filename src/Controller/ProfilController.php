@@ -20,8 +20,8 @@ class ProfilController extends AbstractController
 
         
         $commande = $commandeRepository->find($id);
-        $remise = $commande->getRemise(); 
-        $prixTotalAvecRemise = $commande->getTotaleCommande() - $remise;
+       // $remise = $commande->getRemise(); 
+       // $prixTotalAvecRemise = $commande->getTotaleCommande() - $remise;
 
         // Récupérer l'historique des commandes du client avec l'ID passé en paramètre
         $historiqueCommandes = $commandeRepository->findHistoriqueCommandesByClientId($id_client);
@@ -29,7 +29,7 @@ class ProfilController extends AbstractController
         return $this->render('profil/index.html.twig', [
             'historiqueCommandes' => $historiqueCommandes,
             'commande'=>$commande,
-            'prixTotalAvecRemise' => $prixTotalAvecRemise,  // Passer les commandes au template
+           // 'prixTotalAvecRemise' => $prixTotalAvecRemise,  // Passer les commandes au template
         ]);
     }
 
@@ -39,8 +39,8 @@ class ProfilController extends AbstractController
     public function commandeDetails($id, CommandeRepository $commandeRepository)
     {
         $commande = $commandeRepository->find($id);
-        $remise = $commande->getRemise(); 
-        $prixTotalAvecRemise = $commande->getTotaleCommande() - $remise;
+        //$remise = $commande->getRemise(); 
+        //$prixTotalAvecRemise = $commande->getTotaleCommande() - $remise;
 
 
         if (!$commande) {
@@ -54,7 +54,7 @@ class ProfilController extends AbstractController
         return $this->render('profil/details_commande.html.twig', [
             'commande' => $commande,
             'qrCode' => $qrCode,
-            'prixTotalAvecRemise' => $prixTotalAvecRemise, // Passer le QR code au template
+           // 'prixTotalAvecRemise' => $prixTotalAvecRemise, // Passer le QR code au template
         ]);
     }
 

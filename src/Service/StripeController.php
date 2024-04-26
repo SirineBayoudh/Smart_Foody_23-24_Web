@@ -79,6 +79,7 @@ class StripeController extends AbstractController
 
             // Vider le panier après un paiement réussi
             $this->viderPanier($request);
+            return $this->redirectToRoute('app_test');
 
             $this->addFlash('success', 'Payment Successful!');
         } catch (\Stripe\Exception\ApiErrorException $e) {
