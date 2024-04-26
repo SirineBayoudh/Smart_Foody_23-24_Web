@@ -8,6 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
 
 class SearchType extends AbstractType
 {
@@ -16,29 +19,44 @@ class SearchType extends AbstractType
         $builder
             ->add('search', TextType::class, [
                 'label' => false,
-                'required' => false, // Désactivation de la requête HTML5
+                'required' => false,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Le champ de recherche ne peut pas être vide.', // Message personnalisé
+                        'message' => 'Le champ de recherche ne peut pas être vide.',
                     ]),
                     new Regex([
-                        'pattern' => '/^(\d{4}-\d{2}-\d{2})|([a-zA-Z\s]+)$/i',
-                        'message' => 'Entrez une date valide (YYYY-MM-DD) ou un nom (lettres et espaces uniquement).'
-                    ])
+                        'pattern' => '/^(\d{4}-\d{2}-\d{2})|([a-zA-Z\s]+)|(\d+)$/i',
+                        'message' => 'Entrez une date valide (YYYY-MM-DD), un nom (lettres et espaces uniquement) ou un ID (composé uniquement de chiffres).'
+                    ]),
                 ],
                 'attr' => [
                     'placeholder' => 'YYYY-MM-DD ou Nom',
                     'class' => 'form-control',
-                    'autocomplete' => 'off'  // Désactivation de l'autocomplétion du navigateur
-                ]
-                ]);
+                    'autocomplete' => 'off'
+                ],
+                
+            ]);
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $form->getData();
+
+            // Vérifiez si le champ de recherche est vide
           
+
+            // Vérifiez si la recherche a donné aucun résultat
+            // Insérez ici votre logique pour vérifier si la recherche a donné aucun résultat
+            $resultNotFound = false; // Remplacez cela par votre propre logique
+
+            if ($resultNotFound) {
+                $form->addError(new FormError('Nous n\'avons pas trouvé cette valeur.'));
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => null,
             'csrf_protection' => true,
             'method' => 'GET',
         ]);
