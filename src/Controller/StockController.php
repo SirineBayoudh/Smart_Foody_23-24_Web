@@ -49,6 +49,21 @@ class StockController extends AbstractController
         // Retourner une réponse avec le contenu traduit
         return new Response($translatedContent);
     }
+    #[Route('/translate-to-french', name: 'translate_to_french')]
+    public function translateToFrench(Request $request): Response
+    {
+        // Récupérer le contenu à traduire depuis la requête
+        $contentToTranslate = $request->request->get('content');
+
+        // Créer une instance de GoogleTranslate
+        $translator = new GoogleTranslate();
+
+        // Traduire le contenu de l'anglais en français
+        $translatedContent = $translator->setSource('en')->setTarget('fr')->translate($contentToTranslate);
+
+        // Retourner une réponse avec le contenu traduit
+        return new Response($translatedContent);
+    }
     #[Route('/stock', name: 'stock_get')]
     public function getStock(
         StockRepository $stockRepo,

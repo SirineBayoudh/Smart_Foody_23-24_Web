@@ -473,6 +473,7 @@
 </li>    
 <li class="nav-item">
   <button id="translateButton">Traduire en anglais</button>
+  <button id="translateButtonReverse" class="btn btn-primary">Traduire en français</button>
 </li>
         </ul> 
       </nav>
@@ -565,6 +566,49 @@
                 translateTableContentToEnglish();
             });
         });
+        var initialContent = {};
+var initialNavContent = {};
+
+$(document).ready(function() {
+    // Enregistrer l'état initial du contenu
+    saveInitialContent();
+    saveInitialNavContent();
+
+    // Gestionnaire d'événements pour le clic sur le bouton de traduction inverse (anglais vers français)
+    $('#translateButtonReverse').on('click', function() {
+        // Restaurer l'état initial du contenu
+        restoreInitialContent();
+        restoreInitialNavContent();
+    });
+});
+
+// Fonction pour enregistrer l'état initial du contenu principal
+function saveInitialContent() {
+    $('.content-to-translate').each(function(index, element) {
+        initialContent[index] = $(element).html();
+    });
+}
+
+// Fonction pour restaurer l'état initial du contenu principal
+function restoreInitialContent() {
+    for (var index in initialContent) {
+        $('.content-to-translate').eq(index).html(initialContent[index]);
+    }
+}
+
+// Fonction pour enregistrer l'état initial du contenu de la barre de navigation
+function saveInitialNavContent() {
+    $('#sidebar .nav-link .menu-title, #sidebar .sub-menu .nav-item .nav-link').each(function(index, element) {
+        initialNavContent[index] = $(element).html();
+    });
+}
+
+// Fonction pour restaurer l'état initial du contenu de la barre de navigation
+function restoreInitialNavContent() {
+    for (var index in initialNavContent) {
+        $('#sidebar .nav-link .menu-title, #sidebar .sub-menu .nav-item .nav-link').eq(index).html(initialNavContent[index]);
+    }
+}
     </script>
     
     <script>
