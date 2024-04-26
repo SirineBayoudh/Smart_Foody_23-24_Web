@@ -566,6 +566,7 @@ class BackUserController extends AbstractController
         $userco = $repo->find($userId);
 
         $role = $userco->getRole();
+
         $photo = $repo->getAdminImage();
 
         if ($role == 'Admin') {
@@ -613,6 +614,9 @@ class BackUserController extends AbstractController
 
                             $em->persist($user);
                             $em->flush();
+
+                            $this->addFlash('successPorfilCAdmin', 'Votre profil a été modifié avec succès.');
+
                             return $this->redirectToRoute("accueil");
                         }
                     }
@@ -642,6 +646,8 @@ class BackUserController extends AbstractController
         $userco = $repo->find($userId);
 
         $role = $userco->getRole();
+
+        $photo = $repo->getAdminImage();
 
         if ($role == 'Admin') {
             $error = false;
@@ -680,7 +686,8 @@ class BackUserController extends AbstractController
             return $this->renderform('back_user/profilAdminMDP.html.twig', [
                 'f' => $form2,
                 'user' => $user,
-                'error' => $error
+                'error' => $error,
+                'photo' => $photo
             ]);
         } else {
             return $this->renderform('accueil/introuvable.html.twig', []);

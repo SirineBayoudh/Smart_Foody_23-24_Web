@@ -28,23 +28,25 @@
 	<div class="col-md-6 grid-margin stretch-card" style="margin-left:100px;">
 		<div class="card">
 			<div class="card-body" style="margin-left:200px;">
-				
+
 				<h2 class="card-title" style="margin-top:100px;">Mot de passe</h2>
 				<div class="forms-sample">
-						{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
-						<div class="form-group">
-							<input type="password" name="ancienMDP" class="form-control form-control-lg" id="exampleInputEmail1" placeholder="Mot de passe actuel" required autofocus>
-						</div>
-
-						<div
-							class="form-group">
-							{# Affichage du champ nouveauMotDePasse #}
-							<label for="exampleInputUsername1">{{ form_label(f.mot_de_passe) }}</label>
-							{{ form_widget(f.mot_de_passe, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nouveau mot de passe'}}) }}
-							{{ form_errors(f.mot_de_passe) }}
-						</div>
-						{{ form_end(f) }}
+					{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
+					<div class="form-group">
+						<input type="password" name="ancienMDP" class="form-control form-control-lg" id="exampleInputEmail1" placeholder="Mot de passe actuel" required autofocus>
 					</div>
+
+					<div class="form-group">
+						<label for="exampleInputPassword1">{{ form_label(f.motDePasse) }}</label>
+						{{ form_widget(f.motDePasse, {'attr': {'class': 'form-control' ~ (form_errors(f.motDePasse) ? ' is-invalid' : ''), 'id': 'exampleInputPassword1', 'placeholder': 'Mot de passe'}}) }}
+						{% if form_errors(f.motDePasse) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.motDePasse) }}
+							</div>
+						{% endif %}
+					</div>
+					{{ form_end(f) }}
+				</div>
 			</div>
 		</div>
 	</div>

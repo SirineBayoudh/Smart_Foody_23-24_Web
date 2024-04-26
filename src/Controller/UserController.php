@@ -156,10 +156,10 @@ class UserController extends AbstractController
                 $user->setMotDePasse(md5($p));
                 $entityManager->flush();
 
-                $this->addFlash('success', 'Votre mot de passe a été réinitialisé.');
+                $this->addFlash('successReset', 'Votre mot de passe a été réinitialisé.');
                 return $this->redirectToRoute('login');
             } else {
-                $this->addFlash('danger', 'Les mots de passe ne correspondent pas.');
+                $this->addFlash('dangerReset', 'Les mots de passe ne correspondent pas.');
             }
         }
 
@@ -188,8 +188,11 @@ class UserController extends AbstractController
 
         $form->handleRequest($req);
 
+        $emptySubmission = false;
+
 
         if ($form->isSubmitted()) {
+            $emptySubmission = true;
 
             $imageFile = $form->get('photo')->getData();
             if ($imageFile) {
@@ -218,6 +221,7 @@ class UserController extends AbstractController
             if ($form->isValid()) {
 
                 if (!$existingUser) {
+                    $emptySubmission = true;
 
                     $plainPassword = $user->getMotDePasse();
                     $hashedPassword = md5($plainPassword);
@@ -246,6 +250,7 @@ class UserController extends AbstractController
             'country_name' => $countryName,
             'phone_code' => '+' . $phoneCode,
             'flag' => $flag,
+            'emptySubmission' => $emptySubmission ?? false,
         ]);
     }
 
@@ -304,6 +309,9 @@ class UserController extends AbstractController
 
                             $em->persist($user);
                             $em->flush();
+
+                            $this->addFlash('successPorfilClient', 'Votre profil a été modifié avec succès.');
+
                             return $this->redirectToRoute("accueil");
                         }
                     }

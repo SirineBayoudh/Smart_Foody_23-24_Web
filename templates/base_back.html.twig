@@ -19,7 +19,6 @@
 		<!-- inject:css -->
 		<link
 		rel="stylesheet" href="{{asset('css/vertical-layout-light/style.css')}}"> <!-- endinject -->
-		
 
 
 		<link rel="stylesheet" href="../../vendors/feather/feather.css">
@@ -433,10 +432,10 @@
 							<div class="collapse" id="profile">
 								<ul class="nav flex-column sub-menu" style="color: white; background-color: #77bb58; margin-left:-10px">
 									<li class="nav-item">
-										<a class="nav-link" href="/profilAdmin/66" style="color:white">Données personnelles</a>
+										<a class="nav-link" href="/profilAdmin/32" style="color:white">Données personnelles</a>
 									</li>
 									<li class="nav-item">
-										<a class="nav-link" href="/profilAdminMDP/66" style="color:white">Mot de passe</a>
+										<a class="nav-link" href="/profilAdminMDP/32" style="color:white">Mot de passe</a>
 									</li>
 									<li class="nav-item">
 										<a class="nav-link" href="{{ path('logout') }}" style="color:white">Se déconnecter</a>
@@ -446,38 +445,38 @@
 						</li>
 
 						{#           
-																																																						          <li class="nav-item">
-																																																						            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-																																																						              <i class="icon-head menu-icon"></i>
-																																																						              <span class="menu-title">User Pages</span>
-																																																						              <i class="menu-arrow"></i>
-																																																						            </a>
-																																																						            <div class="collapse" id="auth">
-																																																						              <ul class="nav flex-column sub-menu">
-																																																						                <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
-																																																						                <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
-																																																						              </ul>
-																																																						            </div>
-																																																						          </li>
-																																																						          <li class="nav-item">
-																																																						            <a class="nav-link" data-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error">
-																																																						              <i class="icon-ban menu-icon"></i>
-																																																						              <span class="menu-title">Error pages</span>
-																																																						              <i class="menu-arrow"></i>
-																																																						            </a>
-																																																						            <div class="collapse" id="error">
-																																																						              <ul class="nav flex-column sub-menu">
-																																																						                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html"> 404 </a></li>
-																																																						                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> 500 </a></li>
-																																																						              </ul>
-																																																						            </div>
-																																																						          </li>
-																																																						          <li class="nav-item">
-																																																						            <a class="nav-link" href="pages/documentation/documentation.html">
-																																																						              <i class="icon-paper menu-icon"></i>
-																																																						              <span class="menu-title">Documentation</span>
-																																																						            </a>
-																																																						          </li> #}
+																																																												          <li class="nav-item">
+																																																												            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+																																																												              <i class="icon-head menu-icon"></i>
+																																																												              <span class="menu-title">User Pages</span>
+																																																												              <i class="menu-arrow"></i>
+																																																												            </a>
+																																																												            <div class="collapse" id="auth">
+																																																												              <ul class="nav flex-column sub-menu">
+																																																												                <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
+																																																												                <li class="nav-item"> <a class="nav-link" href="pages/samples/register.html"> Register </a></li>
+																																																												              </ul>
+																																																												            </div>
+																																																												          </li>
+																																																												          <li class="nav-item">
+																																																												            <a class="nav-link" data-toggle="collapse" href="#error" aria-expanded="false" aria-controls="error">
+																																																												              <i class="icon-ban menu-icon"></i>
+																																																												              <span class="menu-title">Error pages</span>
+																																																												              <i class="menu-arrow"></i>
+																																																												            </a>
+																																																												            <div class="collapse" id="error">
+																																																												              <ul class="nav flex-column sub-menu">
+																																																												                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html"> 404 </a></li>
+																																																												                <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html"> 500 </a></li>
+																																																												              </ul>
+																																																												            </div>
+																																																												          </li>
+																																																												          <li class="nav-item">
+																																																												            <a class="nav-link" href="pages/documentation/documentation.html">
+																																																												              <i class="icon-paper menu-icon"></i>
+																																																												              <span class="menu-title">Documentation</span>
+																																																												            </a>
+																																																												          </li> #}
 					</ul>
 				</nav>
 				<!-- partial -->
@@ -487,6 +486,11 @@
 							<div class="row">
 								<div class="col-md-12 grid-margin">
 									<div class="row">
+										{% for flash_message in app.flashes('successProfilAdmin') %}
+											<div class="alert alert-success" id="successMessageModif" role="alert">
+												{{ flash_message }}
+											</div>
+										{% endfor %}
 										<div class="col-12 col-xl-8 mb-4 mb-xl-0">
 											<h3 class="font-weight-bold">Welcome Aamir</h3>
 											<h6 class="font-weight-normal mb-0">All systems are running smoothly! You have
@@ -1285,7 +1289,7 @@ localStorage.setItem('activeLink', 'alertes');
 localStorage.setItem('activeLink', 'auth');
 } else if ($('#profileItem').hasClass('active')) {
 localStorage.setItem('activeLink', 'profile');
-}else {
+} else {
 localStorage.removeItem('activeLink');
 }
 }

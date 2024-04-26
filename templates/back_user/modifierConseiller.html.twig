@@ -12,19 +12,31 @@
 				<div class="forms-sample">
 					{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
 					<div class="form-group">
-						<label for="exampleInputUsername1">{{ form_label(f.nom) }}</label>
-						{{ form_widget(f.nom, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-						{{ form_errors(f.nom) }}
+						<label for="exampleInputNom1">{{ form_label(f.nom) }}</label>
+						{{ form_widget(f.nom, {'attr': {'class': 'form-control' ~ (form_errors(f.nom) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+						{% if form_errors(f.nom) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.nom) }}
+							</div>
+						{% endif %}
 					</div>
 					<div class="form-group">
-						<label for="exampleInputEmail1">{{ form_label(f.prenom) }}</label>
-                        {{ form_widget(f.prenom, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
-						{{ form_errors(f.prenom) }}
+						<label for="exampleInputPrenom1">{{ form_label(f.prenom) }}</label>
+						{{ form_widget(f.prenom, {'attr': {'class': 'form-control' ~ (form_errors(f.prenom) ? ' is-invalid' : ''), 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+						{% if form_errors(f.prenom) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.prenom) }}
+							</div>
+						{% endif %}
 					</div>
-                    <div class="form-group">
+					<div class="form-group">
 						<label for="exampleInputEmail1">{{ form_label(f.email) }}</label>
-                        {{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Email'}}) }}
-						{{ form_errors(f.email) }}
+						{{ form_widget(f.email, {'attr': {'class': 'form-control' ~ (form_errors(f.email) ? ' is-invalid' : ''), 'id': 'exampleInputEmail1', 'placeholder': 'Email'}}) }}
+						{% if form_errors(f.email) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.email) }}
+							</div>
+						{% endif %}
 					</div>
                     <div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.genre) }}</label>
@@ -33,13 +45,21 @@
 					</div>
                     <div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
-						{{ form_widget(f.numTel, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Numéro de téléphone'}}) }}
-						{{ form_errors(f.numTel) }}
+						{{ form_widget(f.numTel, {'attr': {'class': 'form-control' ~ (form_errors(f.numTel) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Numéro de téléphone'}}) }}
+						{% if form_errors(f.numTel) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.numTel) }}
+							</div>
+						{% endif %}
 					</div>
                     <div class="form-group">
-						<label for="exampleInputUsername1">{{ form_label(f.matricule) }}</label>
-						{{ form_widget(f.matricule, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Matricule'}}) }}
-						{{ form_errors(f.matricule) }}
+						<label for="exampleInputMatricule1">{{ form_label(f.matricule) }}</label>
+						{{ form_widget(f.matricule, {'attr': {'class': 'form-control' ~ (form_errors(f.matricule) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Matricule'}}) }}
+						{% if form_errors(f.matricule) %}
+							<div class="invalid-feedback">
+								{{ form_errors(f.matricule) }}
+							</div>
+						{% endif %}
 					</div>
                     <div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.attestation) }}</label>

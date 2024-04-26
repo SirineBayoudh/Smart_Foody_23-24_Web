@@ -31,9 +31,9 @@
 					<a
 						{% block href %}
 							href=""
-						{% endblock %}	
-						style="text-decoration: none; color: black;"> 
-												Données personnelles et adresses</a>
+						{% endblock %}
+						style="text-decoration: none; color: black;">
+																																				Données personnelles et adresses</a>
 					<br/>
 					<a href="/profilClientMDP/{{user.idUtilisateur}}" id="linkPassword" style="text-decoration: none; color: black;">
 						Mot de passe</a>
@@ -58,24 +58,40 @@
 							<div class="forms-sample">
 								{{ form_start(f,{'attr':{'novalidate':'novalidate'}}) }}
 								<div class="form-group">
-									<label for="exampleInputUsername1">{{ form_label(f.nom) }}</label>
-									{{ form_widget(f.nom, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-									{{ form_errors(f.nom) }}
+									<label for="exampleInputNom1">{{ form_label(f.nom) }}</label>
+									{{ form_widget(f.nom, {'attr': {'class': 'form-control' ~ (form_errors(f.nom) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
+									{% if form_errors(f.nom) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.nom) }}
+										</div>
+									{% endif %}
 								</div>
 								<div class="form-group">
-									<label for="exampleInputEmail1">{{ form_label(f.prenom) }}</label>
-									{{ form_widget(f.prenom, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
-									{{ form_errors(f.prenom) }}
+									<label for="exampleInputPrenom1">{{ form_label(f.prenom) }}</label>
+									{{ form_widget(f.prenom, {'attr': {'class': 'form-control' ~ (form_errors(f.prenom) ? ' is-invalid' : ''), 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
+									{% if form_errors(f.prenom) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.prenom) }}
+										</div>
+									{% endif %}
 								</div>
 								<div class="form-group">
 									<label for="exampleInputEmail1">{{ form_label(f.email) }}</label>
-									{{ form_widget(f.email, {'attr': {'class': 'form-control', 'id': 'exampleInputEmail1', 'placeholder': 'Prenom'}}) }}
-									{{ form_errors(f.email) }}
+									{{ form_widget(f.email, {'attr': {'class': 'form-control' ~ (form_errors(f.email) ? ' is-invalid' : ''), 'id': 'exampleInputEmail1', 'placeholder': 'Email'}}) }}
+									{% if form_errors(f.email) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.email) }}
+										</div>
+									{% endif %}
 								</div>
 								<div class="form-group">
-									<label for="exampleInputUsername1">{{ form_label(f.objectif) }}</label>
-									{{ form_widget(f.objectif, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-									{{ form_errors(f.objectif) }}
+									<label for="exampleInputEmail1">{{ form_label(f.objectif) }}</label>
+									{{ form_widget(f.objectif, {'attr': {'class': 'form-control' ~ (form_errors(f.objectif) ? ' is-invalid' : ''), 'id': 'exampleInputEmail1', 'placeholder': 'Objectif'}}) }}
+									{% if form_errors(f.objectif) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.objectif) }}
+										</div>
+									{% endif %}
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.genre) }}</label>
@@ -84,13 +100,21 @@
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
-									{{ form_widget(f.numTel, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-									{{ form_errors(f.numTel) }}
+									{{ form_widget(f.numTel, {'attr': {'class': 'form-control' ~ (form_errors(f.numTel) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Numéro de téléphone'}}) }}
+									{% if form_errors(f.numTel) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.numTel) }}
+										</div>
+									{% endif %}
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.adresse) }}</label>
-									{{ form_widget(f.adresse, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-									{{ form_errors(f.adresse) }}
+									{{ form_widget(f.adresse, {'attr': {'class': 'form-control' ~ (form_errors(f.adresse) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Adresse'}}) }}
+									{% if form_errors(f.adresse) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.adresse) }}
+										</div>
+									{% endif %}
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
@@ -105,13 +129,17 @@
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.taille) }}</label>
-									{{ form_widget(f.taille, {'attr': {'class': 'form-control', 'id': 'exampleInputUsername1', 'placeholder': 'Nom'}}) }}
-									{{ form_errors(f.taille) }}
+									{{ form_widget(f.taille, {'attr': {'class': 'form-control' ~ (form_errors(f.taille) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Taille'}}) }}
+									{% if form_errors(f.taille) %}
+										<div class="invalid-feedback">
+											{{ form_errors(f.taille) }}
+										</div>
+									{% endif %}
 								</div>
 								<div class="form-group">
 									<label for="exampleInputUsername1">{{ form_label(f.poids) }}</label>
 									<div class="custom">
-										{{ form_widget(f.poids, {'attr': {'class': 'form-control' ~ (form_errors(f.poids) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+										{{ form_widget(f.poids, {'attr': {'class': 'form-control' ~ (form_errors(f.poids) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Poids'}}) }}
 									</div>
 									{% if form_errors(f.poids) %}
 										<div class="invalid-feedback">

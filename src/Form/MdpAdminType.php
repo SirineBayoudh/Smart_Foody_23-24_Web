@@ -15,7 +15,7 @@ class MdpAdminType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('mot_de_passe', PasswordType::class, [
+            ->add('motDePasse', PasswordType::class, [
                 'constraints' => [
                     new NotBlank([
                         'message' => 'champ obligatoire',

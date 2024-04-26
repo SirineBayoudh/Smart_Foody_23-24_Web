@@ -113,7 +113,7 @@
 					<div class="form-group">
 						<label for="exampleInputUsername1">{{ form_label(f.photo) }}</label>
 						<div class="custom">
-							{{ form_widget(f.photo, {'attr': {'class': 'form-control' ~ (form_errors(f.photo) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Attestation'}}) }}
+							{{ form_widget(f.photo, {'attr': {'class': 'form-control' ~ (form_errors(f.photo) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Photo'}}) }}
 						</div>
 						{% if form_errors(f.photo) %}
 							<div class="invalid-feedback">
