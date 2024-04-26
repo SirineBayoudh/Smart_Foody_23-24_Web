@@ -5,6 +5,8 @@ namespace App\Form;
 use App\Entity\Objectif;
 use App\Entity\Utilisateur;
 use Gregwar\CaptchaBundle\Type\CaptchaType;
+use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 use League\OAuth2\Client\Grant\Password;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -114,6 +116,11 @@ class ClientType extends AbstractType
             ])
             ->add('Inscription', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn', 'id' => 'submitBtn', 'style' => 'background-color: #56ab2f; border-color:#56ab2f']
+            ])
+            ->add('captcha', Recaptcha3Type::class, [
+                'constraints' => new Recaptcha3(),
+                'action_name' => 'signup',
+                'locale' => 'de',
             ])
             ->setAttributes(['id' => '1']);;
     }

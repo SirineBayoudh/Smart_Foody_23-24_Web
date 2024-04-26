@@ -13,6 +13,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.1",
         "dompdf/dompdf": "^2.0",
+        "karser/karser-recaptcha3-bundle": "^0.1.26",
         "knplabs/knp-paginator-bundle": "^5.9",
         "knplabs/knp-snappy-bundle": "^1.10",
         "knpuniversity/oauth2-client-bundle": "^2.0",
@@ -49,6 +50,7 @@
         "symfony/validator": "5.4.*",
         "symfony/web-link": "5.4.*",
         "symfony/yaml": "5.4.*",
+        "thiagoalessio/tesseract_ocr": "^2.13",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
     },

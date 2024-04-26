@@ -33,9 +33,17 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Security;
+use App\Service\GeoService;
 
 class UserController extends AbstractController
 {
+
+    private $geoService;
+
+    public function __construct(GeoService $geoService)
+    {
+        $this->geoService = $geoService;
+    }
 
     #[Route('/login', name: 'login')]
     public function login(Request $request, ManagerRegistry $manager, SessionInterface $session): Response
@@ -117,7 +125,6 @@ class UserController extends AbstractController
                 $mailer->send($message);
 
                 $this->addFlash('envoye', 'Un email de réinitialisation de mot de passe a été envoyé.');
-                
             }
 
             $this->addFlash('nonenvoye', 'Aucun utilisateur trouvé avec cet email.');
@@ -163,9 +170,17 @@ class UserController extends AbstractController
 
     /** Méthodes pour le client */
 
+
+
     #[Route('/signup', name: 'signup')]
     public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer, EmailService $emailService, UtilisateurRepository $repo): Response
     {
+
+        $ip = '197.2.48.207'; // 102.129.65.0 france
+        $countryName = $this->geoService->getCountryNameFromIp($ip);
+        $phoneCode = $this->geoService->getPhoneCodeFromCountryName($countryName);
+        $flag = $this->geoService->getFlagFromCountryName($countryName);
+
         $user = new Utilisateur();
         $form = $this->createForm(ClientType::class, $user);
 
@@ -226,7 +241,12 @@ class UserController extends AbstractController
             }
         }
 
-        return $this->renderform('user/register.html.twig', ['f' => $form]);
+        return $this->renderform('user/register.html.twig', [
+            'f' => $form,
+            'country_name' => $countryName,
+            'phone_code' => '+' . $phoneCode,
+            'flag' => $flag,
+        ]);
     }
 
     /** Profil Client */
@@ -476,48 +496,45 @@ class UserController extends AbstractController
         if ($role == 'Conseiller') {
             $error = false;
 
-        $user = $repo->find($id);
-        $form2 = $this->createForm(MdpConseillerType::class, $user);
+            $user = $repo->find($id);
+            $form2 = $this->createForm(MdpConseillerType::class, $user);
 
-        $em2 = $manager->getManager();
+            $em2 = $manager->getManager();
 
-        $form2->handleRequest($req);
+            $form2->handleRequest($req);
 
-        $ancMDP = $req->request->get('ancienMDP');
-        dump($ancMDP);
+            $ancMDP = $req->request->get('ancienMDP');
+            dump($ancMDP);
 
-        $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
-        dump($mdpActuel);
+            $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
+            dump($mdpActuel);
 
 
-        if ($form2->isSubmitted()) {
-            if ($form2->isValid()) {
-                if (md5($ancMDP) == $mdpActuel) {
+            if ($form2->isSubmitted()) {
+                if ($form2->isValid()) {
+                    if (md5($ancMDP) == $mdpActuel) {
 
-                    $plainPassword = $user->getMotDePasse();
-                    $hashedPassword = md5($plainPassword);
-                    $user->setMotDePasse($hashedPassword);
+                        $plainPassword = $user->getMotDePasse();
+                        $hashedPassword = md5($plainPassword);
+                        $user->setMotDePasse($hashedPassword);
 
-                    $em2->persist($user);
-                    $em2->flush();
-                    return $this->redirectToRoute("login");
-                } else {
-                    $error = true;
+                        $em2->persist($user);
+                        $em2->flush();
+                        return $this->redirectToRoute("login");
+                    } else {
+                        $error = true;
+                    }
                 }
             }
-        }
 
-        return $this->renderform('user/profilConseillerMDP.html.twig', [
-            'f2' => $form2,
-            'user' => $user,
-            'error' => $error
-        ]);
-            
+            return $this->renderform('user/profilConseillerMDP.html.twig', [
+                'f2' => $form2,
+                'user' => $user,
+                'error' => $error
+            ]);
         } else {
             return $this->renderform('accueil/introuvable.html.twig', []);
         }
-
-        
     }
 
 
