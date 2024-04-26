@@ -38,6 +38,9 @@
             "./migrations/.gitignore"
         ]
     },
+    "jms/translation-bundle": {
+        "version": "2.2.1"
+    },
     "knplabs/knp-paginator-bundle": {
         "version": "v5.9.0"
     },

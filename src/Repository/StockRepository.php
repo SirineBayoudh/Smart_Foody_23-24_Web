@@ -66,6 +66,14 @@ class StockRepository extends ServiceEntityRepository
 
         return $marques;
     }
+    public function findAllDistinctCategories(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p.categorie')
+            ->distinct()
+            ->getQuery()
+            ->getResult();
+    }
 
     public function findFutureStocks(): array
     {

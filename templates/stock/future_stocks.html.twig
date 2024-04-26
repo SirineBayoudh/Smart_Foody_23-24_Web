@@ -44,7 +44,7 @@
     }
 
 </style>
-        <div class="col-lg-20 grid-margin stretch-card">
+        <div class="col-lg-20 grid-margin stretch-card content-to-translate">
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title"> Table Stock En arrivage</h4>
@@ -111,17 +111,20 @@
                                 <td style="font-size: 12px;">{{ s.dateArrivage|date('Y-m-d') }}</td>
                                 <td><img src="{{ asset('images/' ~ s.image) }}" alt="Image"></td>
                                 <td> 
+                                    <button style="background-color: transparent;border-color:transparent">
                                     <a  href="{{ path('stock_edit', {id: s.id_s}) }}?mode=modifier" enctype="multipart/form-data" class="btn btn-warning btn-sm" title="Modifier" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
                               onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
                               onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
                                <i class="ti-pencil-alt"></i>
-                           </a></td>
+                           </a>
+                                    </button></td>
                                 {# <td>
                                     <a href="{{ path('stock_update', {id: s.id_s}) }}">
                                         <button type="button" class="btn btn-warning">Modifier</button>
                                     </a>
                                 </td> #}
                                 <td>
+                                    <button style="background-color: transparent;border-color:transparent">
                                 <a  href="#"  onclick="confirmSuppression('{{ path('stock_delete', {id: s.id_s}) }}'); return false;"class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
                                 onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
                                 onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
@@ -162,6 +165,7 @@
         </div>
     {% endfor %}
   </div>
+ 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
         var showCalendarButton = document.getElementById('showCalendarButton');

@@ -27,7 +27,7 @@
         background-color: #72c22f; /* Nouvelle couleur de fond */
     }
     </style>
-        <div class="col-lg-20 grid-margin stretch-card">
+        <div class="col-lg-20 grid-margin stretch-card content-to-translate">
             <div class="card">
               <div class="card-body">
                 <h4 class="card-title"> Table Alerte </h4>
@@ -61,21 +61,24 @@
                             <td>{{ a.description_alerte }}</td>
                             <td>{{ a.isType() ? 'Lue' : 'Non lue' }}</td>
                             <td>
-                              <a  href="{{ path('update_alert_type', {'id_alerte': a.id_alerte}) }}"  class="btn btn-danger btn-sm" title="Modifier" onclick="return confirmSwal();" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
+                                <button style="background-color: transparent; border-color:transparent"> <a  href="{{ path('update_alert_type', {'id_alerte': a.id_alerte}) }}"  class="btn btn-danger btn-sm" title="Modifier" onclick="return confirmSwal();" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
                               onmouseover="this.style.backgroundColor='#bbddab'; this.style.color=''; this.style.borderColor='#bbddab';" 
                               onmouseout="this.style.backgroundColor='#56ab2f'; this.style.color=''; this.style.borderColor='#56ab2f';">
                               <i class="ti-eye"></i>
-                           </a> 
+                           </a> </button>
                           </td>
                             {# <td>
 
     <a href="{{ path('update_alert_type', {'id_alerte': a.id_alerte}) }}" class="alert-link"><button type="button" class="btn btn-warning">Modifier</button></a>
 </td>
              #} <td>
+                <button style="background-color: transparent; border-color:transparent">
     <a href="#" class="btn btn-danger btn-sm" title="Supprimer" style="background-color: #56ab2f; border-color: #56ab2f; transition: background-color 0.3s, border-color 0.3s;"
     onclick="confirmSwal(event, {{ a.id_alerte }})">
     <i class="ti-trash"></i>
+
 </a>
+                </button>
 </td>
 
              {# <td>

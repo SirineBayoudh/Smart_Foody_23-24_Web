@@ -9,6 +9,7 @@ use App\Entity\Stock;
 use App\Form\AjouterStockType;
 use App\Repository\ProduitRepository;
 use App\Repository\StockRepository;
+use App\Service\FacebookService;
 use App\Service\SmsGenerator;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,14 +26,29 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class StockController extends AbstractController
 {
+    #[Route('/tr', name: 'translate_to_english')]
+    public function translateToEnglish(Request $request): Response
+    {
+        // Récupérer le contenu à traduire depuis la requête
+        $contentToTranslate = $request->request->get('content');
 
+        // Créer une instance de GoogleTranslate
+        $translator = new GoogleTranslate();
+
+        // Traduire le contenu de français en anglais
+        $translatedContent = $translator->setSource('fr')->setTarget('en')->translate($contentToTranslate);
+
+        // Retourner une réponse avec le contenu traduit
+        return new Response($translatedContent);
+    }
     #[Route('/stock', name: 'stock_get')]
     public function getStock(
         StockRepository $stockRepo,
@@ -154,6 +170,7 @@ class StockController extends AbstractController
         $em->flush();
         return $this->redirectToRoute("stock_get");
     }
+
     #[Route('/edit_stock/{id}', name: 'stock_edit')]
     public function editstock(Request $req, ManagerRegistry $manager, $id, StockRepository $repo): Response
     {
@@ -439,5 +456,25 @@ class StockController extends AbstractController
         return $this->render('stock/statistiques.html.twig', [
             'stocks' => $stocks, // Transmettre les stocks au modèle Twig
         ]);
+    }
+
+    #[Route('/get-categorie', name: 'get_categorie', methods: ['GET'])]
+    public function getCategorie(Request $request, ProduitRepository $produitRepository): JsonResponse
+    {
+        $selectedRef = $request->query->get('ref');
+        $categorie = $produitRepository->findCategorieByRef($selectedRef);
+        return new JsonResponse(['categorie' => $categorie]);
+    }
+    #[Route('/get-marques-by-categorie', name: 'get_marques_by_categorie', methods: ["GET"])]
+    public function getMarquesByCategorie(Request $request, ProduitRepository $pr): JsonResponse
+    {
+        // Récupérer la catégorie envoyée depuis la requête AJAX
+        $selectedCategorie = $request->query->get('categorie');
+
+        // Récupérer les marques associées à la catégorie
+        $marques = $pr->findAllDistinctMarquesByCategorie($selectedCategorie);
+
+        // Retourner les marques au format JSON
+        return new JsonResponse(['marques' => $marques]);
     }
 }

@@ -25,16 +25,7 @@ class ProduitRepository extends ServiceEntityRepository
      *
      * @return array
      */
-    public function findByCategorie(string $categorie): array
-    {
-        return $this->createQueryBuilder('p')
-            ->select('p.marque')
-            ->where('p.categorie = :categorie')
-            ->setParameter('categorie', $categorie)
-            ->distinct()
-            ->getQuery()
-            ->getResult();
-    }
+
     public function findAllDistinctMarques(): array
     {
         $marques = $this->createQueryBuilder('s')
@@ -42,7 +33,7 @@ class ProduitRepository extends ServiceEntityRepository
             ->distinct()
             ->getQuery()
             ->getResult();
-        var_dump($marques);
+
         // Formater les résultats pour avoir un tableau associatif
         $formattedMarques = [];
         foreach ($marques as $marque) {
@@ -50,7 +41,6 @@ class ProduitRepository extends ServiceEntityRepository
         }
 
         return $formattedMarques;
-        var_dump($formattedMarques);
     }
     public function findAllDistinctMarquesByCategorie(string $categorie): array
     {
@@ -69,14 +59,44 @@ class ProduitRepository extends ServiceEntityRepository
 
         return $formattedMarques;
     }
+
     public function findAllDistinctCategories(): array
     {
         return $this->createQueryBuilder('p')
-            ->select('DISTINCT p.categorie')
-            ->orderBy('p.categorie', 'ASC')
+            ->select('p.categorie')
+            ->distinct()
             ->getQuery()
             ->getResult();
     }
+
+    public function findByCategorie(string $categorie): array
+    {
+        $marques = $this->createQueryBuilder('p')
+            ->select('p.marque')
+            ->distinct()
+            ->leftJoin('p.categorie', 'c')
+            ->andWhere('c.nom = :categorie')
+            ->setParameter('categorie', $categorie)
+            ->getQuery()
+            ->getResult();
+
+        return $marques;
+    }
+    public function  findByMarquesParCategorie(): array
+    {
+        $marquesParCategorie = [];
+
+        // Récupérer toutes les catégories distinctes
+        $categories = $this->findAllDistinctCategories();
+
+        // Pour chaque catégorie, récupérer les marques correspondantes
+        foreach ($categories as $categorie) {
+            $marquesParCategorie[$categorie] = $this->findByMarquesParCategorie($categorie);
+        }
+
+        return $marquesParCategorie;
+    }
+
     //    /**
     //     * @return Produit[] Returns an array of Produit objects
     //     */

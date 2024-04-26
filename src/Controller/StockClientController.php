@@ -14,13 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class StockClientController extends AbstractController
 {
-    // #[Route('/stock/client', name: 'app_stock_client')]
-    // public function index(): Response
-    // {
-    //     return $this->render('stock_client/index.html.twig', [
-    //         'controller_name' => 'StockClientController',
-    //     ]);
-    // }
+
 
 
     #[Route('/stock/client', name: 'app_stock_client')]

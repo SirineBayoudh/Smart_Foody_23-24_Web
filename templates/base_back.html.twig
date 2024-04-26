@@ -29,10 +29,7 @@
 			#test:visited {
 				color: green; background-color: #77bb58;
 			}
-      /* #stocksItem a:visited .menu-title, #alertesItem a:visited .menu-title {
-    background-color: #77bb58;
-    color: green;
-} */
+   
 #stocksItem.active .nav-link,
 #stocksItem.active .menu-title {
     background-color: #77bb58;
@@ -66,6 +63,14 @@
     background-color: #77bb58;
     color: white
 }
+#translateButton {
+    display: block;
+    margin-top: 20px; /* Espace au-dessus du bouton */
+    margin-right: auto; /* Centrage horizontal */
+    margin-left: auto; /* Centrage horizontal */
+}
+
+
 		</style>
 </head>
 <body>
@@ -94,6 +99,7 @@
             </div>
           </li>
         </ul>
+        
         <ul class="navbar-nav navbar-nav-right">
           <li class="nav-item dropdown">
             <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
@@ -350,28 +356,7 @@
               <span class="menu-title">Dashboard</span>
             </a>
           </li>
-          {# <li class="nav-item" >
-            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth" id="test">
-              <i class="icon-head menu-icon"></i>
-              <span class="menu-title" >Utilisateur</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="auth">
-              <ul class="nav flex-column sub-menu" style="color: green; background-color: #77bb58;">
-                <li class="nav-item">
-                  <a class="nav-link" href="listUsers">
-                    Liste
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="statUsers">
-                    Statistiques
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li>
-      #}
+     
       <li class="nav-item" id="authItem">
     <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
         <i class="icon-head menu-icon"></i>
@@ -486,9 +471,174 @@
     </ul> 
   </div> 
 </li>    
-
+<li class="nav-item">
+  <button id="translateButton">Traduire en anglais</button>
+</li>
         </ul> 
       </nav>
+   
+     
+      {# <script>
+    $(document).ready(function() {
+        // Fonction pour traduire le contenu des deux pages en anglais
+        function translateContentToEnglish() {
+            // Récupérer les éléments à traduire dans la page de navigation
+            const navElementsToTranslate = $('#sidebar .nav-link .menu-title, #sidebar .sub-menu .nav-item .nav-link');
+
+            // Parcourir les éléments à traduire dans la page de navigation
+            navElementsToTranslate.each(function() {
+                const contentToTranslate = $(this).text().trim();
+
+                // Envoyer le texte à traduire au backend pour la traduction
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ path('translate_to_english') }}',
+                    data: { content: contentToTranslate },
+                    success: function(response) {
+                        // Mettre à jour le contenu traduit dans la page de navigation
+                        $(this).text(response);
+                    },
+                    error: function(error) {
+                        console.error('Erreur lors de la traduction :', error);
+                    }
+                });
+            });
+
+            // Appeler la fonction de traduction sur la page "Stock"
+            translateStockContentToEnglish();
+        }
+
+        // Appeler la fonction de traduction lorsque vous cliquez sur le bouton de traduction
+        $('#translateButton').on('click', function() {
+            translateContentToEnglish();
+        });
+    });
+</script> #}
+
+      {# <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fonction pour traduire le contenu du menu de navigation en anglais
+            function translateNavContentToEnglish() {
+                // Récupérer les éléments du menu de navigation à traduire
+                const navItemsToTranslate = document.querySelectorAll('#sidebar .nav-link .menu-title, #sidebar .sub-menu .nav-item .nav-link ');
+          
+                // Parcourir tous les éléments du menu de navigation à traduire
+                navItemsToTranslate.forEach(function(navItem) {
+                    // Récupérer le texte à traduire
+                    const contentToTranslate = navItem.textContent.trim();
+    
+                    // Envoyer le texte à traduire au backend pour la traduction
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ path('translate_to_english') }}',
+                        data: {content: contentToTranslate},
+                        success: function (response) {
+                            // Mettre à jour le contenu traduit
+                            navItem.textContent = response;
+                        },
+                        error: function (error) {
+                            console.error('Erreur lors de la traduction:', error);
+                        }
+                    });
+                });
+                  
+            }
+    
+            // Appeler la fonction de traduction lorsque vous cliquez sur le bouton de traduction
+            document.getElementById('translateButton').addEventListener('click', function() {
+                translateNavContentToEnglish();
+            });
+        });
+    </script> #}
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Gestionnaire d'événements pour le clic sur le bouton de traduction
+            $('#translateButton').on('click', function() {
+                // Créer un événement personnalisé pour déclencher la traduction
+                var translateEvent = new Event('translateContent');
+                // Dispatch de l'événement à l'objet document
+                document.dispatchEvent(translateEvent);
+                // Appel de la fonction pour traduire le contenu du tableau
+                translateTableContentToEnglish();
+            });
+        });
+    </script>
+    
+    <script>
+        // Fonction pour traduire le contenu du tableau en anglais
+        function translateTableContentToEnglish() {
+            // Récupérer toutes les cellules (th et td) du tableau à traduire
+            const cellsToTranslate = document.querySelectorAll('.content-to-translate th, .content-to-translate td,.content-to-translate .card-title, .content-to-translate .btn, .content-to-translate a, .content-to-translate p, .content-to-translate button');
+    
+            // Parcourir toutes les cellules du tableau à traduire
+            cellsToTranslate.forEach(function(cell) {
+                // Exclure les balises <a> et les balises d'images de la traduction
+                const childrenToTranslate = Array.from(cell.childNodes).filter(function(child) {
+                    return child.nodeType === Node.TEXT_NODE || child.tagName !== 'A';
+                });
+    
+                // Construire le contenu à traduire en conservant les balises d'images et les balises <a>
+                const contentToTranslate = childrenToTranslate.reduce(function(acc, child) {
+                    if (child.nodeType === Node.TEXT_NODE) {
+                        return acc + child.nodeValue.trim();
+                    } else {
+                        return acc + child.outerHTML;
+                    }
+                }, '');
+    
+                // Envoyer le contenu à traduire au backend pour la traduction
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ path('translate_to_english') }}',
+                    data: {content: contentToTranslate},
+                    success: function (response) {
+                        // Mettre à jour le contenu de la cellule avec le contenu traduit
+                        // Exclure les balises d'images de la mise à jour
+                        cell.innerHTML = response;
+                    },
+                    error: function (error) {
+                        console.error('Erreur lors de la traduction:', error);
+                    }
+                });
+            });
+    
+            // Appeler la fonction pour traduire le contenu de la navigation
+            translateNavContentToEnglish();
+        }
+    
+        // Fonction pour traduire le contenu de la navigation en anglais
+        function translateNavContentToEnglish() {
+            // Récupérer les éléments du menu de navigation à traduire
+            const navItemsToTranslate = document.querySelectorAll('#sidebar .nav-link .menu-title, #sidebar .sub-menu .nav-item .nav-link');
+    
+            // Parcourir tous les éléments du menu de navigation à traduire
+            navItemsToTranslate.forEach(function(navItem) {
+                // Récupérer le texte à traduire
+                const contentToTranslate = navItem.textContent.trim();
+    
+                // Envoyer le texte à traduire au backend pour la traduction
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ path('translate_to_english') }}',
+                    data: {content: contentToTranslate},
+                    success: function (response) {
+                        // Mettre à jour le contenu traduit
+                        navItem.textContent = response;
+                    },
+                    error: function (error) {
+                        console.error('Erreur lors de la traduction:', error);
+                    }
+                });
+            });
+        }
+    
+        // // Appeler la fonction pour traduire le contenu du tableau une fois que le DOM est chargé
+        // translateTableContentToEnglish();
+    </script>
+    
       <!-- partial -->
       {% block body %}
       <div class="main-panel">
@@ -1283,6 +1433,7 @@
 
 
 </html>
+
 {# <script>
 $(document).ready(function() {
     $('.nav-link').click(function() {
