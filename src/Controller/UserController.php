@@ -232,110 +232,129 @@ class UserController extends AbstractController
     /** Profil Client */
 
     #[Route('/profilClient/{id}', name: 'client_profile')]
-    public function updateClient(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
+    public function updateClient(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
     {
 
-        $user = $repo->find($id);
-        $form = $this->createForm(ProfilClientType::class, $user);
+        $userId = $session->get('utilisateur')['idUtilisateur'];
 
-        $emailExistant = $user->getEmail();
+        $userco = $repo->find($userId);
 
-        $em = $manager->getManager();
+        $role = $userco->getRole();
 
-        $form->handleRequest($req);
+        if ($role == 'Client') {
+            $user = $repo->find($id);
+            $form = $this->createForm(ProfilClientType::class, $user);
 
-        if ($form->isSubmitted()) {
+            $emailExistant = $user->getEmail();
 
-            $imageFile = $form->get('photo')->getData();
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
-                $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                // Déplace le fichier dans le répertoire où sont stockées les images
-                try {
-                    $imageFile->move(
-                        $this->getParameter('images_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // Gérer l'exception si le fichier ne peut pas être déplacé
-                }
-                // Met à jour le nom de l'image dans l'entité Produit
-                $user->setPhoto($newFilename);
-            }
+            $em = $manager->getManager();
 
-            $emailNV = $user->getEmail();
+            $form->handleRequest($req);
 
-            if ($emailExistant != $emailNV) {
+            if ($form->isSubmitted()) {
 
-                $existingUser = $repo->findByEmail($emailNV);
-
-                if ($existingUser) {
-                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
-                } else {
-                    if ($form->isValid()) {
-
-                        $em->persist($user);
-                        $em->flush();
-                        return $this->redirectToRoute("accueil");
+                $imageFile = $form->get('photo')->getData();
+                if ($imageFile) {
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                    // Déplace le fichier dans le répertoire où sont stockées les images
+                    try {
+                        $imageFile->move(
+                            $this->getParameter('images_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        // Gérer l'exception si le fichier ne peut pas être déplacé
                     }
+                    // Met à jour le nom de l'image dans l'entité Produit
+                    $user->setPhoto($newFilename);
                 }
-            } elseif ($form->isValid()) {
 
-                $em->persist($user);
-                $em->flush();
-                return $this->redirectToRoute("accueil");
+                $emailNV = $user->getEmail();
+
+                if ($emailExistant != $emailNV) {
+
+                    $existingUser = $repo->findByEmail($emailNV);
+
+                    if ($existingUser) {
+                        $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                    } else {
+                        if ($form->isValid()) {
+
+                            $em->persist($user);
+                            $em->flush();
+                            return $this->redirectToRoute("accueil");
+                        }
+                    }
+                } elseif ($form->isValid()) {
+
+                    $em->persist($user);
+                    $em->flush();
+                    return $this->redirectToRoute("accueil");
+                }
             }
-        }
 
-        return $this->renderform('user/profilClient.html.twig', [
-            'f' => $form,
-            'user' => $user,
-        ]);
+            return $this->renderform('user/profilClient.html.twig', [
+                'f' => $form,
+                'user' => $user,
+            ]);
+        } else {
+            return $this->renderform('accueil/introuvable.html.twig', []);
+        }
     }
 
     #[Route('/profilClientMDP/{id}', name: 'client_profileMDP')]
-    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
+    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
     {
+        $userId = $session->get('utilisateur')['idUtilisateur'];
 
-        $error = false;
+        $userco = $repo->find($userId);
 
-        $user = $repo->find($id);
-        $form2 = $this->createForm(MdpClientType::class, $user);
+        $role = $userco->getRole();
 
-        $em2 = $manager->getManager();
+        if ($role == 'Client') {
+            $error = false;
 
-        $form2->handleRequest($req);
+            $user = $repo->find($id);
+            $form2 = $this->createForm(MdpClientType::class, $user);
 
-        $ancMDP = $req->request->get('ancienMDP');
-        dump($ancMDP);
+            $em2 = $manager->getManager();
 
-        $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
-        dump($mdpActuel);
+            $form2->handleRequest($req);
+
+            $ancMDP = $req->request->get('ancienMDP');
+            dump($ancMDP);
+
+            $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
+            dump($mdpActuel);
 
 
-        if ($form2->isSubmitted()) {
-            if ($form2->isValid()) {
-                if (md5($ancMDP) == $mdpActuel) {
+            if ($form2->isSubmitted()) {
+                if ($form2->isValid()) {
+                    if (md5($ancMDP) == $mdpActuel) {
 
-                    $plainPassword = $user->getMotDePasse();
-                    $hashedPassword = md5($plainPassword);
-                    $user->setMotDePasse($hashedPassword);
+                        $plainPassword = $user->getMotDePasse();
+                        $hashedPassword = md5($plainPassword);
+                        $user->setMotDePasse($hashedPassword);
 
-                    $em2->persist($user);
-                    $em2->flush();
-                    return $this->redirectToRoute("login");
-                } else {
-                    $error = true;
+                        $em2->persist($user);
+                        $em2->flush();
+                        return $this->redirectToRoute("login");
+                    } else {
+                        $error = true;
+                    }
                 }
             }
-        }
 
-        return $this->renderform('user/profilClientMDP.html.twig', [
-            'f2' => $form2,
-            'user' => $user,
-            'error' => $error
-        ]);
+            return $this->renderform('user/profilClientMDP.html.twig', [
+                'f2' => $form2,
+                'user' => $user,
+                'error' => $error
+            ]);
+        } else {
+            return $this->renderform('accueil/introuvable.html.twig', []);
+        }
     }
 
     /** Méthodes pour le conseiller*/
@@ -344,100 +363,118 @@ class UserController extends AbstractController
     /* Profil Conseiller */
 
     #[Route('/profilConseiller/{id}', name: 'conseiller_profile')]
-    public function updateConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
+    public function updateConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
     {
 
-        $user = $repo->find($id);
+        $userId = $session->get('utilisateur')['idUtilisateur'];
 
-        $form = $this->createForm(ProfilConseillerType::class, $user);
+        $userco = $repo->find($userId);
 
-        $emailExistant = $user->getEmail();
+        $role = $userco->getRole();
 
-        $em = $manager->getManager();
+        if ($role == 'Conseiller') {
 
-        $form->handleRequest($req);
+            $user = $repo->find($id);
 
-        if ($form->isSubmitted()) {
+            $form = $this->createForm(ProfilConseillerType::class, $user);
 
-            $file = $form->get('attestation')->getData();
-            if ($file) {
-                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
-                $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
+            $emailExistant = $user->getEmail();
 
-                // Assurez-vous que l'extension est correcte pour un PDF
-                if ($file->guessExtension() !== 'pdf') {
-                    throw new \Exception("Le fichier n'est pas un PDF valide.");
-                }
+            $em = $manager->getManager();
 
-                // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
-                try {
-                    $file->move(
-                        $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // Gérer l'exception si le fichier ne peut pas être déplacé
-                    // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
-                }
+            $form->handleRequest($req);
 
-                // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
-                $user->setAttestation($newFilename);
-            }
+            if ($form->isSubmitted()) {
 
-            $imageFile = $form->get('photo')->getData();
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
-                $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                // Déplace le fichier dans le répertoire où sont stockées les images
-                try {
-                    $imageFile->move(
-                        $this->getParameter('images_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // Gérer l'exception si le fichier ne peut pas être déplacé
-                }
-                // Met à jour le nom de l'image dans l'entité Produit
-                $user->setPhoto($newFilename);
-            }
+                $file = $form->get('attestation')->getData();
+                if ($file) {
+                    $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
+                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
-            $emailNV = $user->getEmail();
-
-            if ($emailExistant != $emailNV) {
-
-                $existingUser = $repo->findByEmail($emailNV);
-
-                if ($existingUser) {
-                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
-                } else {
-                    if ($form->isValid()) {
-
-                        $em->persist($user);
-                        $em->flush();
-                        return $this->redirectToRoute("accueil");
+                    // Assurez-vous que l'extension est correcte pour un PDF
+                    if ($file->guessExtension() !== 'pdf') {
+                        throw new \Exception("Le fichier n'est pas un PDF valide.");
                     }
+
+                    // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
+                    try {
+                        $file->move(
+                            $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        // Gérer l'exception si le fichier ne peut pas être déplacé
+                        // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
+                    }
+
+                    // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
+                    $user->setAttestation($newFilename);
                 }
-            } elseif ($form->isValid()) {
 
-                $em->persist($user);
-                $em->flush();
-                return $this->redirectToRoute("accueil");
+                $imageFile = $form->get('photo')->getData();
+                if ($imageFile) {
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                    // Déplace le fichier dans le répertoire où sont stockées les images
+                    try {
+                        $imageFile->move(
+                            $this->getParameter('images_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        // Gérer l'exception si le fichier ne peut pas être déplacé
+                    }
+                    // Met à jour le nom de l'image dans l'entité Produit
+                    $user->setPhoto($newFilename);
+                }
+
+                $emailNV = $user->getEmail();
+
+                if ($emailExistant != $emailNV) {
+
+                    $existingUser = $repo->findByEmail($emailNV);
+
+                    if ($existingUser) {
+                        $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                    } else {
+                        if ($form->isValid()) {
+
+                            $em->persist($user);
+                            $em->flush();
+                            return $this->redirectToRoute("accueil");
+                        }
+                    }
+                } elseif ($form->isValid()) {
+
+                    $em->persist($user);
+                    $em->flush();
+                    return $this->redirectToRoute("accueil");
+                }
             }
-        }
 
-        return $this->renderform('user/profilConseiller.html.twig', [
-            'f' => $form,
-            'user' => $user,
-        ]);
+            return $this->renderform('user/profilConseiller.html.twig', [
+                'f' => $form,
+                'user' => $user,
+            ]);
+        } else {
+            return $this->renderform('accueil/introuvable.html.twig', []);
+        }
     }
 
 
     #[Route('/profilConseillerMDP/{id}', name: 'conseiller_profileMDP')]
-    public function updateConseillerMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id): Response
+    public function updateConseillerMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
     {
-        $error = false;
+        $userId = $session->get('utilisateur')['idUtilisateur'];
+
+        $userco = $repo->find($userId);
+
+        $role = $userco->getRole();
+
+        if ($role == 'Conseiller') {
+            $error = false;
 
         $user = $repo->find($id);
         $form2 = $this->createForm(MdpConseillerType::class, $user);
@@ -475,6 +512,12 @@ class UserController extends AbstractController
             'user' => $user,
             'error' => $error
         ]);
+            
+        } else {
+            return $this->renderform('accueil/introuvable.html.twig', []);
+        }
+
+        
     }
 
 

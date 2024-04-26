@@ -20,11 +20,8 @@ class AccueilController extends AbstractController
         dump($session);
 
         $user = $repo->find($userId);
-
-        dump($user);
+        
         $role = $user->getRole();
-
-        dump($role);
         
         return $this->render('accueil/index.html.twig', [
             'controller_name' => 'AccueilController',
