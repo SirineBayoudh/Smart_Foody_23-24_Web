@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
             <div class="col-md-9 ftco-animate text-center">
-                <p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>Finaliser ma commande</span></p>
+                <p class="breadcrumbs"><span class="mr-2"><a href="index.html">Accueil</a></span> <span>Finaliser ma commande</span></p>
                 <h1 class="mb-0 bread">Finaliser ma commande</h1>
             </div>
         </div>
@@ -17,8 +17,7 @@
 <style>
     .form-control {
         font-weight: bold !important;
-      
-          background-color: #e8f5e9 !important;
+        background-color: #e8f5e9 !important;
         animation: borderAnimation 3s infinite !important;
         border: 1px solid #66BB6A !important;
     }
@@ -114,7 +113,9 @@
                         <div class="col-md-12">
                             <div class="form-group mb-3">
                                 <label>Adresse de Livraison</label>
-                                <input type="text" class="form-control" value="{{ commande.address }}" readonly>
+                                
+                                <input type="text" class="form-control" name="address" value="{{ commande.address }}" readonly>
+
                             
                              <div class="w-100"></div>
                              
@@ -165,13 +166,14 @@
                             <input type="checkbox" class="form-check-input" id="etatCommande" name="etatCommande" value="nonLivree" />
                             <label class="form-check-label" for="etatCommande">Payer à la Livraison</label>
                         </div>
-                          <a href="{{ path('cANU', {'id': commande.id}) }}" class="btn btn-primary">Anuuler la commande</a>
-                        <button type="submit" class="btn btn-primary">Valider la Commande</button>
+                          <a href="{{ path('cANU', {'id': commande.id}) }}" class="btn btn-primary" id="annulerCommande">Anuuler la commande</a>
+                        <button type="submit" class="btn btn-primary"id="validerCommande">Valider la Commande</button>
 
                     </form>
         </div>
     </div>
 </section>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
 document.getElementById("openMapButton").addEventListener("click", function() {
     var mapContainer = document.getElementById("mapContainer");
@@ -182,5 +184,68 @@ document.getElementById("openMapButton").addEventListener("click", function() {
         initMap();
     }
 });
+
+document.getElementById("validerCommande").addEventListener("click", function(event) {
+    var addressInput = document.querySelector('.billing-form input[name="address"]');
+    var paymentCheckbox = document.getElementById("etatCommande");
+    
+    if (!addressInput.value.trim()) {
+        event.preventDefault(); // Empêche l'envoi du formulaire
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Veuillez choisir l\'adresse de livraison avant de valider la commande.',
+        });
+    }
+});
+
+document.getElementById("validerCommande").addEventListener("click", function(event) {
+    // Empêche l'envoi du formulaire si l'adresse et la méthode de paiement ne sont pas sélectionnées
+    var addressInput = document.querySelector('.billing-form input[name="address"]');
+    var paymentCheckbox = document.getElementById("etatCommande");
+    
+    if (!addressInput.value.trim() || !paymentCheckbox.checked) {
+        // Empêche l'envoi du formulaire
+        return; // Sortie de la fonction pour éviter d'afficher l'alerte de succès
+    }
+    
+    // Afficher l'alerte de succès après avoir soumis le formulaire
+    Swal.fire({
+        icon: 'success',
+        title: 'Commande validée avec succès!',
+        text: 'Un email de confirmation a été envoyé à votre adresse.',
+        showConfirmButton: false,
+        timer: 4000 // Ferme automatiquement après 3 secondes
+    });
+});
+
+
+
+
+
+document.getElementById("annulerCommande").addEventListener("click", function(event) {
+    event.preventDefault(); // Empêche le comportement par défaut du lien
+    Swal.fire({
+        title: 'Êtes-vous sûr?',
+        text: "Vous êtes sur le point d'annuler la commande.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Oui, annuler la commande',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = this.href; // Redirige vers l'URL du lien
+        }
+    });
+});
+
 </script>
+
+
+
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAZxrDjNK7_HqMz-reXjQXfG6-fAmOf1s&callback=initMap"></script>
 {% endblock %}

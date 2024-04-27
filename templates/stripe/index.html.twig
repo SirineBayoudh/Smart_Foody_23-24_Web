@@ -1,0 +1,77 @@
+{% extends 'base_accueil.html.twig' %}
+
+{% block header_image %}
+<div class="hero-wrap hero-bread" style="background-image: url('{{ asset('images/bg_1.jpg') }}');">
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+            <div class="col-md-9 ftco-animate text-center">
+                <p class="breadcrumbs"><span class="mr-2"><a href="#">Home</a></span> <span>Stripe Payment</span></p>
+                <h1 class="mb-0 bread">Payment</h1>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    {% for message in app.flashes('success') %}
+                        <div style="color: green; border: 2px green solid; text-align: center; padding: 5px; margin-bottom: 10px;">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                 
+                    <form id='checkout-form' method='post' action="{{ path('stripe_charge') }}">
+                        <input type='hidden' name='stripeToken' id='stripe-token-id'>
+                        <label for="card-element" class="mb-4">Checkout Forms</label>
+                        <div id="card-element" class="form-control mb-4"></div>
+                        <button id='pay-btn' class="btn btn-success mt-3" type="button" style="width: 100%;padding: 10px;" onclick="createToken()">
+                            PAY {{ totalEnDevise }} EUR
+                        </button>
+                    </form>
+                    <div class="payment-image mt-4 text-center">
+                        <img src="{{ asset('images/paiement.jpg') }}" alt="Payment Methods" style="max-width: 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    var stripe = Stripe("{{ stripe_key }}");
+    var elements = stripe.elements();
+    var cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    function createToken() {
+        document.getElementById("pay-btn").disabled = true;
+        stripe.createToken(cardElement).then(function(result) {
+            if (typeof result.error != 'undefined') {
+                document.getElementById("pay-btn").disabled = false;
+                alert(result.error.message);
+            } else if (typeof result.token != 'undefined') {
+                document.getElementById("stripe-token-id").value = result.token.id;
+                document.getElementById('checkout-form').submit();
+                // Afficher l'alerte de succès après avoir soumis le formulaire
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Paiement effectué avec succès!',
+                    text: 'Un email de confirmation vous sera envoyé.',
+                    showConfirmButton: false,
+                    timer: 4000 // Ferme automatiquement après 4 secondes
+                }).then(() => {
+                    // Redirection vers la page d'accueil après la fermeture de l'alerte
+                    window.location.href = "{{ path('app_test') }}";
+                });
+            }
+        });
+    }
+</script>
+{% endblock %}
