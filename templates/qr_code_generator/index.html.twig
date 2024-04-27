@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Qr Code</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container text-center">
+    <h1>Détails de la Commande</h1>
+    <p>Commande ID: {{ commande.id }}</p>
+    <p>Date: {{ commande.dateCommande|date('Y-m-d') }}</p>
+    <p>Total: {{ commande.totaleCommande }} TND</p>
+     <p>Total: {{ commande.etat }} TND</p>
+
+    <div class="mt-5">
+        <h2>Produits Achetés</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Prix</th>
+                    <th>Quantité</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ligne in commande.getLignesCommande() %}
+                    <tr>
+                        <td>{{ ligne.produit.marque }}</td>
+                        <td>{{ ligne.produit.prix }} TND</td>
+                        <td>{{ ligne.quantite }}</td>
+                        <td>{{ ligne.quantite * ligne.produit.prix }} TND</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row mt-5">
+       <div class="row mt-5">
+    <div class="col">
+        <h2>QR Code</h2>
+        <a href="{{ path('app_qr_code', {'id': commande.id}) }}"><img src="{{ qrCode }}" alt="QR Code de la commande"></a>
+    </div>
+</div>
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
