@@ -176,13 +176,18 @@ class UserController extends AbstractController
     public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer, EmailService $emailService, UtilisateurRepository $repo): Response
     {
 
-        $ip = '197.2.48.207'; // 102.129.65.0 france
+        $ip = '197.2.48.207'; // 102.129.65.0 france // 197.3.253.36 manouba// 197.2.48.207 sousse
         $countryName = $this->geoService->getCountryNameFromIp($ip);
         $phoneCode = $this->geoService->getPhoneCodeFromCountryName($countryName);
         $flag = $this->geoService->getFlagFromCountryName($countryName);
+        $adress = $this->geoService->getAdressFromIP($ip);
+
+        dump($adress);
 
         $user = new Utilisateur();
-        $form = $this->createForm(ClientType::class, $user);
+        $form = $this->createForm(ClientType::class, $user, [
+            'adresse' => $adress // Passez l'adresse comme option au formulaire
+        ]);
 
         $em = $manager->getManager();
 

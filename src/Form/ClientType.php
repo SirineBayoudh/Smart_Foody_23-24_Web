@@ -75,6 +75,7 @@ class ClientType extends AbstractType
                 'invalid_message' => 'Le numéro de téléphone doit contenir uniquement des chiffres'
             ])
             ->add('adresse', TextType::class, [
+                'data' => $options['adresse'],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'champ obligatoire',
@@ -111,7 +112,7 @@ class ClientType extends AbstractType
 
                 'attr' => [
                     'accept' => 'image/*', // Cela limite le gestionnaire de fichiers à montrer seulement les images
-                    'class' => 'custom-file-input' 
+                    'class' => 'custom-file-input'
                 ]
             ])
             ->add('Inscription', SubmitType::class, [
@@ -128,7 +129,8 @@ class ClientType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Utilisateur::class
+            'data_class' => Utilisateur::class,
+            'adresse' => null,
         ]);
     }
 }
