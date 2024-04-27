@@ -106,7 +106,16 @@ class Panier
     }
 
 
+    public function updateTotal(): void
+    {
+        $total = 0.0;
 
+        foreach ($this->getLignesCommande() as $ligne) {
+            $total += $ligne->getQuantite() * $ligne->getProduit()->getPrix();
+        }
+
+        $this->setTotale($total);
+    }
 
   
 

@@ -173,7 +173,7 @@ class Produit
         return $this->ligneCommandes;
     }
 
-    public function addLigneCommande(LigneCommande $ligneCommande): static
+ /*   public function addLigneCommande(LigneCommande $ligneCommande): static
     {
         if (!$this->ligneCommandes->contains($ligneCommande)) {
             $this->ligneCommandes->add($ligneCommande);
@@ -193,7 +193,7 @@ class Produit
         }
 
         return $this;
-    }
+    }*/
 
     public function getCritere(): ?Objectif
     {

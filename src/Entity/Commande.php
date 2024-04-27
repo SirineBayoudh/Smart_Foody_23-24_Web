@@ -6,6 +6,7 @@ use App\Repository\CommandeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use symfony\component\Validator\Constraints as assert;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
@@ -24,7 +25,9 @@ class Commande
     }
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\Date(message: "La date doit être au format YYYY-MM-DD.")]
     private ?\DateTimeInterface $dateCommande = null;
+   
 
 
 
@@ -158,6 +161,7 @@ public function setUtilisateur(?Utilisateur $utilisateur): self
 
         return $this;
     }
+  
 
     public function getEtat(): ?string
     {

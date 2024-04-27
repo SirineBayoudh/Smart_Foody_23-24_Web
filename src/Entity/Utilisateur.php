@@ -368,28 +368,10 @@ class Utilisateur
         return $this->commandes;
     }
 
-    public function addCommande(Commande $commande): static
-    {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes->add($commande);
-            $commande->setIdClient($this);
-        }
+   
 
-        return $this;
-    }
-
-    public function removeCommande(Commande $commande): static
-    {
-        if ($this->commandes->removeElement($commande)) {
-            // set the owning side to null (unless already changed)
-            if ($commande->getIdClient() === $this) {
-                $commande->setIdClient(null);
-            }
-        }
-
-        return $this;
-    }
-
+    
+    
     /**
      * @return Collection<int, Panier>
      */
@@ -398,25 +380,7 @@ class Utilisateur
         return $this->paniers;
     }
 
-    public function addPanier(Panier $panier): static
-    {
-        if (!$this->paniers->contains($panier)) {
-            $this->paniers->add($panier);
-            $panier->setIdClient($this);
-        }
+  
 
-        return $this;
-    }
-
-    public function removePanier(Panier $panier): static
-    {
-        if ($this->paniers->removeElement($panier)) {
-            // set the owning side to null (unless already changed)
-            if ($panier->getIdClient() === $this) {
-                $panier->setIdClient(null);
-            }
-        }
-
-        return $this;
-    }
+  
 }
