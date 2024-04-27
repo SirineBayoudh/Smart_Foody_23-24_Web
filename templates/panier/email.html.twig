@@ -144,10 +144,36 @@
                                                                                     <td align="center" class="esd-block-text es-p40t es-p20r es-p20l es-m-p10t">
                                                                                         <h3 class="b_title">COMMANDE NUM {{ commande.id }}<br>{{ commande.dateCommande|date('Y-m-d') }}</h3>
                                                                                         <h3 class="b_title">Total de la Commande: {{ commande.totaleCommande }}<br>Remise: {{ commande.remise }}</h3>
+
+<div class="mt-5">
+        <h2>Produits Achetés</h2>
+       <table class="table" style="width: 100%; border-collapse: collapse; border: 1px solid #dddddd;">
+    <thead>
+        <tr style="background-color: #77bb58;">
+            <th style="padding: 8px; border: 1px solid #dddddd;">Produit</th>
+            <th style="padding: 8px; border: 1px solid #dddddd;">Prix</th>
+            <th style="padding: 8px; border: 1px solid #dddddd;">Quantité</th>
+            <th style="padding: 8px; border: 1px solid #dddddd;">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ligne in commande.getLignesCommande() %}
+        <tr>
+            <td style="padding: 8px; border: 1px solid #dddddd;">{{ ligne.produit.marque }}</td>
+            <td style="padding: 8px; border: 1px solid #dddddd;">{{ ligne.produit.prix }} TND</td>
+            <td style="padding: 8px; border: 1px solid #dddddd;">{{ ligne.quantite }}</td>
+            <td style="padding: 8px; border: 1px solid #dddddd;">{{ ligne.quantite * ligne.produit.prix }} TND</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+    </div>
                                                                                     </td>
                                                                                 </tr>
                                                                             </tbody>
                                                                         </table>
+    
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -162,6 +188,12 @@
                         </table>
                     </td>
                 </tr>
+                <tr>
+     
+        
+    </div>
+</tr>
+
             </tbody>
         </table>
     </div>
