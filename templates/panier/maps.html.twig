@@ -1,3 +1,4 @@
+
 {% block body %}
 <style>
     #mapContainer {
@@ -18,6 +19,10 @@
         background-color: #0056b3;
         border-color: #0056b3;
     }
+    .swal2-confirm {
+        background-color: #28a745 !important; /* Vert */
+        border-color: #28a745 !important;
+    }
 </style>
 
 <div id="formContainer">
@@ -27,7 +32,7 @@
         <input type="hidden" id="adresse" name="adresse" placeholder="Adresse" />
 
         <div id="buttonContainer" style="text-align: center; margin-top: 20px;">
-            <button type="button" class="btn btn-primary" onclick="sendData()">Confirmer l'emplacement</button>
+            <button type="button" class="btn btn-primary" onclick="confirmLocation()">Confirmer l'emplacement</button>
         </div>
     </form>
 </div>
@@ -36,6 +41,7 @@
     <div id="map"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 // Initialisation de la carte Google Maps
 function initMap() {
@@ -75,6 +81,27 @@ function placeMarkerAndPanTo(latLng, map) {
     });
 }
 
+// Fonction pour confirmer la localisation
+function confirmLocation() {
+    Swal.fire({
+        title: 'Confirmer l\'emplacement',
+        text: 'Voulez-vous confirmer cet emplacement et cette adresse ?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff', // Couleur bleue
+        cancelButtonColor: '#dc3545', // Couleur rouge
+        confirmButtonText: 'Confirmer',
+        cancelButtonText: 'Annuler',
+        customClass: {
+            confirmButton: 'btn btn-primary', // Personnaliser le style du bouton de confirmation
+            cancelButton: 'btn btn-secondary' // Personnaliser le style du bouton d'annulation
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            sendData(); // Si l'utilisateur confirme, envoi des données de localisation
+        }
+    });
+}
 
 // Envoi des données de localisation au serveur
 function sendData() {
@@ -96,19 +123,22 @@ function sendData() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('L\'emplacement et l\'adresse ont été confirmés avec succès.');
-               window.location.href = `/commande/valider/${id}`;
+            Swal.fire('Succès', 'L\'emplacement et l\'adresse ont été confirmés avec succès.', 'success')
+            .then(() => {
+                window.location.href = `/commande/valider/${id}`;
+            });
         } else {
-            alert('Une erreur est survenue.');
+            Swal.fire('Erreur', 'Une erreur est survenue.', 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Une erreur est survenue lors de la communication avec le serveur.');
+        Swal.fire('Erreur', 'Une erreur est survenue lors de la communication avec le serveur.', 'error');
     });
 }
-    
 </script>
 
 
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAZxrDjNK7_HqMz-reXjQXfG6-fAmOf1s&callback=initMap"></script>
 {% endblock %}
