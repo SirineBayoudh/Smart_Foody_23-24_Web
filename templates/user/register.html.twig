@@ -8,8 +8,8 @@
 
 		<!-- plugins:css -->
 		<!--	<link rel="stylesheet" href="../../vendors/feather/feather.css">
-																																<link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
-																																<link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">-->
+																																		<link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
+																																		<link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">-->
 		<link rel="stylesheet" href="{{asset('css/vertical-layout-light/style.css')}}"> <!-- endinject -->
 		<!-- Plugin css for this page -->
 		<!-- End plugin css for this page -->
@@ -41,7 +41,7 @@
 									<img src="../../images/trans_logo.png" alt="logo">
 								</div>
 								<div style="display: flex; justify-content:center; margin-top:-20px">
-									<a style="margin-right: 80px; font-weight:bold; color:black	" class="inscri">
+									<a style="margin-right: 80px; font-weight:bold; color:black	" class="inscri" href="login">
 										Se connecter</a>
 									<a style="color:#56ab2f; font-weight:bold; text-decoration:underline">
 										S'inscrire</a>
@@ -98,9 +98,9 @@
 											{{ form_errors(f.genre) }}
 										</div>
 										<div class="form-group">
-										<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
+											<label for="exampleInputUsername1">{{ form_label(f.numTel) }}</label>
 											<img src="{{ flag }}" alt="Drapeau de {{ country_name }}" style="width:20px; height:20px; margin-left:-80px; margin-bottom:-85px;">
-											
+
 											{{ form_widget(f.numTel, {'attr': {'class': 'form-control' ~ (form_errors(f.numTel) ? ' is-invalid' : ''), 'id': 'exampleInputUsername1', 'placeholder': 'Numéro de téléphone'}}) }}
 											{% if form_errors(f.numTel) %}
 												<div class="invalid-feedback">
@@ -173,15 +173,17 @@ fileNameDisplay.textContent = fileName; // Affiche le nom du fichier
 										<div class="row">
 											<div class="col">
 												<div class="form-group">
-													{{ form_widget(f.taille, {'attr': {'class': 'form-control', 'id': 'exampleInputTaille1', 'placeholder': 'Taille', 'style': 'width: 170px;'}})}}
+													{{ form_widget(f.taille, {'attr': {'class': 'form-control', 'id': 'taille', 'placeholder': 'Taille', 'style': 'width: 170px;'}})}}
 													{{ form_errors(f.taille) }}
 												</div>
 											</div>
 											<div class="col">
 												<div class="form-group">
-													{{ form_widget(f.poids, {'attr': {'class': 'form-control', 'id': 'exampleInputPoids1', 'placeholder': 'Poids', 'style': 'width: 170px;'}}) }}
+													{{ form_widget(f.poids, {'attr': {'class': 'form-control', 'id': 'poids', 'placeholder': 'Poids', 'style': 'width: 170px;'}}) }}
 													{{ form_errors(f.poids) }}
 												</div>
+											</div>
+											<div style="margin-bottom:10px; margin-left:30px;"> Votre IMC est : <span id="imcDisplay"> {{imc}} </span>
 											</div>
 										</div>
 										{{ form_end(f) }}

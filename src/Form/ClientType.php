@@ -131,6 +131,7 @@ class ClientType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Utilisateur::class,
             'adresse' => null,
+            'IMC'=> null,
         ]);
     }
 }

@@ -8,6 +8,7 @@ use App\Form\ConseillerType;
 use App\Form\MdpAdminType;
 use App\Form\ProfilConseillerType;
 use App\Repository\UtilisateurRepository;
+use App\Service\CalculComplexite;
 use App\Service\EmailService;
 use Doctrine\Persistence\ManagerRegistry;
 use Dompdf\Dompdf;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Knp\Component\Pager\PaginatorInterface;
 use Knp\Snappy\Pdf;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -238,7 +240,7 @@ class BackUserController extends AbstractController
     /* Ajouter un Conseiller */
 
     #[Route('/ajouterConseiller', name: 'addConseiller')]
-    public function addConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, SessionInterface $session, EmailService $emailService): Response
+    public function addConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, SessionInterface $session, EmailService $emailService, CalculComplexite $calculCmplx): Response
     {
 
         $userId = $session->get('utilisateur')['idUtilisateur'];
@@ -264,84 +266,94 @@ class BackUserController extends AbstractController
 
             if ($form->isSubmitted()) {
 
-                $file = $form->get('attestation')->getData();
-                if ($file) {
-                    $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
-                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
+                if ($user->getMotDePasse()) {
+                    $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
 
-                    // Assurez-vous que l'extension est correcte pour un PDF
-                    if ($file->guessExtension() !== 'pdf') {
-                        throw new \Exception("Le fichier n'est pas un PDF valide.");
-                    }
+                    if ($complexityScore < 6) {
+                        $form->get('motDePasse')->addError(new FormError('Mot de passe faible.'));
+                    } elseif ($complexityScore >= 6 && $complexityScore < 12) {
+                        $form->get('motDePasse')->addError(new FormError('Mot de passe moyen.'));
+                    } elseif ($complexityScore == 12) {
+                        $file = $form->get('attestation')->getData();
+                        if ($file) {
+                            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                            // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
+                            $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
-                    // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
-                    try {
-                        $file->move(
-                            $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        // Gérer l'exception si le fichier ne peut pas être déplacé
-                        // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
-                    }
+                            // Assurez-vous que l'extension est correcte pour un PDF
+                            if ($file->guessExtension() !== 'pdf') {
+                                throw new \Exception("Le fichier n'est pas un PDF valide.");
+                            }
 
-                    // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
-                    $user->setAttestation($newFilename);
-                }
+                            // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
+                            try {
+                                $file->move(
+                                    $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
+                                    $newFilename
+                                );
+                            } catch (FileException $e) {
+                                // Gérer l'exception si le fichier ne peut pas être déplacé
+                                // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
+                            }
+
+                            // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
+                            $user->setAttestation($newFilename);
+                        }
 
 
-                $imageFile = $form->get('photo')->getData();
-                if ($imageFile) {
-                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
-                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                    // Déplace le fichier dans le répertoire où sont stockées les images
-                    try {
-                        $imageFile->move(
-                            $this->getParameter('images_directory'),
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        // Gérer l'exception si le fichier ne peut pas être déplacé
-                    }
-                    // Met à jour le nom de l'image dans l'entité Produit
-                    $user->setPhoto($newFilename);
-                }
+                        $imageFile = $form->get('photo')->getData();
+                        if ($imageFile) {
+                            $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                            // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                            $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                            // Déplace le fichier dans le répertoire où sont stockées les images
+                            try {
+                                $imageFile->move(
+                                    $this->getParameter('images_directory'),
+                                    $newFilename
+                                );
+                            } catch (FileException $e) {
+                                // Gérer l'exception si le fichier ne peut pas être déplacé
+                            }
+                            // Met à jour le nom de l'image dans l'entité Produit
+                            $user->setPhoto($newFilename);
+                        }
 
-                $email = $form->get('email')->getData();
+                        $email = $form->get('email')->getData();
 
-                $existingUser = $repo->findByEmail($email);
-                $emptySubmission = true;
-
-                if ($form->isValid()) {
-
-                    if (!$existingUser) {
-
+                        $existingUser = $repo->findByEmail($email);
                         $emptySubmission = true;
 
-                        $plainPassword = $user->getMotDePasse();
-                        $hashedPassword = md5($plainPassword);
-                        $user->setMotDePasse($hashedPassword);
+                        if ($form->isValid()) {
 
-                        $user->setRole('Conseiller');
-                        $user->setAdresse('');
-                        $user->setObjectif(null);
-                        $user->setTentative('0');
-                        $user->setTaille('0');
-                        $user->setPoids('0');
+                            if (!$existingUser) {
 
-                        $em->persist($user);
-                        $em->flush();
+                                $emptySubmission = true;
+
+                                $plainPassword = $user->getMotDePasse();
+                                $hashedPassword = md5($plainPassword);
+                                $user->setMotDePasse($hashedPassword);
+
+                                $user->setRole('Conseiller');
+                                $user->setAdresse('');
+                                $user->setObjectif(null);
+                                $user->setTentative('0');
+                                $user->setTaille('0');
+                                $user->setPoids('0');
+
+                                $em->persist($user);
+                                $em->flush();
 
 
-                        $this->addFlash('success', 'Conseiller ajouté avec succès');
+                                $this->addFlash('success', 'Conseiller ajouté avec succès');
 
-                        $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
+                                $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
 
-                        return $this->redirectToRoute("usersList");
-                    } else {
-                        $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                                return $this->redirectToRoute("usersList");
+                            } else {
+                                $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                            }
+                        }
                     }
                 }
             }
@@ -639,7 +651,7 @@ class BackUserController extends AbstractController
     }
 
     #[Route('/profilAdminMDP/{id}', name: 'admin_profileMDP')]
-    public function updateAdminMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
+    public function updateAdminMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session, CalculComplexite $calculCmplx): Response
     {
         $userId = $session->get('utilisateur')['idUtilisateur'];
 
@@ -667,18 +679,28 @@ class BackUserController extends AbstractController
 
 
             if ($form2->isSubmitted()) {
-                if ($form2->isValid()) {
-                    if (md5($ancMDP) == $mdpActuel) {
+                if ($user->getMotDePasse()) {
+                    $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
 
-                        $plainPassword = $user->getMotDePasse();
-                        $hashedPassword = md5($plainPassword);
-                        $user->setMotDePasse($hashedPassword);
+                    if ($complexityScore < 6) {
+                        $form2->get('motDePasse')->addError(new FormError('Mot de passe faible.'));
+                    } elseif ($complexityScore >= 6 && $complexityScore < 12) {
+                        $form2->get('motDePasse')->addError(new FormError('Mot de passe moyen.'));
+                    } elseif ($complexityScore == 12) {
+                        if ($form2->isValid()) {
+                            if (md5($ancMDP) == $mdpActuel) {
 
-                        $em2->persist($user);
-                        $em2->flush();
-                        return $this->redirectToRoute("login");
-                    } else {
-                        $error = true;
+                                $plainPassword = $user->getMotDePasse();
+                                $hashedPassword = md5($plainPassword);
+                                $user->setMotDePasse($hashedPassword);
+
+                                $em2->persist($user);
+                                $em2->flush();
+                                return $this->redirectToRoute("login");
+                            } else {
+                                $error = true;
+                            }
+                        }
                     }
                 }
             }
@@ -707,21 +729,21 @@ class BackUserController extends AbstractController
 
         // Instanciation de Dompdf avec les options
         $dompdf = new Dompdf($pdfOptions);
-        
+
         // Rendu du HTML avec le template Twig
         $html = $this->renderView('back_user/clients_pdf.html.twig', [
             'clients' => $clients
         ]);
-        
+
         // Chargement du HTML dans Dompdf
         $dompdf->loadHtml($html);
-        
+
         // Paramétrage (A4 en portrait par défaut)
         $dompdf->setPaper('A4', 'portrait');
-        
+
         // Rendu du PDF
         $dompdf->render();
-        
+
         // Envoi du fichier PDF au navigateur
         return new Response($dompdf->output(), 200, [
             'Content-Type' => 'application/pdf',
@@ -731,7 +753,7 @@ class BackUserController extends AbstractController
 
     #[Route('/pdfConseillers', name: 'conseillers_pdf')]
     public function conseillersPdf(UtilisateurRepository $repo): Response
-    {   
+    {
         // Récupération des utilisateurs
         $conseillers = $repo->findByRole('Conseiller');
         // Options de Dompdf
@@ -740,22 +762,22 @@ class BackUserController extends AbstractController
         $pdfOptions->setIsRemoteEnabled(true);
 
         // Instanciation de Dompdf avec les options
-        $dompdf = new Dompdf($pdfOptions);  
-        
+        $dompdf = new Dompdf($pdfOptions);
+
         // Rendu du HTML avec le template Twig
         $html = $this->renderView('back_user/conseillers_pdf.html.twig', [
             'conseillers' => $conseillers
         ]);
-        
+
         // Chargement du HTML dans Dompdf
         $dompdf->loadHtml($html);
-        
+
         // Paramétrage (A4 en portrait par défaut)
         $dompdf->setPaper('A4', 'portrait');
-        
+
         // Rendu du PDF
         $dompdf->render();
-        
+
         // Envoi du fichier PDF au navigateur
         return new Response($dompdf->output(), 200, [
             'Content-Type' => 'application/pdf',

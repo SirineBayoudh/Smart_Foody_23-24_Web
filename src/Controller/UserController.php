@@ -13,6 +13,7 @@ use App\Form\ResetPasswordType;
 use App\Form\SendEmailType;
 use App\Form\UtilisateurType;
 use App\Repository\UtilisateurRepository;
+use App\Service\CalculComplexite;
 use App\Service\EmailService;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,6 +35,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Security;
 use App\Service\GeoService;
+use Symfony\Component\Form\FormError;
 
 class UserController extends AbstractController
 {
@@ -173,16 +175,14 @@ class UserController extends AbstractController
 
 
     #[Route('/signup', name: 'signup')]
-    public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer, EmailService $emailService, UtilisateurRepository $repo): Response
+    public function addClient(ManagerRegistry $manager, Request $req, MailerInterface $mailer, EmailService $emailService, UtilisateurRepository $repo, CalculComplexite $calculCmplx): Response
     {
 
-        $ip = '197.2.48.207'; // 102.129.65.0 france // 197.3.253.36 manouba// 197.2.48.207 sousse
+        $ip = '197.3.253.36'; // 31.35.27.169 france // 197.3.253.36 manouba// 197.2.48.207 sousse // 197.0.229.141 sfax
         $countryName = $this->geoService->getCountryNameFromIp($ip);
         $phoneCode = $this->geoService->getPhoneCodeFromCountryName($countryName);
         $flag = $this->geoService->getFlagFromCountryName($countryName);
         $adress = $this->geoService->getAdressFromIP($ip);
-
-        dump($adress);
 
         $user = new Utilisateur();
         $form = $this->createForm(ClientType::class, $user, [
@@ -195,6 +195,7 @@ class UserController extends AbstractController
 
         $emptySubmission = false;
 
+        $imc = 0;
 
         if ($form->isSubmitted()) {
             $emptySubmission = true;
@@ -222,30 +223,41 @@ class UserController extends AbstractController
 
             $existingUser = $repo->findByEmail($email);
 
+            $imc = $user->getPoids() / (($user->getTaille() / 100.0) *  ($user->getTaille() / 100.0));
 
-            if ($form->isValid()) {
+            if ($user->getMotDePasse()) {
+                $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
 
-                if (!$existingUser) {
-                    $emptySubmission = true;
+                if ($complexityScore < 6) {
+                    $form->get('motDePasse')->addError(new FormError('Mot de passe faible.'));
+                } elseif ($complexityScore >= 6 && $complexityScore < 12) {
+                    $form->get('motDePasse')->addError(new FormError('Mot de passe moyen.'));
+                } elseif ($complexityScore == 12) {
+                    if ($form->isValid()) {
 
-                    $plainPassword = $user->getMotDePasse();
-                    $hashedPassword = md5($plainPassword);
-                    $user->setMotDePasse($hashedPassword);
+                        if (!$existingUser) {
+                            $emptySubmission = true;
 
-                    $user->setRole('Client');
-                    $user->setMatricule('');
-                    $user->setAttestation('');
-                    $user->setTentative('0');
+                            $plainPassword = $user->getMotDePasse();
+                            $hashedPassword = md5($plainPassword);
+                            $user->setMotDePasse($hashedPassword);
 
-                    $em->persist($user);
-                    $em->flush();
+                            $user->setRole('Client');
+                            $user->setMatricule('');
+                            $user->setAttestation('');
+                            $user->setTentative('0');
 
-                    $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
+                            $em->persist($user);
+                            $em->flush();
+
+                            $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
 
 
-                    return $this->redirectToRoute("login");
-                } else {
-                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                            return $this->redirectToRoute("login");
+                        } else {
+                            $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                        }
+                    }
                 }
             }
         }
@@ -256,6 +268,7 @@ class UserController extends AbstractController
             'phone_code' => '+' . $phoneCode,
             'flag' => $flag,
             'emptySubmission' => $emptySubmission ?? false,
+            'imc' => $imc
         ]);
     }
 
@@ -338,7 +351,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/profilClientMDP/{id}', name: 'client_profileMDP')]
-    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
+    public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session, CalculComplexite $calculCmplx): Response
     {
         $userId = $session->get('utilisateur')['idUtilisateur'];
 
@@ -364,18 +377,29 @@ class UserController extends AbstractController
 
 
             if ($form2->isSubmitted()) {
-                if ($form2->isValid()) {
-                    if (md5($ancMDP) == $mdpActuel) {
+                if ($user->getMotDePasse()) {
+                    $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
 
-                        $plainPassword = $user->getMotDePasse();
-                        $hashedPassword = md5($plainPassword);
-                        $user->setMotDePasse($hashedPassword);
+                    if ($complexityScore < 6) {
+                        $form2->get('mot_de_passe')->addError(new FormError('Mot de passe faible.'));
+                    } elseif ($complexityScore >= 6 && $complexityScore < 12) {
+                        $form2->get('mot_de_passe')->addError(new FormError('Mot de passe moyen.'));
+                    } elseif ($complexityScore == 12) {
 
-                        $em2->persist($user);
-                        $em2->flush();
-                        return $this->redirectToRoute("login");
-                    } else {
-                        $error = true;
+                        if ($form2->isValid()) {
+                            if (md5($ancMDP) == $mdpActuel) {
+
+                                $plainPassword = $user->getMotDePasse();
+                                $hashedPassword = md5($plainPassword);
+                                $user->setMotDePasse($hashedPassword);
+
+                                $em2->persist($user);
+                                $em2->flush();
+                                return $this->redirectToRoute("login");
+                            } else {
+                                $error = true;
+                            }
+                        }
                     }
                 }
             }
@@ -498,7 +522,7 @@ class UserController extends AbstractController
 
 
     #[Route('/profilConseillerMDP/{id}', name: 'conseiller_profileMDP')]
-    public function updateConseillerMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
+    public function updateConseillerMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session, CalculComplexite $calculCmplx): Response
     {
         $userId = $session->get('utilisateur')['idUtilisateur'];
 
@@ -524,18 +548,28 @@ class UserController extends AbstractController
 
 
             if ($form2->isSubmitted()) {
-                if ($form2->isValid()) {
-                    if (md5($ancMDP) == $mdpActuel) {
+                if ($user->getMotDePasse()) {
+                    $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
 
-                        $plainPassword = $user->getMotDePasse();
-                        $hashedPassword = md5($plainPassword);
-                        $user->setMotDePasse($hashedPassword);
+                    if ($complexityScore < 6) {
+                        $form2->get('mot_de_passe')->addError(new FormError('Mot de passe faible.'));
+                    } elseif ($complexityScore >= 6 && $complexityScore < 12) {
+                        $form2->get('mot_de_passe')->addError(new FormError('Mot de passe moyen.'));
+                    } elseif ($complexityScore == 12) {
+                        if ($form2->isValid()) {
+                            if (md5($ancMDP) == $mdpActuel) {
 
-                        $em2->persist($user);
-                        $em2->flush();
-                        return $this->redirectToRoute("login");
-                    } else {
-                        $error = true;
+                                $plainPassword = $user->getMotDePasse();
+                                $hashedPassword = md5($plainPassword);
+                                $user->setMotDePasse($hashedPassword);
+
+                                $em2->persist($user);
+                                $em2->flush();
+                                return $this->redirectToRoute("login");
+                            } else {
+                                $error = true;
+                            }
+                        }
                     }
                 }
             }
