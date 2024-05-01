@@ -68,13 +68,7 @@
 	      <div class="collapse navbar-collapse" id="ftco-nav">
 	        <ul class="navbar-nav ml-auto">
 	          <li class="nav-item"><a href="/accueil" class="nav-link">Home</a></li>
-	          <li class="nav-item active dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Produit</a>
-                <div class="dropdown-menu" aria-labelledby="dropdown04">
-                    <a class="dropdown-item" href="/prod/recommande">Produit recommandé</a>
-                    <a class="dropdown-item" href="wishlist.html">recette</a>
-              </div>
-            </li>
+	          <li class="nav-item active"><a href="/prod/recommande" class="nav-link">Produit recommandé</a></li>
 	          <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
 	          <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
 	          <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
@@ -137,11 +131,24 @@
     </div>
 </section>
 
-<div>
+<div class="search-form">
   <label for="ingredient">Ingrédient :</label>
   <input type="text" id="ingredient" placeholder="Entrez un ingrédient">
   <button onclick="searchRecipes()">Rechercher</button>
 </div>
+<br>
+<br>
+
+<!-- Structure du carousel -->
+<section>
+  <div class="row ftco-animate">
+    <div class="col-md-12">
+      <div class="carousel-testimony owl-carousel">
+        <!-- Les recettes seront ajoutées ici -->
+      </div>
+    </div>
+  </div>
+</section>
 
 <div id="recipe-container">
   <!-- Les recettes seront affichées ici -->
@@ -328,77 +335,129 @@
 </script>
 
 <script>
+  // Fonction pour afficher une recette avec sa description et son image
+  function displayRecipe(title, description, image) {
+    var carousel = document.querySelector(".carousel-testimony.owl-carousel");
+
+    var item = document.createElement("div");
+    item.classList.add("item");
+
+    var testimonyWrap = document.createElement("div");
+    testimonyWrap.classList.add("testimony-wrap", "p-4", "pb-5");
+
+    var userImg = document.createElement("div");
+    userImg.classList.add("user-img", "mb-5");
+    userImg.style.backgroundImage = "url(" + image + ")";
+
+    var quote = document.createElement("span");
+    quote.classList.add("quote", "d-flex", "align-items-center", "justify-content-center");
+
+    var icon = document.createElement("i");
+    icon.classList.add("icon-quote-left");
+
+    quote.appendChild(icon);
+    userImg.appendChild(quote);
+
+    var text = document.createElement("div");
+    text.classList.add("text", "text-center");
+
+    var descParagraph = document.createElement("p");
+    descParagraph.classList.add("mb-5", "pl-4", "line");
+    descParagraph.innerHTML = description;
+
+    var name = document.createElement("p");
+    name.classList.add("name");
+    name.textContent = "Nom de la recette: " + title;
+
+    text.appendChild(descParagraph);
+    text.appendChild(name);
+
+    testimonyWrap.appendChild(userImg);
+    testimonyWrap.appendChild(text);
+
+    item.appendChild(testimonyWrap);
+    carousel.appendChild(item);
+}
+
   // Fonction pour rechercher les recettes
-function searchRecipes() {
-  // Récupérer l'ingrédient saisi par l'utilisateur
-  var ingredient = document.getElementById("ingredient").value;
+  function searchRecipes() {
+      // Récupérer l'ingrédient saisi par l'utilisateur
+      var ingredient = document.getElementById("ingredient").value;
 
-  // Vérifier si l'ingrédient est vide
-  if (ingredient.trim() === "") {
-    alert("Veuillez saisir un ingrédient !");
-    return;
-  }
+      // Vérifier si l'ingrédient est vide
+      if (ingredient.trim() === "") {
+          alert("Veuillez saisir un ingrédient !");
+          return;
+      }
 
-  // Effacer les recettes précédentes
-  document.getElementById("recipe-container").innerHTML = "";
+      // Effacer les recettes précédentes
+      var carousel = document.querySelector(".carousel-testimony.owl-carousel");
+      carousel.innerHTML = "";
 
-  // Votre clé API Spoonacular
-  var apiKey = "7a54d73f23c24bbab743375dbe147451";
+      // Votre clé API Spoonacular
+      var apiKey = "7a54d73f23c24bbab743375dbe147451";
 
-  // URL de l'API Spoonacular pour rechercher des recettes par ingrédient
-  var apiUrl = "https://api.spoonacular.com/recipes/findByIngredients?apiKey=" + apiKey + "&ingredients=" + encodeURIComponent(ingredient) + "&number=5";
+      // URL de l'API Spoonacular pour rechercher des recettes par ingrédient
+      var apiUrl = "https://api.spoonacular.com/recipes/findByIngredients?apiKey=" + apiKey + "&ingredients=" + encodeURIComponent(ingredient) + "&number=5";
 
-  // Faire une requête GET à l'API Spoonacular
-  fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => {
-      // Pour chaque recette, obtenir les détails de la recette
-      data.forEach(function(recipe) {
-        var recipeId = recipe.id;
-        var recipeTitle = recipe.title;
-        var recipeImage = recipe.image;
-
-        // URL de l'API Spoonacular pour obtenir les détails de la recette par son ID
-        var recipeDetailsUrl = "https://api.spoonacular.com/recipes/" + recipeId + "/information?apiKey=" + apiKey;
-
-        // Faire une autre requête GET pour obtenir les détails de la recette
-        fetch(recipeDetailsUrl)
+      // Faire une requête GET à l'API Spoonacular
+      fetch(apiUrl)
           .then(response => response.json())
-          .then(recipeData => {
-            // Afficher la recette avec ses détails
-            displayRecipe(recipeTitle, recipeImage, recipeData);
+          .then(data => {
+              // Pour chaque recette, afficher la recette avec ses détails
+              data.forEach(function(recipe) {
+                  var recipeId = recipe.id;
+                  var recipeTitle = recipe.title;
+                  var recipeImage = recipe.image;
+                  var recipeDescription = "Description de la recette non disponible."; // En attendant de récupérer la description
+
+                  // URL de l'API Spoonacular pour obtenir les détails de la recette par son ID
+                  var recipeDetailsUrl = "https://api.spoonacular.com/recipes/" + recipeId + "/information?apiKey=" + apiKey;
+
+                  // Faire une autre requête GET pour obtenir les détails de la recette
+                  fetch(recipeDetailsUrl)
+                      .then(response => response.json())
+                      .then(recipeData => {
+                          // Récupérer la description de la recette
+                          recipeDescription = recipeData.summary;
+
+                          // Afficher la recette avec ses détails
+                          displayRecipe(recipeTitle, recipeDescription, recipeImage);
+                      })
+                      .catch(error => console.error("Erreur lors de la récupération des détails de la recette:", error));
+              });
           })
-          .catch(error => console.error("Erreur lors de la récupération des détails de la recette:", error));
-      });
-    })
-    .catch(error => console.error("Erreur lors de la récupération des recettes:", error));
-}
+          .catch(error => console.error("Erreur lors de la récupération des recettes:", error));
+  }
+</script>
+<!-- Inclure les bibliothèques JavaScript nécessaires -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
-// Fonction pour afficher une recette avec ses détails
-function displayRecipe(title, image, recipeData) {
-  var recipeDiv = document.createElement("div");
-  recipeDiv.className = "recipe";
-
-  var recipeTitle = document.createElement("h3");
-  recipeTitle.textContent = title;
-
-  var recipeImage = document.createElement("img");
-  recipeImage.src = image;
-
-  var recipeInstructions = document.createElement("ol");
-  recipeData.analyzedInstructions[0].steps.forEach(function(step) {
-    var instructionItem = document.createElement("li");
-    instructionItem.textContent = step.step;
-    recipeInstructions.appendChild(instructionItem);
+<!-- Initialisation du carousel -->
+<script>
+  $(document).ready(function(){
+    $(".carousel-testimony.owl-carousel").owlCarousel({
+      loop:true,
+      margin:30,
+      responsiveClass:true,
+      responsive:{
+        0:{
+          items:1,
+          nav:true
+        },
+        600:{
+          items:2,
+          nav:false
+        },
+        1000:{
+          items:3,
+          nav:true,
+          loop:false
+        }
+      }
+    });
   });
-
-  recipeDiv.appendChild(recipeTitle);
-  recipeDiv.appendChild(recipeImage);
-  recipeDiv.appendChild(recipeInstructions);
-
-  document.getElementById("recipe-container").appendChild(recipeDiv);
-}
-
 </script>
 
   <style>
@@ -454,6 +513,42 @@ function displayRecipe(title, image, recipeData) {
 
 
   </style>
+ <style>
+  .search-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .search-form label {
+    margin-right: 10px;
+  }
+
+  .search-form input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    /* Augmenter la largeur du champ de recherche */
+    width: 700px;
+  }
+
+  .search-form button {
+    padding: 8px 15px;
+    background-color: #56ab2f; /* Changer la couleur du bouton en vert */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .search-form button:hover {
+    background-color: #56ab2f; /* Couleur verte plus foncée au survol */
+  }
+</style>
+
     
   </body>
 </html>

@@ -61,7 +61,8 @@
                         {{ form_errors(form.image) }}
                     </div>
                 {% endif %}
-            </div>            
+            </div>   
+                     
             <div class="form-group">
                 {{ form_label(form.critere) }}
                 {{ form_widget(form.critere, {'attr': {'class': 'form-control' ~ (form_errors(form.critere) ? ' is-invalid' : '')}}) }}
