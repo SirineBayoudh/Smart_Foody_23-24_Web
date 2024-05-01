@@ -75,7 +75,7 @@ sendLockoutImage(imageData);
 }
 
 function sendLockoutImage(imageData) {
-fetch('/login', {
+fetch('/capCam', {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
@@ -127,16 +127,6 @@ body: JSON.stringify(
 											<div class="my-2 d-flex justify-content-between align-items-center">
 												<a href="{{ path('app_forgot_password') }}" class="auth-link text-black" style="color:#56ab2f;">Mot de passe oublié?</a>
 
-											</div>
-											<div style="display: flex; align-items: center; justify-content:center;">
-												<hr style="width:100px; margin-right: 10px;">
-												<p style="margin: 0;">OU</p>
-												<hr style="width:100px; margin-left: 10px;">
-											</div>
-											<div class="mb-2">
-												<button type="button" class="btn btn-block btn-google auth-form-btn">
-													<i class="ti-google mr-2"></i>Se connecter avec Google
-												</button>
 											</div>
 											<div class="text-center mt-4 font-weight-light">
 												Vous n'avez pas de compte?

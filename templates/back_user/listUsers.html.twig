@@ -104,7 +104,7 @@
 				<div class="col-lg-2" style="margin-top:150px; margin-left:-370px">
 					<form action="{{ path('usersList') }}" method="GET">
 						<select name="role" class="form-control" onchange="this.form.submit()" style="background-color:#aad597" id="filtre">
-							<option value="">Tous</option>
+							<option value="Tous">Tous</option>
 							<option value="Client">Client</option>
 							<option value="Conseiller">Conseiller</option>
 						</select>
@@ -121,8 +121,30 @@
 						</div>
 					</div>
 				</form>
-				<a id="click_to_record"> <i class="icon-microphone menu-icon" style="margin-top:163px; margin-left:-20px; z-index:10;"></i> </a>
+				<a id="click_to_record"> <i class="icon-microphone menu-icon" style="margin-top:163px; margin-left:-20px;"></i> </a>
+<script>
+click_to_record.addEventListener('click',function(){
+    var speech = true;
+    window.SpeechRecognition = window.webkitSpeechRecognition;
 
+    const recognition = new SpeechRecognition();
+    recognition.interimResults = true;
+
+    recognition.addEventListener('result', e => {
+        const transcript = Array.from(e.results)
+            .map(result => result[0])
+            .map(result => result.transcript)
+            .join('')
+
+        document.getElementById("searchInput").value = transcript;
+        console.log(transcript);
+    });
+    
+    if (speech == true) {
+        recognition.start();
+    }
+})
+</script>
 				<script>
 					// Masquer l'alerte après 5 secondes
 setTimeout(function () {

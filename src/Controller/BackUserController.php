@@ -48,31 +48,38 @@ class BackUserController extends AbstractController
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;
 
-        if ($userId) { 
+        if ($userId) {
             $user = $repo->find($userId);
             $role = $user->getRole();
 
             if ($role == 'Admin') {
                 $roleFilter = $request->query->get('role');
                 $query = $request->query->get('query');
-    
+
                 if ($roleFilter) {
-                    $list = $repo->findByRole($roleFilter);
-                } else {
+                    
+                    if($roleFilter == 'Tous'){
+                        $list = $repo->findAll();
+
+                    } else {
+                        $list = $repo->findByRole($roleFilter);
+                    }
+                    
+                } else{
                     $list = $repo->findAll();
                 }
-    
+
                 $queryBuilder = $repo->createQueryBuilder('u')
                     ->orderBy('u.idUtilisateur', 'DESC');
-    
+
                 $pagination = $paginator->paginate(
-                    $queryBuilder->getQuery(),
+                    $list,
                     $request->query->getInt('page', 1), //num page
                     5 // nb element par page
                 );
-    
+
                 $entityManager = $this->getDoctrine()->getManager();
-    
+
                 // Récupérer le nombre de clients
                 $clientsCount = $entityManager->getRepository(Utilisateur::class)
                     ->createQueryBuilder('u')
@@ -81,7 +88,7 @@ class BackUserController extends AbstractController
                     ->setParameter('role', 'client')
                     ->getQuery()
                     ->getSingleScalarResult();
-    
+
                 // Récupérer le nombre de conseillers
                 $conseillersCount = $entityManager->getRepository(Utilisateur::class)
                     ->createQueryBuilder('u')
@@ -90,11 +97,11 @@ class BackUserController extends AbstractController
                     ->setParameter('role', 'conseiller')
                     ->getQuery()
                     ->getSingleScalarResult();
-    
+
                 $photo = $repo->getAdminImage();
-    
+
                 $query = $request->query->get('query');
-    
+
                 return $this->render('back_user/listUsers.html.twig', [
                     'users' => $pagination,
                     'role' => $roleFilter,
@@ -105,7 +112,6 @@ class BackUserController extends AbstractController
                     'query' => $query
                 ]);
             }
-
         } else {
             return $this->render('accueil/introuvable.html.twig', [
                 'controller_name' => 'BackController',
@@ -123,13 +129,13 @@ class BackUserController extends AbstractController
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;
 
-        if ($userId) { 
+        if ($userId) {
             $user = $repo->find($userId);
             $role = $user->getRole();
 
             if ($role == 'Admin') {
                 $searchQuery = $request->query->get('q');
-    
+
                 if ($searchQuery) {
                     // Effectuer la recherche avec le terme spécifié
                     $queryBuilder = $repo->createQueryBuilder('u');
@@ -137,13 +143,13 @@ class BackUserController extends AbstractController
                         ->orwhere('u.prenom LIKE :searchQuery')
                         ->orwhere('u.email LIKE :searchQuery')
                         ->setParameter('searchQuery', '%' . $searchQuery . '%');
-    
+
                     $pagination = $paginator->paginate(
                         $queryBuilder->getQuery(),
                         $request->query->getInt('page', 1),
-                        2
+                        5
                     );
-    
+
                     // Récupérer les stocks paginés
                     $users = $pagination;
                 } else {
@@ -153,13 +159,13 @@ class BackUserController extends AbstractController
                         $request->query->getInt('page', 1),
                         5
                     );
-    
+
                     // Récupérer les stocks paginés
                     $users = $pagination;
                 }
-    
+
                 $entityManager = $this->getDoctrine()->getManager();
-    
+
                 // Récupérer le nombre de clients
                 $clientsCount = $entityManager->getRepository(Utilisateur::class)
                     ->createQueryBuilder('u')
@@ -168,7 +174,7 @@ class BackUserController extends AbstractController
                     ->setParameter('role', 'client')
                     ->getQuery()
                     ->getSingleScalarResult();
-    
+
                 // Récupérer le nombre de conseillers
                 $conseillersCount = $entityManager->getRepository(Utilisateur::class)
                     ->createQueryBuilder('u')
@@ -177,9 +183,9 @@ class BackUserController extends AbstractController
                     ->setParameter('role', 'conseiller')
                     ->getQuery()
                     ->getSingleScalarResult();
-    
+
                 $photo = $repo->getAdminImage();
-    
+
                 return $this->render('back_user/listUsers.html.twig', [
                     'users' => $users,
                     'searchQuery' => $searchQuery,
@@ -206,7 +212,7 @@ class BackUserController extends AbstractController
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;
 
-        if ($userId) { 
+        if ($userId) {
             $user = $repo->find($userId);
             $role = $user->getRole();
 
@@ -214,17 +220,17 @@ class BackUserController extends AbstractController
                 // Comptez le nombre d'hommes et de femmes dans la base de données
                 $nbFemme = $repo->getCountByGender('Femme');
                 $nbHomme = $repo->getCountByGender('Homme');
-    
+
                 $nbBienEtre = $repo->getCountByObjectif('1');
                 $nbPrisePoids = $repo->getCountByObjectif('2');
                 $nbPertePoids = $repo->getCountByObjectif('3');
                 $nbPriseMasse = $repo->getCountByObjectif('4');
-    
+
                 $nbClients = $repo->getCountByRole('Client');
                 $nbConseillers = $repo->getCountByRole('Conseiller');
-    
-    
-    
+
+
+
                 $photo = $repo->getAdminImage();
                 // Transmettez ces données au modèle
                 return $this->render('back_user/statistiquesUser.html.twig', [
@@ -239,7 +245,6 @@ class BackUserController extends AbstractController
                     'photo' => $photo
                 ]);
             }
-
         } else {
             return $this->render('accueil/introuvable.html.twig', [
                 'controller_name' => 'BackController',
@@ -248,19 +253,76 @@ class BackUserController extends AbstractController
         }
     }
 
+    #[Route('/rechercherUsers', name: 'rechercher_utilisateurs')]
+    public function rechercher(Request $request, SessionInterface $session, UtilisateurRepository $repo): JsonResponse
+    {
+        $userId = $session->get('utilisateur')['idUtilisateur'];
+
+        $user = $repo->find($userId);
+
+        $role = $user->getRole();
+
+
+        if ($role == 'Admin') {
+            $searchText = $request->query->get('searchText');
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $userRepository = $entityManager->getRepository(Utilisateur::class);
+
+            if (empty($searchText)) {
+                $users = $userRepository->findAll();
+            } else {
+                $users = $userRepository->createQueryBuilder('u')
+                    ->where('LOWER(u.nom) LIKE :searchText')
+                    ->setParameter('searchText', '%' . strtolower($searchText) . '%')
+                    ->getQuery()
+                    ->getResult();
+
+                $response = [];
+                foreach ($users as $user) {
+                    $response[] = [
+                        'photo' => $user->getPhoto(),
+                        'nom' => $user->getNom(),
+                        'prenom' => $user->getPrenom(),
+                        'genre' => $user->getGenre(),
+                        'email' => $user->getEmail(),
+                        'motDePasse' => $user->getMotDePasse(),
+                        'numTel' => $user->getNumTel(),
+                        'role' => $user->getRole(),
+                        'matricule' => $user->getMatricule(),
+                        'attestation' => $user->getAttestation(),
+                        'adresse' => $user->getAdresse(),
+                        'objectif' => $user->getObjectif() ? $user->getObjectif()->getLibelle() : null,
+                        'taille' => $user->getTaille(),
+                        'poids' => $user->getPoids(),
+                        'idUtilisateur' => $user->getIdUtilisateur(), // Ajoute l'ID de l'utilisateur pour les liens d'édition et de suppression
+                    ];
+                }
+
+                return $this->json([
+                    'users' => $users,
+                ]);
+            }
+        } else {
+            return $this->render('accueil/introuvable.html.twig', [
+                'controller_name' => 'BackController',
+
+            ]);
+        }
+    }
 
     /* Ajouter un Conseiller */
 
     #[Route('/ajouterConseiller', name: 'addConseiller')]
     public function addConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, SessionInterface $session, EmailService $emailService, CalculComplexite $calculCmplx): Response
     {
-        
+
         $userInfo = $session->get('utilisateur', []);
 
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;
 
-        if ($userId) { 
+        if ($userId) {
             $user = $repo->find($userId);
             $role = $user->getRole();
 
@@ -268,22 +330,22 @@ class BackUserController extends AbstractController
 
                 $user = new Utilisateur();
                 $form = $this->createForm(ConseillerType::class, $user);
-    
+
                 $emptySubmission = false;
-    
+
                 $photo = $repo->getAdminImage();
-    
-    
+
+
                 $em = $manager->getManager();
-    
+
                 $form->handleRequest($req);
-    
-    
+
+
                 if ($form->isSubmitted()) {
-    
+
                     if ($user->getMotDePasse()) {
                         $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
-    
+
                         if ($complexityScore < 6) {
                             $form->get('motDePasse')->addError(new FormError('Mot de passe faible.'));
                         } elseif ($complexityScore >= 6 && $complexityScore < 12) {
@@ -294,12 +356,12 @@ class BackUserController extends AbstractController
                                 $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                                 // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
                                 $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
-    
+
                                 // Assurez-vous que l'extension est correcte pour un PDF
                                 if ($file->guessExtension() !== 'pdf') {
                                     throw new \Exception("Le fichier n'est pas un PDF valide.");
                                 }
-    
+
                                 // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
                                 try {
                                     $file->move(
@@ -310,12 +372,12 @@ class BackUserController extends AbstractController
                                     // Gérer l'exception si le fichier ne peut pas être déplacé
                                     // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
                                 }
-    
+
                                 // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
                                 $user->setAttestation($newFilename);
                             }
-    
-    
+
+
                             $imageFile = $form->get('photo')->getData();
                             if ($imageFile) {
                                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -333,37 +395,37 @@ class BackUserController extends AbstractController
                                 // Met à jour le nom de l'image dans l'entité Produit
                                 $user->setPhoto($newFilename);
                             }
-    
+
                             $email = $form->get('email')->getData();
-    
+
                             $existingUser = $repo->findByEmail($email);
                             $emptySubmission = true;
-    
+
                             if ($form->isValid()) {
-    
+
                                 if (!$existingUser) {
-    
+
                                     $emptySubmission = true;
-    
+
                                     $plainPassword = $user->getMotDePasse();
                                     $hashedPassword = md5($plainPassword);
                                     $user->setMotDePasse($hashedPassword);
-    
+
                                     $user->setRole('Conseiller');
                                     $user->setAdresse('');
                                     $user->setObjectif(null);
                                     $user->setTentative('0');
                                     $user->setTaille('0');
                                     $user->setPoids('0');
-    
+
                                     $em->persist($user);
                                     $em->flush();
-    
-    
+
+
                                     $this->addFlash('success', 'Conseiller ajouté avec succès');
-    
+
                                     $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
-    
+
                                     return $this->redirectToRoute("usersList");
                                 } else {
                                     $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
@@ -398,7 +460,7 @@ class BackUserController extends AbstractController
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;
 
-        if ($userId) { 
+        if ($userId) {
 
             $user = $repo->find($userId);
             $role = $user->getRole();
@@ -407,27 +469,27 @@ class BackUserController extends AbstractController
 
                 $user = $repo->find($id);
                 $form = $this->createForm(ProfilConseillerType::class, $user);
-    
+
                 $photo = $repo->getAdminImage();
-    
+
                 $emailExistant = $user->getEmail();
-    
+
                 $em = $manager->getManager();
-    
+
                 $form->handleRequest($req);
-    
+
                 if ($form->isSubmitted()) {
                     $file = $form->get('attestation')->getData();
                     if ($file) {
                         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                         // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
                         $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
-    
+
                         // Assurez-vous que l'extension est correcte pour un PDF
                         if ($file->guessExtension() !== 'pdf') {
                             throw new \Exception("Le fichier n'est pas un PDF valide.");
                         }
-    
+
                         // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
                         try {
                             $file->move(
@@ -438,12 +500,12 @@ class BackUserController extends AbstractController
                             // Gérer l'exception si le fichier ne peut pas être déplacé
                             // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
                         }
-    
+
                         // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
                         $user->setAttestation($newFilename);
                     }
-    
-    
+
+
                     $imageFile = $form->get('photo')->getData();
                     if ($imageFile) {
                         $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -461,35 +523,35 @@ class BackUserController extends AbstractController
                         // Met à jour le nom de l'image dans l'entité Produit
                         $user->setPhoto($newFilename);
                     }
-    
+
                     $emailNV = $user->getEmail();
-    
+
                     if ($emailExistant != $emailNV) {
-    
+
                         $existingUser = $repo->findByEmail($emailNV);
-    
+
                         if ($existingUser) {
                             $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
                         } else {
                             if ($form->isValid()) {
-    
+
                                 $em->persist($user);
                                 $em->flush();
                                 $this->addFlash('success', 'Conseiller modifié avec succès');
-    
+
                                 return $this->redirectToRoute("usersList");
                             }
                         }
                     } elseif ($form->isValid()) {
-    
+
                         $em->persist($user);
                         $em->flush();
                         $this->addFlash('success', 'Conseiller modifié avec succès');
-    
+
                         return $this->redirectToRoute("usersList");
                     }
                 }
-    
+
                 return $this->renderform('back_user/modifierConseiller.html.twig', [
                     'f' => $form,
                     'photo' => $photo
@@ -513,16 +575,16 @@ class BackUserController extends AbstractController
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;
 
-        if ($userId) { 
-            
+        if ($userId) {
+
             $user = $repo->find($userId);
             $role = $user->getRole();
 
             if ($role == 'Admin') {
                 $user = $repo->find($id);
-    
+
                 $em = $manager->getManager();
-    
+
                 $em->remove($user);
                 $em->flush();
                 return $this->redirectToRoute("usersList");
@@ -535,7 +597,7 @@ class BackUserController extends AbstractController
         }
     }
 
-    
+
 
     #[Route('/profilAdmin/{id}', name: 'admin_profile')]
     public function updateAdmin(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
@@ -546,8 +608,8 @@ class BackUserController extends AbstractController
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;
 
-        if ($userId) { 
-            
+        if ($userId) {
+
             $user = $repo->find($userId);
             $role = $user->getRole();
             $photo = $repo->getAdminImage();
@@ -555,17 +617,17 @@ class BackUserController extends AbstractController
             if ($role == 'Admin') {
 
                 $user = $repo->find($id);
-    
+
                 $form = $this->createForm(AdminType::class, $user);
-    
+
                 $emailExistant = $user->getEmail();
-    
+
                 $em = $manager->getManager();
-    
+
                 $form->handleRequest($req);
-    
+
                 if ($form->isSubmitted()) {
-    
+
                     $imageFile = $form->get('photo')->getData();
                     if ($imageFile) {
                         $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -583,41 +645,40 @@ class BackUserController extends AbstractController
                         // Met à jour le nom de l'image dans l'entité Produit
                         $user->setPhoto($newFilename);
                     }
-    
+
                     $emailNV = $user->getEmail();
-    
+
                     if ($emailExistant != $emailNV) {
-    
+
                         $existingUser = $repo->findByEmail($emailNV);
-    
+
                         if ($existingUser) {
                             $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
                         } else {
                             if ($form->isValid()) {
-    
+
                                 $em->persist($user);
                                 $em->flush();
-    
+
                                 $this->addFlash('successPorfilCAdmin', 'Votre profil a été modifié avec succès.');
-    
+
                                 return $this->redirectToRoute("accueil");
                             }
                         }
                     } elseif ($form->isValid()) {
-    
+
                         $em->persist($user);
                         $em->flush();
                         return $this->redirectToRoute("app_back");
                     }
                 }
-    
+
                 return $this->renderform('back_user/profilAdmin.html.twig', [
                     'f' => $form,
                     'user' => $user,
                     'photo' => $photo
                 ]);
             }
-
         } else {
             return $this->renderform('accueil/introuvable.html.twig', []);
         }
@@ -631,33 +692,33 @@ class BackUserController extends AbstractController
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;
 
-        if ($userId) { 
-            
+        if ($userId) {
+
             $user = $repo->find($userId);
             $role = $user->getRole();
             $photo = $repo->getAdminImage();
 
             if ($role == 'Admin') {
                 $error = false;
-    
+
                 $user = $repo->find($id);
                 $form2 = $this->createForm(MdpAdminType::class, $user);
-    
+
                 $em2 = $manager->getManager();
-    
+
                 $form2->handleRequest($req);
-    
+
                 $ancMDP = $req->request->get('ancienMDP');
                 dump($ancMDP);
-    
+
                 $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
                 dump($mdpActuel);
-    
-    
+
+
                 if ($form2->isSubmitted()) {
                     if ($user->getMotDePasse()) {
                         $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
-    
+
                         if ($complexityScore < 6) {
                             $form2->get('motDePasse')->addError(new FormError('Mot de passe faible.'));
                         } elseif ($complexityScore >= 6 && $complexityScore < 12) {
@@ -665,11 +726,11 @@ class BackUserController extends AbstractController
                         } elseif ($complexityScore == 12) {
                             if ($form2->isValid()) {
                                 if (md5($ancMDP) == $mdpActuel) {
-    
+
                                     $plainPassword = $user->getMotDePasse();
                                     $hashedPassword = md5($plainPassword);
                                     $user->setMotDePasse($hashedPassword);
-    
+
                                     $em2->persist($user);
                                     $em2->flush();
                                     return $this->redirectToRoute("login");
@@ -680,7 +741,7 @@ class BackUserController extends AbstractController
                         }
                     }
                 }
-    
+
                 return $this->renderform('back_user/profilAdminMDP.html.twig', [
                     'f' => $form2,
                     'user' => $user,
@@ -688,7 +749,6 @@ class BackUserController extends AbstractController
                     'photo' => $photo
                 ]);
             }
-
         } else {
             return $this->renderform('accueil/introuvable.html.twig', []);
         }

@@ -31,10 +31,8 @@
 					<th>Nom</th>
 					<th>Prénom</th>
 					<th>Genre</th>
-					<th>Email</th>
-					<th>Numéro de téléphone</th>
-					<th>Objectif</th>
 					<th>Adresse</th>
+					<th>Objectif</th>
 					<th>Taille</th>
 					<th>Poids</th>
 				</tr>
@@ -45,14 +43,13 @@
 						<td>{{ user.nom }}</td>
 						<td>{{ user.prenom }}</td>
 						<td>{{ user.genre }}</td>
-						<td>{{ user.email }}</td>
-						<td>{{ user.numTel }}</td>
+						<td>{{ user.adresse }}</td>
 						<td>
 							{% if user.role == 'Client' %}
 								{{ user.objectif.libelle }}
 							{% endif %}
 						</td>
-						<td>{{ user.adresse }}</td>
+						
 						<td>{{ user.taille }}</td>
 						<td>{{ user.poids }}</td>
 

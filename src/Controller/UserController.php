@@ -142,9 +142,6 @@ class UserController extends AbstractController
         return $this->json(['status' => 'success', 'path' => $filePath]);
     }
 
-
-
-
     #[Route('/reactivate', name: 'reactivate_account')]
     public function reactivateAccount(Request $request, ManagerRegistry $manager)
     {
