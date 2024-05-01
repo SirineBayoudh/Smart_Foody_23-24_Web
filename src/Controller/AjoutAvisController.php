@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
+
 class AjoutAvisController extends AbstractController
 {
 
@@ -50,11 +51,19 @@ class AjoutAvisController extends AbstractController
              // Appel de la fonction countTotalAvis du repository pour obtenir le nombre total d'avis
                  $totalAvis = $avisRepository->countTotalAvis();
 
-            // Récupérer tous les avis
-            $avis = $avisRepository->findAll();
+                  // Récupérer le paramètre de recherche depuis la requête
+                        $ref = $request->query->getInt('ref');
+
+                        // Filtrer les avis en fonction du paramètre de recherche
+                        if ($ref !== 0) {
+                            $avis = $avisRepository->findByRef($ref);
+                        } else {
+                            $avis = $avisRepository->findAll(); // Récupérer tous les avis si ref est null
+                        }
 
             // Récupérer la liste de tous les produits
             $produits = $avisRepository->findAllProducts();
+            
 
             return $this->render('avis/listAvis.html.twig', [
                 'Avis' => $avis,
@@ -135,82 +144,6 @@ class AjoutAvisController extends AbstractController
         return $this->redirectToRoute('avisBack');
     }
     
-//-------------------------------------------------Produit--------------------------------------------------------------------------------------
-        /**
-     * @Route("/afficheP", name="affiche_P")
-     */
-    /*public function afficherp(ProduitRepository $produitRepository, AvisRepository $avisRepository): Response
-        {
-             $produit = new Produit();
-
-        
-            // Récupérer tous les produits en utilisant la méthode findAll
-                    $produits = $produitRepository->findAll();
-
-            return $this->render('avis/produitaffiche.html.twig', [
-                'produit' => $produit,
-            ]);
-        }*/
-                /**
-                 * @Route("/produitaff/{ref}", name="produit_aff")
-                 */
-                public function nouveauProduit(string $ref, Request $request, UtilisateurRepository $utilisateurRepository, ProduitRepository $produitRepository, AvisRepository $avisRepository): Response
-                {
-                    // Récupérer l'utilisateur
-                    $user = $this->prepareReclamationFormForUser7(7, $utilisateurRepository);
-                    
-                    // Récupérer le produit par sa référence
-                    $produit = $produitRepository->findOneBy(['ref' => $ref]);
-
-                    // Vérifier si le produit existe
-                    if (!$produit) {
-                        throw $this->createNotFoundException('Le produit n\'existe pas.');
-                    }
-
-                    // Créer une nouvelle instance d'Avis
-                    $avis = new Avis();
-
-                    // Associer l'utilisateur et le produit à l'avis
-                    $avis->setIdClient($user);
-                    $avis->setRefProduit($produit);
-
-                    // Créer le formulaire
-                    $form = $this->createForm(AvisNoteTypType::class, $avis);
-                    
-                    $form->handleRequest($request);
-
-                    if ($form->isSubmitted() && $form->isValid()) {
-                        $entityManager = $this->getDoctrine()->getManager();
-                        $entityManager->persist($avis);
-                        $entityManager->flush();
-
-                        // Rediriger ou afficher un message de succès
-                        return $this->redirectToRoute('avis_nouveau');
-                    }
-
-                    // Récupérer les quatre derniers avis pour le produit
-                    $lastFourAvis = $avisRepository->findByproduit($produit->getRef());
-
-                    // Appeler la fonction pour calculer le nombre d'avis et la moyenne des étoiles
-                    $calculAvis = $this->calculerAvis($produit->getRef(), $avisRepository);
-
-                    // Récupérer les quatre produits similaires
-                    $similarProducts = $produitRepository->findFourSimilarProducts($produit);
-
-                    return $this->render('avis/produitSingle.html.twig', [
-                        'form' => $form->createView(),
-                        'user' => $user,
-                        'produit' => $produit,
-                        'avis' => $avis, // Passer les avis au modèle Twig
-                        'nombre_avis' => $calculAvis['nombre_avis'],
-                        'moyenne_etoiles' => $calculAvis['moyenne_etoiles'],
-                        'last_four_avis' => $lastFourAvis, // Passer les quatre derniers avis au modèle Twig
-                        'similar_products' => $similarProducts, // Passer les produits similaires au modèle Twig
-                    ]);
-                }
-
-
-
 
 
 
@@ -219,57 +152,77 @@ class AjoutAvisController extends AbstractController
         //---------------------------------------------------------------- Partie FRONT ---------------------------------------------------------------------------
 
 
-    /**
-     * @Route("/NouvelAvis", name="avis_nouveau")
-     */
-    public function nouveau(Request $request, UtilisateurRepository $utilisateurRepository, ProduitRepository $produitRepository, AvisRepository $avisRepository): Response
+        // Nouvelle méthode pour récupérer tous les produits
+            /**
+             * @Route("/tousLesP", name="tous_les_produits")
+             */
+            public function tousLesProduits(ProduitRepository $produitRepository): Response
             {
-            // Récupérer l'utilisateur et le produit
-            $user = $this->prepareReclamationFormForUser7(7, $utilisateurRepository);
-            $produit = $this->prepareReclamationFormProduit(102, $produitRepository);
+                // Appeler la fonction pour récupérer tous les produits
+                $tousLesProduits = $produitRepository->findAll();
 
-            // Créer une nouvelle instance d'Avis
-            $avis = new Avis();
-
-            // Associer l'utilisateur et le produit à l'avis
-            $avis->setIdClient($user);
-            $avis->setRefProduit($produit);
-
-            // Créer le formulaire
-            $form = $this->createForm(AvisNoteTypType::class, $avis);
-            
-            $form->handleRequest($request);
-
-            if ($form->isSubmitted() && $form->isValid()) {
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($avis);
-                $entityManager->flush();
-
-                // Rediriger ou afficher un message de succès
-                return $this->redirectToRoute('avis_nouveau');
+                return $this->render('produits/produitAff.html.twig', [
+                    'tous_les_produits' => $tousLesProduits
+                ]);
             }
 
-            // Récupérer les quatre derniers avis pour le produit
-            $lastFourAvis = $avisRepository->findByproduit($produit->getRef());
-
-            // Appeler la fonction pour calculer le nombre d'avis et la moyenne des étoiles
-            $calculAvis = $this->calculerAvis($produit->getRef(), $avisRepository);
-
-            // Récupérer les quatre produits similaires
-            $similarProducts = $produitRepository->findFourSimilarProducts($produit);
-
-            return $this->render('avis/produitSingle.html.twig', [
-                'form' => $form->createView(),
-                'user' => $user,
-                'produit' => $produit,
-                'avis' => $avis, // Passer les avis au modèle Twig
-                'nombre_avis' => $calculAvis['nombre_avis'],
-                'moyenne_etoiles' => $calculAvis['moyenne_etoiles'],
-                'last_four_avis' => $lastFourAvis, // Passer les quatre derniers avis au modèle Twig
-                'similar_products' => $similarProducts, // Passer les produits similaires au modèle Twig
-            ]);
-        }
-
+            /**
+            * @Route("/NouvelAvis/{ref}", name="avis_nouveau")
+            */
+            public function nouveau(Request $request, UtilisateurRepository $utilisateurRepository, ProduitRepository $produitRepository, AvisRepository $avisRepository, int $ref): Response
+            {
+                // Récupérer l'utilisateur
+                $user = $this->prepareReclamationFormForUser7(7, $utilisateurRepository);
+                
+                // Récupérer le produit spécifié
+                $produit = $this->prepareReclamationFormProduit($ref, $produitRepository);
+            
+                // Vérifier si le produit existe
+                if (!$produit) {
+                    // Rediriger vers une page d'erreur ou à une page par défaut
+                    return $this->redirectToRoute('tous_les_produits');
+                }
+            
+                // Créer une nouvelle instance d'Avis
+                $avis = new Avis();
+                $avis->setIdClient($user);
+                $avis->setRefProduit($produit);
+            
+                // Créer le formulaire
+                $form = $this->createForm(AvisNoteTypType::class, $avis);
+                
+                $form->handleRequest($request);
+            
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->persist($avis);
+                    $entityManager->flush();
+            
+                    // Rediriger vers la même page avec la référence de produit passée en paramètre
+                    return $this->redirectToRoute('avis_nouveau', ['ref' => $ref]);
+                }
+            
+                // Récupérer les quatre derniers avis pour le produit
+                $lastFourAvis = $avisRepository->findByproduit($produit);
+            
+                // Calculer le nombre d'avis et la moyenne des étoiles
+                $calculAvis = $this->calculerAvis($produit->getRef(), $avisRepository);
+            
+                // Récupérer les quatre produits similaires
+                $similarProducts = $produitRepository->findFourSimilarProducts($produit);
+            
+                // Afficher la page avec les données
+                return $this->render('avis/produitSingle.html.twig', [
+                    'form' => $form->createView(),
+                    'user' => $user,
+                    'produit' => $produit,
+                    'avis' => $avis,
+                    'nombre_avis' => $calculAvis['nombre_avis'],
+                    'moyenne_etoiles' => $calculAvis['moyenne_etoiles'],
+                    'last_four_avis' => $lastFourAvis,
+                    'similar_products' => $similarProducts,
+                ]);
+            }
 
 
 /**
@@ -283,6 +236,9 @@ public function modifierAvis(Request $request, int $id): Response
     if (!$avis) {
         throw $this->createNotFoundException('Aucun avis trouvé pour l\'identifiant '.$id);
     }
+
+        // Récupérer la référence du produit associé à l'avis
+        $refProduit = $avis->getRefProduit()->getRef();
 
     // Créer le formulaire de modification d'avis
     $form = $this->createFormBuilder($avis)
@@ -306,7 +262,8 @@ public function modifierAvis(Request $request, int $id): Response
     if ($form->isSubmitted() && $form->isValid()) {
         $entityManager->flush();
 
-        return $this->redirectToRoute('avis_nouveau');
+        // Rediriger vers la même page avec la référence du produit
+        return $this->redirectToRoute('avis_nouveau', ['ref' => $refProduit]);
     }
 
     return $this->render('avis/modifier.html.twig', [
@@ -322,6 +279,9 @@ public function supprimerAvis(Request $request, int $id): Response
     $entityManager = $this->getDoctrine()->getManager();
     $avis = $entityManager->getRepository(Avis::class)->find($id);
 
+    // Récupérer la référence du produit associé à l'avis
+    $refProduit = $avis->getRefProduit()->getRef();
+
     if (!$avis) {
         throw $this->createNotFoundException('Aucun avis trouvé pour l\'identifiant '.$id);
     }
@@ -329,8 +289,8 @@ public function supprimerAvis(Request $request, int $id): Response
     $entityManager->remove($avis);
     $entityManager->flush();
 
-    // Redirection vers une autre page ou afficher un message de succès
-    return $this->redirectToRoute('avis_nouveau');
+    // Rediriger vers la même page avec la référence du produit
+    return $this->redirectToRoute('avis_nouveau', ['ref' => $refProduit]);
 }
 
 /**
@@ -340,6 +300,10 @@ public function signalerAvis(Request $request, int $id): Response
 {
     $entityManager = $this->getDoctrine()->getManager();
     $avis = $entityManager->getRepository(Avis::class)->find($id);
+
+    // Récupérer la référence du produit associé à l'avis
+    $refProduit = $avis->getRefProduit()->getRef();
+
 
     if (!$avis) {
         throw $this->createNotFoundException('Aucun avis trouvé pour l\'identifiant '.$id);
@@ -352,8 +316,8 @@ public function signalerAvis(Request $request, int $id): Response
     $entityManager->persist($avis);
     $entityManager->flush();
 
-    // Redirection vers une autre page ou afficher un message de succès
-    return $this->redirectToRoute('avis_nouveau');
+    // Rediriger vers la même page avec la référence du produit
+    return $this->redirectToRoute('avis_nouveau', ['ref' => $refProduit]);
 }
 
 

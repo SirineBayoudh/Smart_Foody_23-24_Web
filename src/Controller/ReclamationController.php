@@ -7,6 +7,7 @@ use App\Entity\Utilisateur;
 use App\Form\ReclamationEnvoyerType;
 use App\Repository\ReclamationRepository;
 use App\Repository\UtilisateurRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,7 +15,15 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request; // Utilisation de la classe correcte
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+
+
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email; 
+
+
+
 
 class ReclamationController extends AbstractController
 {
@@ -27,6 +36,8 @@ class ReclamationController extends AbstractController
      */
     public function index(ReclamationRepository $reclamationRepository): Response
     {
+
+        
         $reclamations = $reclamationRepository->findByArchive(0);
         $archives = $reclamationRepository->findByArchive(1);
         $nombreRec = $reclamationRepository->countTotalReclamations();
@@ -85,8 +96,89 @@ class ReclamationController extends AbstractController
     }
 
 
+ /**
+ * @Route("/repondre_reclamation/{id}", name="repondre_reclamation", methods={"GET", "POST"})
+ */
+public function repondreReclamation(EntityManagerInterface $entityManager, Request $request, MailerInterface $mailer, $id): Response
+{
+    $reclamation = $entityManager->getRepository(Reclamation::class)->find($id);
 
-   
+    if (!$reclamation) {
+        throw $this->createNotFoundException('La réclamation n\'existe pas.');
+    }
+
+    // Récupérer la réponse depuis la requête
+    $emailContent = "
+    <html>
+        <body>
+            <div style='width: 500px; background-color: #aad597; padding: 20px;'>
+                <p style='color: darkgreen; font-size: 14px;'>Bonjour,</p>
+                <p style='color: darkgreen; font-size: 18px;'>Une nouvelle demande a été reçue :</p>
+                <p style='color: black; font-weight: bold; font-size: 16px;'>Objet: "  . "</p>
+                <p style='color: darkgreen; font-weight: bold; font-size: 16px;'>Date de réception: " . "</p>
+                <p style='font-weight: bold;'>Veuillez consulter l'application pour la traiter.</p>
+                <p style='color: gray;'>Ceci est un message automatique. Merci de ne pas répondre.</p>
+            </div>
+        </body>
+    </html>
+    ";
+
+    // Envoyer un e-mail de réponse
+    $email = (new Email())
+        ->from('smartfoody.2024@gmail.com')
+        ->to('divinpoadzola@gmail.com') // Supposons que la méthode getClient() retourne l'entité Client associée à la réclamation
+        ->subject('Réponse à votre réclamation')
+        ->html($emailContent);
+        $mailer->send($email);
+    try {
+        
+        // Mettre à jour l'état de la réclamation seulement si l'e-mail est envoyé avec succès
+        $reclamation->setStatut('Répondu');
+        
+        // Enregistrer les changements dans la base de données
+        $entityManager->persist($reclamation);
+        $entityManager->flush();
+        
+        // Rediriger ou renvoyer une réponse JSON
+        // ...
+        
+        return $this->redirectToRoute('reclamations');
+    } catch (TransportExceptionInterface $e) {
+        // Gérer l'erreur, par exemple en journalisant ou en affichant un message à l'utilisateur
+        // Vous pouvez également renvoyer une réponse d'erreur appropriée
+        return new Response('Erreur lors de l\'envoi de l\'e-mail de réponse: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+  /**
+ * @Route("/export", name="export_to_excel")
+ */
+public function exportToExcel(ReclamationRepository $reclamationRepository)
+{   
+    // Récupérer les réclamations
+    $reclamations = $reclamationRepository->findByArchive(0);
+    
+    // Générer le contenu CSV avec une ligne de titre explicite
+    $csvContent = "Id Reclamation,Description,Titre,Statut,Type,Date Reclamation\n";
+    foreach ($reclamations as $reclamation) {
+        $dateReclamation = $reclamation->getDateReclamation();
+        $dateFormatted = $dateReclamation ? $dateReclamation->format('Y-m-d') : '';
+        $csvContent .= $reclamation->getId() . ',' . 
+                       $reclamation->getDescription() . ',' . 
+                       $reclamation->getTitre() . ',' . 
+                       $reclamation->getStatut() . ',' . 
+                       $reclamation->getType() . ',' . 
+                       $dateFormatted . "\n";
+    }
+
+    // Créer une réponse avec le contenu CSV
+    $response = new Response($csvContent);
+    $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+    $response->headers->set('Content-Disposition', 'attachment; filename="reclamations.csv"');
+
+    return $response;
+}
 
 
         /**

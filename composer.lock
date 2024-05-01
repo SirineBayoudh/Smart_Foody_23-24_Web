@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "060dc09b463c60af509068beff7aa695",
+    "content-hash": "2c4ced7e3374445e1de3c6bf44b828ce",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1742,6 +1742,68 @@
                 "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.8.2"
             },
             "time": "2024-02-23T11:10:43+00:00"
+        },
+        {
+            "name": "phpoffice/phpexcel",
+            "version": "1.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPOffice/PHPExcel.git",
+                "reference": "372c7cbb695a6f6f1e62649381aeaa37e7e70b32"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPOffice/PHPExcel/zipball/372c7cbb695a6f6f1e62649381aeaa37e7e70b32",
+                "reference": "372c7cbb695a6f6f1e62649381aeaa37e7e70b32",
+                "shasum": ""
+            },
+            "require": {
+                "ext-xml": "*",
+                "ext-xmlwriter": "*",
+                "php": ">=5.2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPExcel": "Classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Maarten Balliauw",
+                    "homepage": "http://blog.maartenballiauw.be"
+                },
+                {
+                    "name": "Mark Baker"
+                },
+                {
+                    "name": "Franck Lefevre",
+                    "homepage": "http://blog.rootslabs.net"
+                },
+                {
+                    "name": "Erik Tilt"
+                }
+            ],
+            "description": "PHPExcel - OpenXML - Read, Create and Write Spreadsheet documents in PHP - Spreadsheet engine",
+            "homepage": "http://phpexcel.codeplex.com",
+            "keywords": [
+                "OpenXML",
+                "excel",
+                "php",
+                "spreadsheet",
+                "xls",
+                "xlsx"
+            ],
+            "support": {
+                "issues": "https://github.com/PHPOffice/PHPExcel/issues",
+                "source": "https://github.com/PHPOffice/PHPExcel/tree/master"
+            },
+            "abandoned": "phpoffice/phpspreadsheet",
+            "time": "2015-05-01T07:00:55+00:00"
         },
         {
             "name": "phpstan/phpdoc-parser",
@@ -3765,6 +3827,72 @@
             "time": "2024-02-20T14:48:43+00:00"
         },
         {
+            "name": "symfony/google-mailer",
+            "version": "v5.4.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/google-mailer.git",
+                "reference": "6d7191a30fd2ae0ab740a93cfbf7fba64834aed6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/google-mailer/zipball/6d7191a30fd2ae0ab740a93cfbf7fba64834aed6",
+                "reference": "6d7191a30fd2ae0ab740a93cfbf7fba64834aed6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.5",
+                "psr/event-dispatcher": "^1",
+                "symfony/mailer": "^5.4.21|^6.2.7"
+            },
+            "require-dev": {
+                "symfony/http-client": "^4.4|^5.0|^6.0"
+            },
+            "type": "symfony-mailer-bridge",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Mailer\\Bridge\\Google\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Google Mailer Bridge",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/google-mailer/tree/v5.4.35"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-01-23T13:51:25+00:00"
+        },
+        {
             "name": "symfony/http-client",
             "version": "v5.4.37",
             "source": {
@@ -4212,16 +4340,16 @@
         },
         {
             "name": "symfony/mailer",
-            "version": "v5.4.36",
+            "version": "v5.4.38",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mailer.git",
-                "reference": "b57d722f2bf6e1dc08df9c86efbfdcaaba89693b"
+                "reference": "1d0ef27f1b19b9a0175a0e130d1df3113e5a130e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mailer/zipball/b57d722f2bf6e1dc08df9c86efbfdcaaba89693b",
-                "reference": "b57d722f2bf6e1dc08df9c86efbfdcaaba89693b",
+                "url": "https://api.github.com/repos/symfony/mailer/zipball/1d0ef27f1b19b9a0175a0e130d1df3113e5a130e",
+                "reference": "1d0ef27f1b19b9a0175a0e130d1df3113e5a130e",
                 "shasum": ""
             },
             "require": {
@@ -4268,7 +4396,7 @@
             "description": "Helps sending emails",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/mailer/tree/v5.4.36"
+                "source": "https://github.com/symfony/mailer/tree/v5.4.38"
             },
             "funding": [
                 {
@@ -4284,7 +4412,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-02-01T13:42:14+00:00"
+            "time": "2024-03-19T10:19:25+00:00"
         },
         {
             "name": "symfony/messenger",

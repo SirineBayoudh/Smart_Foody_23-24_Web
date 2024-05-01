@@ -109,6 +109,23 @@ class AvisRepository extends ServiceEntityRepository
                         ->getQuery()
                         ->getSingleScalarResult();
                 }
+
+      //Repository
+
+      public function findByRef(?int $ref): array
+    {
+        $qb = $this->createQueryBuilder('a');
+
+        // Vérifier si le paramètre ref est spécifié
+        if ($ref !== null) {
+            $qb->andWhere('a.ref_produit = :ref')
+               ->setParameter('ref', $ref);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    
     
 //    /**
 //     * @return Avis[] Returns an array of Avis objects

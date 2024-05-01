@@ -49,47 +49,96 @@
      color: white;
  }
 </style>
-<div>
-    <br>
-    <div class="table-responsive" id="reclamationsTable">
-        <h1 class="card-title">Liste des Avis</h1>
-        <table class="table table-striped" id="avisTable">
-            <thead class="bg-custom-green">
-                <tr class="text-center">
-                    <th>Id Avis</th>
-                    <th>Ref Produit</th>
-                    <th>Id Client</th>
-                    <th>Note</th>
-                    <th>Commentaire</th>
-                    <th>Signale</th>
-                    <th>Date Avis</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for avis in Avis %}
-                <tr class="text-center avisRow" title="{{avis.getRefProduit().marque}}">
-                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getId }}</td>
-                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getRefProduit().getRef() }}</td>
-                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getIdClient().getId() }}</td>
-                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getNbEtoiles }}</td>
-                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.commentaire }}</td>
-                    <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.signaler }}</td>
-                    <td  data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getDateAvis|date('d-m-Y') }}</td>
-                    <td>
-                      <button class="btn btn-success btn-sm" onclick="confirmRepondre('{{ path('refreshSignal', {'id_avis': avis.id}) }}')" title="Refresh signal">
-                          <i class="ti-reload"></i>
-                      </button>
-                      
-                      <button class="btn btn-danger btn-sm" onclick="confirmSupprimer('{{ path('deleteAvis', {'id_avis': avis.id}) }}')" title="Supprimer">
-                          <i class="ti-trash"></i>
-                      </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <div>
+        <br>
+        <div class="mb-3">
+            <form id="searchForm" action="{{ path('avisBack') }}" method="GET">
+                <div class="row">
+                    <div class="col">
+                        <input type="text" class="form-control" name="ref" id="refInput" placeholder="Réf produit">
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Rechercher</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+
+        
+
+        <br>
+        <div class="table-responsive" id="reclamationsTable">
+            <h1 class="card-title">Liste des Avis</h1>
+            <table class="table table-striped" id="avisTable">
+                <thead class="bg-custom-green">
+                    <tr class="text-center">
+                        <th>Id Avis</th>
+                        <th>Ref Produit</th>
+                        <th>Id Client</th>
+                        <th>Note</th>
+                        <th>Commentaire</th>
+                        <th>Signale</th>
+                        <th>Date Avis</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if Avis is empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">Aucun avis disponible.</td>
+                        </tr>
+                     {% else %}
+                        {% for avis in Avis %}
+                        <tr class="text-center avisRow" title="{{avis.getRefProduit().marque}}">
+                            <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getId }}</td>
+                            <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getRefProduit().getRef() }}</td>
+                            <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getIdClient().getId() }}</td>
+                            <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getNbEtoiles }}</td>
+                            <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.commentaire }}</td>
+                            <td data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.signaler }}</td>
+                            <td  data-avis-id="{{ avis.id }}" onclick="window.location='{{ path('calculPersonne', {'ref_produit': avis.getRefProduit().getRef()}) }}'">{{ avis.getDateAvis|date('d-m-Y') }}</td>
+                            <td>
+                            <button class="btn btn-success btn-sm" onclick="confirmRepondre('{{ path('refreshSignal', {'id_avis': avis.id}) }}')" title="Refresh signal">
+                                <i class="ti-reload"></i>
+                            </button>
+                            
+                            <button class="btn btn-danger btn-sm" onclick="confirmSupprimer('{{ path('deleteAvis', {'id_avis': avis.id}) }}')" title="Supprimer">
+                                <i class="ti-trash"></i>
+                            </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#refInput').on('input', function() {
+                    var refValue = $(this).val().trim();
+                    if (refValue !== '') {
+                        $.ajax({
+                            url: '{{ path('avisBack') }}',
+                            method: 'GET',
+                            data: { ref: refValue },
+                            success: function(response) {
+                                // Mettez à jour le contenu du tableau avec la réponse
+                                $('#avisTable tbody').html($(response).find('#avisTable tbody').html());
+                            },
+                            error: function(xhr, status, error) {
+                                // Gérez les erreurs ici
+                                console.error('Une erreur est survenue:', error);
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
 
 
 <br>
@@ -201,6 +250,8 @@
           }
         });
     </script>
+
+    
 
 
 {% endblock %}
