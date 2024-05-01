@@ -131,6 +131,10 @@
     </div>
 </section>
 
+<div class="col-md-12 text-center">
+<h1>Notre coin des recettes :</h1> 
+</div>
+
 <div class="search-form">
   <label for="ingredient">Ingrédient :</label>
   <input type="text" id="ingredient" placeholder="Entrez un ingrédient">
@@ -157,8 +161,7 @@
 
 
  
-<div class="col-md-12 text-center">
-<h1>Propositions des recettes :</h1>  
+<div class="col-md-12 text-center"> 
 <div class="video-container" id="video-container">
   <!-- Les vidéos seront chargées ici -->
 </div>
@@ -289,52 +292,6 @@
     }
 </script>
 <script>
-  // Liste des IDs de vidéos YouTube
-  var videoIds = ["1N6hbRbyAeQ", "AYXfaVD5o40", "KB0NansInGA"];
-
-  // Votre clé API YouTube
-  var apiKey = "AIzaSyCXEBk9FVXu4vD2dJUIEDd2GDgVxxtnuMM";
-
-  // Fonction pour charger les vidéos
-  function loadVideos() {
-    var container = document.getElementById("video-container");
-
-    // Pour chaque ID de vidéo, récupérer les informations de la vidéo
-    videoIds.forEach(function(videoId) {
-      var apiUrl = "https://www.googleapis.com/youtube/v3/videos?id=" + videoId + "&key=" + apiKey + "&part=status";
-      
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          // Vérifier si la vidéo peut être intégrée
-          var embeddable = data.items[0].status.embeddable;
-          if (embeddable) {
-            // Si la vidéo peut être intégrée, créer un iframe pour charger la vidéo
-            var iframe = document.createElement("iframe");
-            iframe.width = "300";
-            iframe.height = "168.75";
-            iframe.src = "https://www.youtube.com/embed/" + videoId;
-            iframe.frameborder = "0";
-            iframe.allowfullscreen = true;
-
-            var videoDiv = document.createElement("div");
-            videoDiv.className = "video";
-            videoDiv.appendChild(iframe);
-
-            container.appendChild(videoDiv);
-          } else {
-            console.log("La vidéo avec l'ID " + videoId + " ne peut pas être intégrée.");
-          }
-        })
-        .catch(error => console.error("Erreur lors de la récupération des informations de la vidéo:", error));
-    });
-  }
-
-  // Charger les vidéos lorsque la page est prête
-  document.addEventListener("DOMContentLoaded", loadVideos);
-</script>
-
-<script>
   // Fonction pour afficher une recette avec sa description et son image
   function displayRecipe(title, description, image) {
     var carousel = document.querySelector(".carousel-testimony.owl-carousel");
@@ -377,59 +334,85 @@
 
     item.appendChild(testimonyWrap);
     carousel.appendChild(item);
-}
+  }
+
+  // Fonction pour rechercher les vidéos YouTube en fonction de l'ingrédient
+  function searchYouTubeVideos(ingredient) {
+    var apiKey = "AIzaSyCXEBk9FVXu4vD2dJUIEDd2GDgVxxtnuMM"; // Remplacez par votre clé d'API YouTube
+
+    var query = encodeURIComponent(ingredient) + " recette";
+
+    var apiUrl = "https://www.googleapis.com/youtube/v3/search?key=" + apiKey + "&part=snippet&type=video&q=" + query + "&maxResults=3";
+
+    return fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        var videoIds = data.items.map(item => item.id.videoId);
+        return videoIds;
+      })
+      .catch(error => console.error("Erreur lors de la récupération des vidéos YouTube:", error));
+  }
 
   // Fonction pour rechercher les recettes
   function searchRecipes() {
-      // Récupérer l'ingrédient saisi par l'utilisateur
-      var ingredient = document.getElementById("ingredient").value;
+    var ingredient = document.getElementById("ingredient").value.trim();
 
-      // Vérifier si l'ingrédient est vide
-      if (ingredient.trim() === "") {
-          alert("Veuillez saisir un ingrédient !");
-          return;
-      }
+    if (ingredient === "") {
+      alert("Veuillez saisir un ingrédient !");
+      return;
+    }
 
-      // Effacer les recettes précédentes
-      var carousel = document.querySelector(".carousel-testimony.owl-carousel");
-      carousel.innerHTML = "";
+    var carousel = document.querySelector(".carousel-testimony.owl-carousel");
+    carousel.innerHTML = "";
 
-      // Votre clé API Spoonacular
-      var apiKey = "7a54d73f23c24bbab743375dbe147451";
+    var apiKey = "7a54d73f23c24bbab743375dbe147451"; // Remplacez par votre clé d'API Spoonacular
 
-      // URL de l'API Spoonacular pour rechercher des recettes par ingrédient
-      var apiUrl = "https://api.spoonacular.com/recipes/findByIngredients?apiKey=" + apiKey + "&ingredients=" + encodeURIComponent(ingredient) + "&number=5";
+    var apiUrl = "https://api.spoonacular.com/recipes/findByIngredients?apiKey=" + apiKey + "&ingredients=" + encodeURIComponent(ingredient) + "&number=5";
 
-      // Faire une requête GET à l'API Spoonacular
-      fetch(apiUrl)
-          .then(response => response.json())
-          .then(data => {
-              // Pour chaque recette, afficher la recette avec ses détails
-              data.forEach(function(recipe) {
-                  var recipeId = recipe.id;
-                  var recipeTitle = recipe.title;
-                  var recipeImage = recipe.image;
-                  var recipeDescription = "Description de la recette non disponible."; // En attendant de récupérer la description
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(recipe => {
+          var recipeId = recipe.id;
+          var recipeTitle = recipe.title;
+          var recipeImage = recipe.image;
+          var recipeDescription = "Description de la recette non disponible.";
 
-                  // URL de l'API Spoonacular pour obtenir les détails de la recette par son ID
-                  var recipeDetailsUrl = "https://api.spoonacular.com/recipes/" + recipeId + "/information?apiKey=" + apiKey;
+          var recipeDetailsUrl = "https://api.spoonacular.com/recipes/" + recipeId + "/information?apiKey=" + apiKey;
 
-                  // Faire une autre requête GET pour obtenir les détails de la recette
-                  fetch(recipeDetailsUrl)
-                      .then(response => response.json())
-                      .then(recipeData => {
-                          // Récupérer la description de la recette
-                          recipeDescription = recipeData.summary;
+          fetch(recipeDetailsUrl)
+            .then(response => response.json())
+            .then(recipeData => {
+              recipeDescription = recipeData.summary;
+              displayRecipe(recipeTitle, recipeDescription, recipeImage);
+            })
+            .catch(error => console.error("Erreur lors de la récupération des détails de la recette:", error));
+        });
 
-                          // Afficher la recette avec ses détails
-                          displayRecipe(recipeTitle, recipeDescription, recipeImage);
-                      })
-                      .catch(error => console.error("Erreur lors de la récupération des détails de la recette:", error));
-              });
-          })
-          .catch(error => console.error("Erreur lors de la récupération des recettes:", error));
+        // Charger les vidéos YouTube
+        searchYouTubeVideos(ingredient)
+          .then(videoIds => {
+            var container = document.getElementById("video-container");
+            videoIds.forEach(videoId => {
+              var iframe = document.createElement("iframe");
+              iframe.width = "300";
+              iframe.height = "168.75";
+              iframe.src = "https://www.youtube.com/embed/" + videoId;
+              iframe.frameborder = "0";
+              iframe.allowfullscreen = true;
+
+              var videoDiv = document.createElement("div");
+              videoDiv.className = "video";
+              videoDiv.appendChild(iframe);
+
+              container.appendChild(videoDiv);
+            });
+          });
+      })
+      .catch(error => console.error("Erreur lors de la récupération des recettes:", error));
   }
 </script>
+
 <!-- Inclure les bibliothèques JavaScript nécessaires -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
