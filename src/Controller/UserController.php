@@ -14,6 +14,7 @@ use App\Form\SendEmailType;
 use App\Form\UtilisateurType;
 use App\Repository\UtilisateurRepository;
 use App\Service\CalculComplexite;
+use App\Service\EmailBloque;
 use App\Service\EmailService;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,9 +49,9 @@ class UserController extends AbstractController
     }
 
     #[Route('/login', name: 'login')]
-    public function login(Request $request, ManagerRegistry $manager, SessionInterface $session): Response
+    public function login(Request $request, ManagerRegistry $manager, SessionInterface $session, MailerInterface $mailer, EmailBloque $emailbloque): Response
     {
-        $error = '';
+
 
         if ($request->isMethod('POST')) {
 
@@ -63,30 +64,69 @@ class UserController extends AbstractController
 
             if ($user) {
                 if ($user->getMotDePasse() == md5($password)) {
-                    dump("we found it");
-
-                    $session->set('utilisateur', ['idUtilisateur' => $user->getIdUtilisateur(), 'email' => $user->getEmail(), 'role' => $user->getRole()]);
-
-                    if ($user->getRole() == 'Admin') {
-                        return $this->redirectToRoute('app_back');
+                    if ($user->getTentative() >= 3) {
+                        $this->addFlash('error', 'Votre compte est verrouillé.');
                     } else {
-                        return $this->redirectToRoute('accueil');
+
+                        $user->setTentative(0);
+                        $manager->getManager()->flush();
+
+                        $session->set('utilisateur', ['idUtilisateur' => $user->getIdUtilisateur(), 'email' => $user->getEmail(), 'role' => $user->getRole()]);
+
+                        if ($user->getRole() == 'Admin') {
+                            return $this->redirectToRoute('app_back');
+                        } else {
+                            return $this->redirectToRoute('accueil');
+                        }
                     }
                 } else {
-                    dump("we didn't found it");
 
-                    $error = 'mot de passe incorrect';
+                    if ($user->getTentative() < 3) {
+
+                        $user->setTentative($user->getTentative() + 1);
+                        $manager->getManager()->flush();
+
+                        if ($user->getTentative() == 3) {
+
+                            $emailbloque->sendLockoutEmail($user->getEmail(), 'Compte Verrouillé', $user->getPrenom(), $user->getIdUtilisateur());
+                            $this->addFlash('error', 'Votre compte a été verrouillé après plusieurs tentatives de connexion échouées.');
+                        } else {
+                            $this->addFlash('error', 'Mot de passe incorrect. Tentative ' . $user->getTentative() . ' sur 3.');
+                        }
+                    } else {
+                        $this->addFlash('error', 'Votre compte est verrouillé.');
+                        // Envoyer un email ici aussi si nécessaire
+                    }
                 }
             } else {
-                $error = 'Utilisateur non trouvé';
+                $this->addFlash('error', 'Utilisateur non trouvé.');
             }
         }
 
         // Afficher le formulaire de connexion avec éventuellement un message d'erreur
-        return $this->render('security/login.html.twig', [
-            'error' => $error,
+        return $this->render('security/login.html.twig', []);
+    }
+
+    #[Route('/reactivate', name: 'reactivate_account')]
+    public function reactivateAccount(Request $request, ManagerRegistry $manager)
+    {
+        $userId = $request->query->get('userId');
+        $em = $manager->getManager();
+        $user = $em->getRepository(Utilisateur::class)->find($userId);
+
+        if (!$user) {
+            return new Response('Utilisateur non trouvé', 404);
+        }
+
+        $user->setTentative(0);
+        $em->flush();
+
+        // Rediriger ou informer l'utilisateur que son compte a été réactivé
+        return $this->render('security/account_reactivated.html.twig', [
+            'user' => $user
         ]);
     }
+
 
     #[Route('/logout', name: 'logout')]
     public function logout(SessionInterface $session): Response
@@ -127,9 +167,9 @@ class UserController extends AbstractController
                 $mailer->send($message);
 
                 $this->addFlash('envoye', 'Un email de réinitialisation de mot de passe a été envoyé.');
+            } else {
+                $this->addFlash('nonenvoye', 'Aucun utilisateur trouvé avec cet email.');
             }
-
-            $this->addFlash('nonenvoye', 'Aucun utilisateur trouvé avec cet email.');
         }
 
         return $this->render('security/forgot_password.html.twig', [
@@ -233,29 +273,37 @@ class UserController extends AbstractController
                 } elseif ($complexityScore >= 6 && $complexityScore < 12) {
                     $form->get('motDePasse')->addError(new FormError('Mot de passe moyen.'));
                 } elseif ($complexityScore == 12) {
+
                     if ($form->isValid()) {
 
-                        if (!$existingUser) {
-                            $emptySubmission = true;
+                        $motDePasse = $form->get('motDePasse')->getData();
+                        $confirmationMotDePasse = $req->request->get('confirmationMotDePasse'); // Assurez-vous que le nom du champ correspond à celui défini dans votre Twig
 
-                            $plainPassword = $user->getMotDePasse();
-                            $hashedPassword = md5($plainPassword);
-                            $user->setMotDePasse($hashedPassword);
-
-                            $user->setRole('Client');
-                            $user->setMatricule('');
-                            $user->setAttestation('');
-                            $user->setTentative('0');
-
-                            $em->persist($user);
-                            $em->flush();
-
-                            $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
-
-
-                            return $this->redirectToRoute("login");
+                        if ($motDePasse !== $confirmationMotDePasse) {
+                            $form->get('motDePasse')->addError(new FormError('Les mots de passe ne correspondent pas.'));
                         } else {
-                            $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                            if (!$existingUser) {
+                                $emptySubmission = true;
+
+                                $plainPassword = $user->getMotDePasse();
+                                $hashedPassword = md5($plainPassword);
+                                $user->setMotDePasse($hashedPassword);
+
+                                $user->setRole('Client');
+                                $user->setMatricule('');
+                                $user->setAttestation('');
+                                $user->setTentative('0');
+
+                                $em->persist($user);
+                                $em->flush();
+
+                                $emailService->sendWelcomeEmail($user->getEmail(), 'Bienvenue', $user->getPrenom());
+
+
+                                return $this->redirectToRoute("login");
+                            } else {
+                                $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                            }
                         }
                     }
                 }
@@ -278,73 +326,77 @@ class UserController extends AbstractController
     public function updateClient(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
     {
 
-        $userId = $session->get('utilisateur')['idUtilisateur'];
+        $userInfo = $session->get('utilisateur', []);
 
-        $userco = $repo->find($userId);
+        // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
+        $userId = $userInfo['idUtilisateur'] ?? null;
 
-        $role = $userco->getRole();
+        if ($userId) {
+            $user = $repo->find($userId);
+            $role = $user->getRole();
 
-        if ($role == 'Client') {
-            $user = $repo->find($id);
-            $form = $this->createForm(ProfilClientType::class, $user);
+            if ($role == 'Client') {
+                $user = $repo->find($id);
+                $form = $this->createForm(ProfilClientType::class, $user);
 
-            $emailExistant = $user->getEmail();
+                $emailExistant = $user->getEmail();
 
-            $em = $manager->getManager();
+                $em = $manager->getManager();
 
-            $form->handleRequest($req);
+                $form->handleRequest($req);
 
-            if ($form->isSubmitted()) {
+                if ($form->isSubmitted()) {
 
-                $imageFile = $form->get('photo')->getData();
-                if ($imageFile) {
-                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
-                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                    // Déplace le fichier dans le répertoire où sont stockées les images
-                    try {
-                        $imageFile->move(
-                            $this->getParameter('images_directory'),
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        // Gérer l'exception si le fichier ne peut pas être déplacé
-                    }
-                    // Met à jour le nom de l'image dans l'entité Produit
-                    $user->setPhoto($newFilename);
-                }
-
-                $emailNV = $user->getEmail();
-
-                if ($emailExistant != $emailNV) {
-
-                    $existingUser = $repo->findByEmail($emailNV);
-
-                    if ($existingUser) {
-                        $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
-                    } else {
-                        if ($form->isValid()) {
-
-                            $em->persist($user);
-                            $em->flush();
-
-                            $this->addFlash('successPorfilClient', 'Votre profil a été modifié avec succès.');
-
-                            return $this->redirectToRoute("accueil");
+                    $imageFile = $form->get('photo')->getData();
+                    if ($imageFile) {
+                        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                        // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                        $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                        // Déplace le fichier dans le répertoire où sont stockées les images
+                        try {
+                            $imageFile->move(
+                                $this->getParameter('images_directory'),
+                                $newFilename
+                            );
+                        } catch (FileException $e) {
+                            // Gérer l'exception si le fichier ne peut pas être déplacé
                         }
+                        // Met à jour le nom de l'image dans l'entité Produit
+                        $user->setPhoto($newFilename);
                     }
-                } elseif ($form->isValid()) {
 
-                    $em->persist($user);
-                    $em->flush();
-                    return $this->redirectToRoute("accueil");
+                    $emailNV = $user->getEmail();
+
+                    if ($emailExistant != $emailNV) {
+
+                        $existingUser = $repo->findByEmail($emailNV);
+
+                        if ($existingUser) {
+                            $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                        } else {
+                            if ($form->isValid()) {
+
+                                $em->persist($user);
+                                $em->flush();
+
+                                $this->addFlash('successPorfilClient', 'Votre profil a été modifié avec succès.');
+
+                                return $this->redirectToRoute("accueil");
+                            }
+                        }
+                    } elseif ($form->isValid()) {
+
+                        $em->persist($user);
+                        $em->flush();
+                        return $this->redirectToRoute("accueil");
+                    }
                 }
-            }
 
-            return $this->renderform('user/profilClient.html.twig', [
-                'f' => $form,
-                'user' => $user,
-            ]);
+                return $this->renderform('user/profilClient.html.twig', [
+                    'f' => $form,
+                    'user' => $user,
+                ]);
+            }
         } else {
             return $this->renderform('accueil/introuvable.html.twig', []);
         }
@@ -353,62 +405,66 @@ class UserController extends AbstractController
     #[Route('/profilClientMDP/{id}', name: 'client_profileMDP')]
     public function updateClientMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session, CalculComplexite $calculCmplx): Response
     {
-        $userId = $session->get('utilisateur')['idUtilisateur'];
+        $userInfo = $session->get('utilisateur', []);
 
-        $userco = $repo->find($userId);
+        // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
+        $userId = $userInfo['idUtilisateur'] ?? null;
 
-        $role = $userco->getRole();
+        if ($userId) {
+            $user = $repo->find($userId);
+            $role = $user->getRole();
 
-        if ($role == 'Client') {
-            $error = false;
+            if ($role == 'Client') {
+                $error = false;
 
-            $user = $repo->find($id);
-            $form2 = $this->createForm(MdpClientType::class, $user);
+                $user = $repo->find($id);
+                $form2 = $this->createForm(MdpClientType::class, $user);
 
-            $em2 = $manager->getManager();
+                $em2 = $manager->getManager();
 
-            $form2->handleRequest($req);
+                $form2->handleRequest($req);
 
-            $ancMDP = $req->request->get('ancienMDP');
-            dump($ancMDP);
+                $ancMDP = $req->request->get('ancienMDP');
+                dump($ancMDP);
 
-            $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
-            dump($mdpActuel);
+                $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
+                dump($mdpActuel);
 
 
-            if ($form2->isSubmitted()) {
-                if ($user->getMotDePasse()) {
-                    $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
+                if ($form2->isSubmitted()) {
+                    if ($user->getMotDePasse()) {
+                        $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
 
-                    if ($complexityScore < 6) {
-                        $form2->get('mot_de_passe')->addError(new FormError('Mot de passe faible.'));
-                    } elseif ($complexityScore >= 6 && $complexityScore < 12) {
-                        $form2->get('mot_de_passe')->addError(new FormError('Mot de passe moyen.'));
-                    } elseif ($complexityScore == 12) {
+                        if ($complexityScore < 6) {
+                            $form2->get('mot_de_passe')->addError(new FormError('Mot de passe faible.'));
+                        } elseif ($complexityScore >= 6 && $complexityScore < 12) {
+                            $form2->get('mot_de_passe')->addError(new FormError('Mot de passe moyen.'));
+                        } elseif ($complexityScore == 12) {
 
-                        if ($form2->isValid()) {
-                            if (md5($ancMDP) == $mdpActuel) {
+                            if ($form2->isValid()) {
+                                if (md5($ancMDP) == $mdpActuel) {
 
-                                $plainPassword = $user->getMotDePasse();
-                                $hashedPassword = md5($plainPassword);
-                                $user->setMotDePasse($hashedPassword);
+                                    $plainPassword = $user->getMotDePasse();
+                                    $hashedPassword = md5($plainPassword);
+                                    $user->setMotDePasse($hashedPassword);
 
-                                $em2->persist($user);
-                                $em2->flush();
-                                return $this->redirectToRoute("login");
-                            } else {
-                                $error = true;
+                                    $em2->persist($user);
+                                    $em2->flush();
+                                    return $this->redirectToRoute("login");
+                                } else {
+                                    $error = true;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            return $this->renderform('user/profilClientMDP.html.twig', [
-                'f2' => $form2,
-                'user' => $user,
-                'error' => $error
-            ]);
+                return $this->renderform('user/profilClientMDP.html.twig', [
+                    'f2' => $form2,
+                    'user' => $user,
+                    'error' => $error
+                ]);
+            }
         } else {
             return $this->renderform('accueil/introuvable.html.twig', []);
         }
@@ -423,98 +479,102 @@ class UserController extends AbstractController
     public function updateConseiller(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session): Response
     {
 
-        $userId = $session->get('utilisateur')['idUtilisateur'];
+        $userInfo = $session->get('utilisateur', []);
 
-        $userco = $repo->find($userId);
+        // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
+        $userId = $userInfo['idUtilisateur'] ?? null;
 
-        $role = $userco->getRole();
+        if ($userId) {
+            $user = $repo->find($userId);
+            $role = $user->getRole();
 
-        if ($role == 'Conseiller') {
+            if ($role == 'Conseiller') {
 
-            $user = $repo->find($id);
+                $user = $repo->find($id);
 
-            $form = $this->createForm(ProfilConseillerType::class, $user);
+                $form = $this->createForm(ProfilConseillerType::class, $user);
 
-            $emailExistant = $user->getEmail();
+                $emailExistant = $user->getEmail();
 
-            $em = $manager->getManager();
+                $em = $manager->getManager();
 
-            $form->handleRequest($req);
+                $form->handleRequest($req);
 
-            if ($form->isSubmitted()) {
+                if ($form->isSubmitted()) {
 
-                $file = $form->get('attestation')->getData();
-                if ($file) {
-                    $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
-                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
+                    $file = $form->get('attestation')->getData();
+                    if ($file) {
+                        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                        // Cela sert à donner un nom unique à chaque fichier pour éviter les conflits de nom
+                        $newFilename = $originalFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
-                    // Assurez-vous que l'extension est correcte pour un PDF
-                    if ($file->guessExtension() !== 'pdf') {
-                        throw new \Exception("Le fichier n'est pas un PDF valide.");
-                    }
-
-                    // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
-                    try {
-                        $file->move(
-                            $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        // Gérer l'exception si le fichier ne peut pas être déplacé
-                        // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
-                    }
-
-                    // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
-                    $user->setAttestation($newFilename);
-                }
-
-                $imageFile = $form->get('photo')->getData();
-                if ($imageFile) {
-                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
-                    $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                    // Déplace le fichier dans le répertoire où sont stockées les images
-                    try {
-                        $imageFile->move(
-                            $this->getParameter('images_directory'),
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        // Gérer l'exception si le fichier ne peut pas être déplacé
-                    }
-                    // Met à jour le nom de l'image dans l'entité Produit
-                    $user->setPhoto($newFilename);
-                }
-
-                $emailNV = $user->getEmail();
-
-                if ($emailExistant != $emailNV) {
-
-                    $existingUser = $repo->findByEmail($emailNV);
-
-                    if ($existingUser) {
-                        $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
-                    } else {
-                        if ($form->isValid()) {
-
-                            $em->persist($user);
-                            $em->flush();
-                            return $this->redirectToRoute("accueil");
+                        // Assurez-vous que l'extension est correcte pour un PDF
+                        if ($file->guessExtension() !== 'pdf') {
+                            throw new \Exception("Le fichier n'est pas un PDF valide.");
                         }
+
+                        // Déplace le fichier dans le répertoire où sont stockés les fichiers PDF
+                        try {
+                            $file->move(
+                                $this->getParameter('pdf_directory'),  // Assurez-vous que ce paramètre est bien défini dans votre configuration
+                                $newFilename
+                            );
+                        } catch (FileException $e) {
+                            // Gérer l'exception si le fichier ne peut pas être déplacé
+                            // Par exemple : enregistrer un message d'erreur dans un log ou afficher un message à l'utilisateur
+                        }
+
+                        // Met à jour le nom du fichier PDF dans l'entité correspondante, par exemple un utilisateur ou un document
+                        $user->setAttestation($newFilename);
                     }
-                } elseif ($form->isValid()) {
 
-                    $em->persist($user);
-                    $em->flush();
-                    return $this->redirectToRoute("accueil");
+                    $imageFile = $form->get('photo')->getData();
+                    if ($imageFile) {
+                        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                        // Cela sert à donner un nom unique à chaque image pour éviter les conflits de nom
+                        $newFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                        // Déplace le fichier dans le répertoire où sont stockées les images
+                        try {
+                            $imageFile->move(
+                                $this->getParameter('images_directory'),
+                                $newFilename
+                            );
+                        } catch (FileException $e) {
+                            // Gérer l'exception si le fichier ne peut pas être déplacé
+                        }
+                        // Met à jour le nom de l'image dans l'entité Produit
+                        $user->setPhoto($newFilename);
+                    }
+
+                    $emailNV = $user->getEmail();
+
+                    if ($emailExistant != $emailNV) {
+
+                        $existingUser = $repo->findByEmail($emailNV);
+
+                        if ($existingUser) {
+                            $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cette adresse email est déjà utilisée.'));
+                        } else {
+                            if ($form->isValid()) {
+
+                                $em->persist($user);
+                                $em->flush();
+                                return $this->redirectToRoute("accueil");
+                            }
+                        }
+                    } elseif ($form->isValid()) {
+
+                        $em->persist($user);
+                        $em->flush();
+                        return $this->redirectToRoute("accueil");
+                    }
                 }
-            }
 
-            return $this->renderform('user/profilConseiller.html.twig', [
-                'f' => $form,
-                'user' => $user,
-            ]);
+                return $this->renderform('user/profilConseiller.html.twig', [
+                    'f' => $form,
+                    'user' => $user,
+                ]);
+            }
         } else {
             return $this->renderform('accueil/introuvable.html.twig', []);
         }
@@ -524,61 +584,65 @@ class UserController extends AbstractController
     #[Route('/profilConseillerMDP/{id}', name: 'conseiller_profileMDP')]
     public function updateConseillerMDP(ManagerRegistry $manager, Request $req, UtilisateurRepository $repo, $id, SessionInterface $session, CalculComplexite $calculCmplx): Response
     {
-        $userId = $session->get('utilisateur')['idUtilisateur'];
+        $userInfo = $session->get('utilisateur', []);
 
-        $userco = $repo->find($userId);
+        // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
+        $userId = $userInfo['idUtilisateur'] ?? null;
 
-        $role = $userco->getRole();
+        if ($userId) {
+            $user = $repo->find($userId);
+            $role = $user->getRole();
 
-        if ($role == 'Conseiller') {
-            $error = false;
+            if ($role == 'Conseiller') {
+                $error = false;
 
-            $user = $repo->find($id);
-            $form2 = $this->createForm(MdpConseillerType::class, $user);
+                $user = $repo->find($id);
+                $form2 = $this->createForm(MdpConseillerType::class, $user);
 
-            $em2 = $manager->getManager();
+                $em2 = $manager->getManager();
 
-            $form2->handleRequest($req);
+                $form2->handleRequest($req);
 
-            $ancMDP = $req->request->get('ancienMDP');
-            dump($ancMDP);
+                $ancMDP = $req->request->get('ancienMDP');
+                dump($ancMDP);
 
-            $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
-            dump($mdpActuel);
+                $mdpActuel = $repo->getPasswordByEmail($user->getEmail());
+                dump($mdpActuel);
 
 
-            if ($form2->isSubmitted()) {
-                if ($user->getMotDePasse()) {
-                    $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
+                if ($form2->isSubmitted()) {
+                    if ($user->getMotDePasse()) {
+                        $complexityScore = $calculCmplx->calculateComplexity($user->getMotDePasse());
 
-                    if ($complexityScore < 6) {
-                        $form2->get('mot_de_passe')->addError(new FormError('Mot de passe faible.'));
-                    } elseif ($complexityScore >= 6 && $complexityScore < 12) {
-                        $form2->get('mot_de_passe')->addError(new FormError('Mot de passe moyen.'));
-                    } elseif ($complexityScore == 12) {
-                        if ($form2->isValid()) {
-                            if (md5($ancMDP) == $mdpActuel) {
+                        if ($complexityScore < 6) {
+                            $form2->get('mot_de_passe')->addError(new FormError('Mot de passe faible.'));
+                        } elseif ($complexityScore >= 6 && $complexityScore < 12) {
+                            $form2->get('mot_de_passe')->addError(new FormError('Mot de passe moyen.'));
+                        } elseif ($complexityScore == 12) {
+                            if ($form2->isValid()) {
+                                if (md5($ancMDP) == $mdpActuel) {
 
-                                $plainPassword = $user->getMotDePasse();
-                                $hashedPassword = md5($plainPassword);
-                                $user->setMotDePasse($hashedPassword);
+                                    $plainPassword = $user->getMotDePasse();
+                                    $hashedPassword = md5($plainPassword);
+                                    $user->setMotDePasse($hashedPassword);
 
-                                $em2->persist($user);
-                                $em2->flush();
-                                return $this->redirectToRoute("login");
-                            } else {
-                                $error = true;
+                                    $em2->persist($user);
+                                    $em2->flush();
+                                    return $this->redirectToRoute("login");
+                                } else {
+                                    $error = true;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            return $this->renderform('user/profilConseillerMDP.html.twig', [
-                'f2' => $form2,
-                'user' => $user,
-                'error' => $error
-            ]);
+                return $this->renderform('user/profilConseillerMDP.html.twig', [
+                    'f2' => $form2,
+                    'user' => $user,
+                    'error' => $error
+                ]);
+            }
         } else {
             return $this->renderform('accueil/introuvable.html.twig', []);
         }

@@ -1,5 +1,11 @@
 {% extends 'base_accueil.html.twig' %}
 
+
+{% block profile %}	
+	href="{{ path('login') }}"
+
+{% endblock %}
+
 {% block body %}
 	<section id="home-section" class="hero">
 		<div class="home-slider owl-carousel">
@@ -20,7 +26,7 @@
 				</div>
 			</div>
 
-			
+
 		</div>
 	</section>
 

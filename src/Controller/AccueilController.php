@@ -16,7 +16,7 @@ class AccueilController extends AbstractController
     {
 
 
-       $userInfo = $session->get('utilisateur', []);
+        $userInfo = $session->get('utilisateur', []);
 
         // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
         $userId = $userInfo['idUtilisateur'] ?? null;

@@ -1,0 +1,20 @@
+
+{% extends 'base_accueil.html.twig' %}
+
+{% block title %}Compte Réactivé{% endblock %}
+
+{% block profile %}	
+	href="{{ path('login') }}"
+
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-top:50px;">
+    <div class="alert alert-success" role="alert">
+        Votre compte a été réactivé avec succès. Vous pouvez maintenant vous <a href="{{ path('login') }}">connecter</a>.
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

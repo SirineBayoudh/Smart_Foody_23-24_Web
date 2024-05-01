@@ -13,26 +13,31 @@ class BackController extends AbstractController
     #[Route('/back', name: 'app_back')]
     public function index(UtilisateurRepository $repo, SessionInterface $session): Response
     {
-        $userId = $session->get('utilisateur')['idUtilisateur'];
+        $userInfo = $session->get('utilisateur', []);
 
-        $user = $repo->find($userId);
+        // Vérifie si 'idUtilisateur' existe dans le tableau $userInfo
+        $userId = $userInfo['idUtilisateur'] ?? null;
 
-        $role = $user->getRole();
+        if ($userId) {
 
+            $user = $repo->find($userId);
 
-        if ($role == 'Admin') {
+            $role = $user->getRole();
 
-            $photo = $repo->getAdminImage();
+            if ($role == 'Admin') {
 
-            return $this->render('back/index.html.twig', [
-                'controller_name' => 'BackController',
-                'photo' => $photo,
-                'user' => $user
-            ]);
-        } else {
+                $photo = $repo->getAdminImage();
+    
+                return $this->render('back/index.html.twig', [
+                    'controller_name' => 'BackController',
+                    'photo' => $photo,
+                    'user' => $user
+                ]);
+            }
+        }else {
             return $this->render('accueil/introuvable.html.twig', [
                 'controller_name' => 'BackController',
-                
+
             ]);
         }
     }

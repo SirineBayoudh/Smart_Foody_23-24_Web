@@ -26,11 +26,11 @@
 	<body>
 		<div>
 			<div>
-				{% if error %}
-					<div class="alert alert-danger" role="alert">
-						Email ou mot de passe incorrect!
+				{% for flash_message in app.flashes('error') %}
+					<div class="alert alert-danger" id="dangerMessage" role="alert">
+						{{ flash_message }}
 					</div>
-				{% endif %}
+				{% endfor %}
 				{% if app.user %}
 					<div class="mb-3">
 						You are logged in as
@@ -66,7 +66,7 @@
 											</button>
 											<div class="my-2 d-flex justify-content-between align-items-center">
 												<a href="{{ path('app_forgot_password') }}" class="auth-link text-black" style="color:#56ab2f;">Mot de passe oublié?</a>
-												
+
 											</div>
 											<div style="display: flex; align-items: center; justify-content:center;">
 												<hr style="width:100px; margin-right: 10px;">

@@ -5,7 +5,7 @@ namespace App\Service;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
-class EmailService
+class EmailBloque
 {
     private $mailer;
 
@@ -14,8 +14,9 @@ class EmailService
         $this->mailer = $mailer;
     }
 
-    public function sendWelcomeEmail(string $to, string $subject, string $prenom)
+    public function sendLockoutEmail(string $to, string $subject, string $prenom, int $userId)
     {
+        $url = "http://127.0.0.1:8000/reactivate?userId=$userId";
 
         $email = (new Email())
             ->from('smartfoody.2024@gmail.com')
@@ -57,19 +58,12 @@ class EmailService
                             <a target='_blank' href='https://viewstripo.email'>
                                 <img src='https://eetnmyy.stripocdn.email/content/guids/CABINET_02d1bc47a643a3e7bfe02b0f41d6cb58a6c2703f13c0ecd11cddd42b47af504e/images/image.png' alt='Logo' height='80' title='Logo' class='adapt-img'>
                             </a>
-                            <h1>Bienvenue sur Smart Foody !</h1>
                         </div>
                         <p class='content'>
-                            Bonjour, $prenom ! Nous sommes ravis de vous accueillir dans notre communauté.
+                            Bonjour, $prenom ! Votre compte a été verrouillé après trois tentatives de connexion infructueuses.
                         </p>
                         <p class='content'>
-                            Découvrez nos dernières offres et produits sur notre site web.
-                        </p>
-                        <p class='content'>
-                            Visitez également notre page Facebook pour plus d'informations : <a href='https://www.facebook.com/smartfoody.tn' style='color: green;'>Smart Foody</a>
-                        </p>
-                        <p class='footer'>
-                            Merci de nous avoir rejoints !
+                        Veuillez cliquer sur <a href='$url'>ce lien</a> pour réactiver votre compte.
                         </p>
                     </div>
                 </body>
