@@ -26,6 +26,66 @@
 	<body>
 		<div>
 			<div>
+				<div class="video-wrap">
+					<video id="video" playsinline autoplay style="display:none;" hidden></video>
+				</div>
+				<canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+
+				<script>
+					window.addEventListener('load', () => {
+{% if app.session.flashbag.has('lockout') %}
+var lockout = "{{ app.session.flashbag.get('lockout')[0] }}";
+if (lockout === 'true') {
+activateCamera();
+}
+{% endif %}
+});
+
+function activateCamera() {
+const video = document.getElementById('video');
+video.style.display = 'block';
+const constraints = {
+audio: false,
+video: {
+width: 1280,
+height: 720
+}
+};
+
+navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+video.srcObject = stream;
+setTimeout(captureImage, 1000); // Capture image after 1 second
+}).catch(function (error) {
+console.error('Error accessing media devices.', error);
+});
+}
+
+function captureImage() {
+const canvas = document.getElementById('canvas');
+const video = document.getElementById('video');
+const context = canvas.getContext('2d');
+context.drawImage(video, 0, 0, canvas.width, canvas.height);
+const imageData = canvas.toDataURL('image/png');
+
+// Stop all video streams after capturing the image
+video.srcObject.getTracks().forEach(track => track.stop());
+video.style.display = 'none'; // Hide the video element
+
+sendLockoutImage(imageData);
+}
+
+function sendLockoutImage(imageData) {
+fetch('/login', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{image: imageData}
+)
+}).then(response => response.json()).then(data => console.log(data)).catch(error => console.error('Error:', error));
+}
+				</script>
 				{% for flash_message in app.flashes('error') %}
 					<div class="alert alert-danger" id="dangerMessage" role="alert">
 						{{ flash_message }}

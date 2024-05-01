@@ -37,6 +37,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Security;
 use App\Service\GeoService;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController extends AbstractController
 {
@@ -51,8 +52,6 @@ class UserController extends AbstractController
     #[Route('/login', name: 'login')]
     public function login(Request $request, ManagerRegistry $manager, SessionInterface $session, MailerInterface $mailer, EmailBloque $emailbloque): Response
     {
-
-
         if ($request->isMethod('POST')) {
 
             $email = $request->request->get('email');
@@ -88,6 +87,8 @@ class UserController extends AbstractController
 
                         if ($user->getTentative() == 3) {
 
+                            $this->addFlash('lockout', 'true');
+
                             $emailbloque->sendLockoutEmail($user->getEmail(), 'Compte Verrouillé', $user->getPrenom(), $user->getIdUtilisateur());
                             $this->addFlash('error', 'Votre compte a été verrouillé après plusieurs tentatives de connexion échouées.');
                         } else {
@@ -106,6 +107,43 @@ class UserController extends AbstractController
         // Afficher le formulaire de connexion avec éventuellement un message d'erreur
         return $this->render('security/login.html.twig', []);
     }
+
+    #[Route('/capCam', name: "capture_image")]
+    public function captureImage(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $imageData = $data['image'];
+
+        // Supprimer l'en-tête 'data:image/png;base64,' si présent
+        if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $type)) {
+            $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            $type = strtolower($type[1]); // jpg, png, gif
+
+            // Décodage
+            $imageData = base64_decode($imageData);
+
+            // Vous pouvez ici vérifier si le décodage a réussi
+            if (!$imageData) {
+                throw new \Exception('Base64 decoding failed');
+            }
+        } else {
+            throw new \Exception('Did not match data URI with image data');
+        }
+
+        // Nom de fichier pour l'image sauvegardée
+        $filename = sprintf('image-%s.%s', uniqid(), $type);
+
+        // Enregistrement de l'image dans un répertoire public
+        $filePath = $this->getParameter('kernel.project_dir') . '/public/images/capture/' . $filename;
+        if (!file_put_contents($filePath, $imageData)) {
+            throw new \Exception('File could not be saved.');
+        }
+
+        return $this->json(['status' => 'success', 'path' => $filePath]);
+    }
+
+
+
 
     #[Route('/reactivate', name: 'reactivate_account')]
     public function reactivateAccount(Request $request, ManagerRegistry $manager)

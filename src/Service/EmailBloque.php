@@ -69,6 +69,8 @@ class EmailBloque
                 </body>
             </html>
         ");
+        
+
 
         $this->mailer->send($email);
     }
