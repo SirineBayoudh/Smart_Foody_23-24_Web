@@ -14,6 +14,40 @@
 {% endblock %}
 
 {% block body %}
+<style>
+.modal-header {
+    display: flex;              /* Utiliser Flexbox */
+    justify-content: center;    /* Centrer les éléments horizontalement */
+    align-items: center;        /* Aligner les éléments verticalement */
+    background-color: #81c784;  /* Couleur de fond */
+    color: white;               /* Couleur de texte */
+    padding: 10px 15px;         /* Espacement interne */
+}
+
+.modal-title {
+    flex-grow: 1;               /* Permet au titre de prendre l'espace disponible */
+    text-align: center;         /* Texte centré */
+    font-weight: bold;          /* Texte en gras */
+    font-size: 20px;            /* Taille de la police */
+}
+
+.close {
+    position: absolute;         /* Positionnement absolu */
+    right: 15px;                /* À droite de la modale */
+    top: 15px;                  /* Haut de la modale */
+    color: white;               /* Couleur de l'icône */
+    opacity: 1;                 /* Opacité pleine */
+}
+
+.close:hover, .close:focus {
+    color: #f1f1f1;             /* Couleur au survol */
+    text-decoration: none;      /* Pas de soulignement */
+    opacity: 0.8;               /* Diminution de l'opacité au survol */
+}
+
+
+
+</style>
 <div class="container mt-5">
     {% if lignesCommande|length > 0 %}
         <div class="cart-list">
@@ -51,9 +85,12 @@
             </table>
         </div>
       
-         <div class="text-right mb-5">
-            <a href="#" id="vider-panier-btn" class="btn btn-primary py-3 px-4" onclick="confirmViderPanier('{{ path('vider_panier') }}')">Vider le Panier</a>
-        </div>
+  <div class="d-flex justify-content-between mb-5">
+    <!-- Bouton pour afficher le graphique des ventes à gauche -->
+    <button class="btn btn-primary py-3 px-4" id="show-sales-chart">Voir Produits Recommandés</button>
+    <!-- Bouton pour vider le panier à droite -->
+    <a href="#" id="vider-panier-btn" class="btn btn-primary py-3 px-4" onclick="confirmViderPanier('{{ path('vider_panier') }}')">Vider le Panier</a>
+</div>
         <div class="row justify-content-center">
             <div class="col-lg-10 mt-5 cart-wrap ftco-animate">
                 <div class="cart-total mb-3 text-center">
@@ -78,6 +115,28 @@
         <p class="text-center">Votre panier est vide.</p>
     {% endif %}
 </div>
+<div class="modal fade" id="salesChartModal" tabindex="-1" role="dialog" aria-labelledby="salesChartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="navbar-brand" id="salesChartModalLabel">Produits Recommandés</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow: auto;"> <!-- Ajout de contrôle de défilement -->
+                <img src="http://127.0.0.1:5000/get_sales_chart" alt="Sales Chart" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById('show-sales-chart').addEventListener('click', function() {
+        $('#salesChartModal').modal('show');
+    });
+</script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
  function confirmViderPanier(url) {
