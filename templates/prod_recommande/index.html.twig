@@ -166,28 +166,6 @@
   <!-- Les vidéos seront chargées ici -->
 </div>
 
-
-
-
-
-		<section class="ftco-section ftco-no-pt ftco-no-pb py-5 bg-light">
-      <div class="container py-4">
-        <div class="row d-flex justify-content-center py-5">
-          <div class="col-md-6">
-          	<h2 style="font-size: 22px;" class="mb-0">Subcribe to our Newsletter</h2>
-          	<span>Get e-mail updates about our latest shops and special offers</span>
-          </div>
-          <div class="col-md-6 d-flex align-items-center">
-            <form action="#" class="subscribe-form">
-              <div class="form-group d-flex">
-                <input type="text" class="form-control" placeholder="Enter email address">
-                <input type="submit" value="Subscribe" class="submit px-3">
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
     <footer class="ftco-footer ftco-section">
       <div class="container">
       	<div class="row">
@@ -291,9 +269,48 @@
         productScroll.scrollLeft += amount;
     }
 </script>
+
+
 <script>
-  // Fonction pour afficher une recette avec sa description et son image
-  function displayRecipe(title, description, image) {
+ // Variable pour garder une trace des erreurs
+var errorOccurred = false;
+
+// Fonction pour envoyer une requête POST au serveur Flask pour la conversion de texte en audio
+function convertTextToSpeech(text) {
+    fetch('http://127.0.0.1:5000/convert', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: text }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur HTTP: ' + response.status);
+        }
+        return response.arrayBuffer();
+    })
+    .then(data => {
+        // Charger l'audio en mémoire
+        var audioBlob = new Blob([data]);
+        var audioUrl = URL.createObjectURL(audioBlob);
+
+        // Créer un nouvel élément audio
+        var audio = new Audio(audioUrl);
+
+        // Jouer l'audio
+        audio.play();
+    })
+    .catch(error => {
+        console.error('Erreur lors de la conversion en audio:', error);
+        if (!errorOccurred) {
+            alert('Une erreur est survenue lors de la conversion en audio: ' + error.message);
+            errorOccurred = true; // Mettre à jour le statut pour indiquer qu'une erreur s'est produite
+        }
+    });
+}
+
+function displayRecipe(title, description, image) {
     var carousel = document.querySelector(".carousel-testimony.owl-carousel");
 
     var item = document.createElement("div");
@@ -318,6 +335,9 @@
     var text = document.createElement("div");
     text.classList.add("text", "text-center");
 
+    // Supprimer les parties indésirables du texte de la recette
+    description = description.replace(/It is brought to you by Foodista\..*?spoonacular score of \d+%/g, '');
+
     var descParagraph = document.createElement("p");
     descParagraph.classList.add("mb-5", "pl-4", "line");
     descParagraph.innerHTML = description;
@@ -326,92 +346,107 @@
     name.classList.add("name");
     name.textContent = "Nom de la recette: " + title;
 
+    // Bouton pour écouter le discours audio
+    var playButton = document.createElement("button");
+    playButton.textContent = "Écouter la description";
+    playButton.classList.add("audio-button");
+    playButton.addEventListener("click", function() {
+        convertTextToSpeech(description); // Appeler la fonction de conversion de texte en audio
+    });
+
     text.appendChild(descParagraph);
     text.appendChild(name);
+    text.appendChild(playButton); // Ajout du bouton pour jouer l'audio
 
     testimonyWrap.appendChild(userImg);
     testimonyWrap.appendChild(text);
 
     item.appendChild(testimonyWrap);
     carousel.appendChild(item);
-  }
-
-  // Fonction pour rechercher les vidéos YouTube en fonction de l'ingrédient
+}
+  
+  /// Fonction pour rechercher les vidéos YouTube en fonction de l'ingrédient
   function searchYouTubeVideos(ingredient) {
-    var apiKey = "AIzaSyCXEBk9FVXu4vD2dJUIEDd2GDgVxxtnuMM"; // Remplacez par votre clé d'API YouTube
-
-    var query = encodeURIComponent(ingredient) + " recette";
-
-    var apiUrl = "https://www.googleapis.com/youtube/v3/search?key=" + apiKey + "&part=snippet&type=video&q=" + query + "&maxResults=3";
-
-    return fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
-        var videoIds = data.items.map(item => item.id.videoId);
-        return videoIds;
-      })
-      .catch(error => console.error("Erreur lors de la récupération des vidéos YouTube:", error));
+      var apiKey = "AIzaSyCXEBk9FVXu4vD2dJUIEDd2GDgVxxtnuMM"; // Remplacez par votre clé d'API YouTube
+  
+      var query = encodeURIComponent(ingredient) + " recette";
+  
+      var apiUrl = "https://www.googleapis.com/youtube/v3/search?key=" + apiKey + "&part=snippet&type=video&q=" + query + "&maxResults=3";
+  
+      return fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+              var videoIds = data.items.map(item => item.id.videoId);
+              return videoIds;
+          })
+          .catch(error => console.error("Erreur lors de la récupération des vidéos YouTube:", error));
   }
-
+  
   // Fonction pour rechercher les recettes
   function searchRecipes() {
-    var ingredient = document.getElementById("ingredient").value.trim();
-
-    if (ingredient === "") {
-      alert("Veuillez saisir un ingrédient !");
-      return;
-    }
-
-    var carousel = document.querySelector(".carousel-testimony.owl-carousel");
-    carousel.innerHTML = "";
-
-    var apiKey = "7a54d73f23c24bbab743375dbe147451"; // Remplacez par votre clé d'API Spoonacular
-
-    var apiUrl = "https://api.spoonacular.com/recipes/findByIngredients?apiKey=" + apiKey + "&ingredients=" + encodeURIComponent(ingredient) + "&number=5";
-
-    fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(recipe => {
-          var recipeId = recipe.id;
-          var recipeTitle = recipe.title;
-          var recipeImage = recipe.image;
-          var recipeDescription = "Description de la recette non disponible.";
-
-          var recipeDetailsUrl = "https://api.spoonacular.com/recipes/" + recipeId + "/information?apiKey=" + apiKey;
-
-          fetch(recipeDetailsUrl)
-            .then(response => response.json())
-            .then(recipeData => {
-              recipeDescription = recipeData.summary;
-              displayRecipe(recipeTitle, recipeDescription, recipeImage);
-            })
-            .catch(error => console.error("Erreur lors de la récupération des détails de la recette:", error));
-        });
-
-        // Charger les vidéos YouTube
-        searchYouTubeVideos(ingredient)
-          .then(videoIds => {
-            var container = document.getElementById("video-container");
-            videoIds.forEach(videoId => {
-              var iframe = document.createElement("iframe");
-              iframe.width = "300";
-              iframe.height = "168.75";
-              iframe.src = "https://www.youtube.com/embed/" + videoId;
-              iframe.frameborder = "0";
-              iframe.allowfullscreen = true;
-
-              var videoDiv = document.createElement("div");
-              videoDiv.className = "video";
-              videoDiv.appendChild(iframe);
-
-              container.appendChild(videoDiv);
-            });
-          });
-      })
-      .catch(error => console.error("Erreur lors de la récupération des recettes:", error));
+      var ingredient = document.getElementById("ingredient").value.trim();
+  
+      if (ingredient === "") {
+          alert("Veuillez saisir un ingrédient !");
+          return;
+      }
+  
+      var carousel = document.querySelector(".carousel-testimony.owl-carousel");
+      carousel.innerHTML = "";
+  
+      var apiKey = "c2f0d9a72df64998a8832900f484cd4b"; // Remplacez par votre clé d'API Spoonacular
+  
+      var apiUrl = "https://api.spoonacular.com/recipes/findByIngredients?apiKey=" + apiKey + "&ingredients=" + encodeURIComponent(ingredient) + "&number=5";
+  
+      fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+              data.forEach(recipe => {
+                  var recipeId = recipe.id;
+                  var recipeTitle = recipe.title;
+                  var recipeImage = recipe.image;
+                  var recipeDescription = "Description de la recette non disponible.";
+  
+                  var recipeDetailsUrl = "https://api.spoonacular.com/recipes/" + recipeId + "/information?apiKey=" + apiKey;
+  
+                  fetch(recipeDetailsUrl)
+                      .then(response => response.json())
+                      .then(recipeData => {
+                          // Supprimez la partie du "review" du texte de la recette
+                          recipeDescription = recipeData.summary.replace(/<p>.*<\/p>/, '');
+                          displayRecipe(recipeTitle, recipeDescription, recipeImage);
+                      })
+                      .catch(error => console.error("Erreur lors de la récupération des détails de la recette:", error));
+              });
+  
+              // Charger les vidéos YouTube
+              searchYouTubeVideos(ingredient)
+                  .then(videoIds => {
+                      var container = document.getElementById("video-container");
+                      container.innerHTML = ""; // Supprimer le contenu précédent du conteneur
+  
+                      videoIds.forEach(videoId => {
+                          var iframe = document.createElement("iframe");
+                          iframe.width = "300";
+                          iframe.height = "168.75";
+                          iframe.src = "https://www.youtube.com/embed/" + videoId;
+                          iframe.frameborder = "0";
+                          iframe.allowfullscreen = true;
+  
+                          var videoDiv = document.createElement("div");
+                          videoDiv.className = "video";
+                          videoDiv.appendChild(iframe);
+  
+                          container.appendChild(videoDiv);
+                      });
+                  });
+          })
+          .catch(error => console.error("Erreur lors de la récupération des recettes:", error));
   }
-</script>
+  </script>
+  
+  
+
 
 <!-- Inclure les bibliothèques JavaScript nécessaires -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -496,6 +531,27 @@
 
 
   </style>
+
+<style>
+  /* Styles pour le bouton d'audio */
+  button.audio-button {
+    background-color: #56ab2f; /* Couleur verte */
+    color: white; /* Texte en blanc */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Changement de couleur au survol */
+  button.audio-button:hover {
+    background-color: #4e9624; /* Couleur verte plus foncée */
+  }
+</style>
+
+
  <style>
   .search-form {
     display: flex;
