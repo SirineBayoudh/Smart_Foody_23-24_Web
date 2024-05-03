@@ -115,6 +115,9 @@ class AjoutAvisController extends AbstractController
         $entityManager->remove($avis);
         $entityManager->flush();
 
+        // Ajouter un message flash pour confirmer la suppression de l'avis
+        $this->addFlash('success', " l'avis a été supprimé avec succes!");
+
         // Redirection vers une autre page ou afficher un message de succès
         return $this->redirectToRoute('avisBack');
     }
@@ -197,10 +200,13 @@ class AjoutAvisController extends AbstractController
                     $entityManager = $this->getDoctrine()->getManager();
                     $entityManager->persist($avis);
                     $entityManager->flush();
+
+                    // Ajouter un message flash pour confirmer l'ajout d'un nouvel avis
+                     $this->addFlash('success', 'Avis ajouté avec succès!');
             
                     // Rediriger vers la même page avec la référence de produit passée en paramètre
                     return $this->redirectToRoute('avis_nouveau', ['ref' => $ref]);
-                }
+                } 
             
                 // Récupérer les quatre derniers avis pour le produit
                 $lastFourAvis = $avisRepository->findByproduit($produit);
@@ -225,51 +231,54 @@ class AjoutAvisController extends AbstractController
             }
 
 
-/**
- * @Route("/modifier-avis/{id}", name="modifier_avis")
- */
-public function modifierAvis(Request $request, int $id): Response
-{
-    $entityManager = $this->getDoctrine()->getManager();
-    $avis = $entityManager->getRepository(Avis::class)->find($id);
+                    /**
+                     * @Route("/modifier-avis/{id}", name="modifier_avis")
+                     */
+                    public function modifierAvis(Request $request, int $id): Response
+                    {
+                        $entityManager = $this->getDoctrine()->getManager();
+                        $avis = $entityManager->getRepository(Avis::class)->find($id);
 
-    if (!$avis) {
-        throw $this->createNotFoundException('Aucun avis trouvé pour l\'identifiant '.$id);
-    }
+                        if (!$avis) {
+                            throw $this->createNotFoundException('Aucun avis trouvé pour l\'identifiant '.$id);
+                        }
 
-        // Récupérer la référence du produit associé à l'avis
-        $refProduit = $avis->getRefProduit()->getRef();
+                            // Récupérer la référence du produit associé à l'avis
+                            $refProduit = $avis->getRefProduit()->getRef();
 
-    // Créer le formulaire de modification d'avis
-    $form = $this->createFormBuilder($avis)
-    ->add('nb_etoiles', ChoiceType::class, [
-        'label' => 'Note : ',
-        'choices' => [
-            '1' => 1,
-            '2' => 2,
-            '3' => 3,
-            '4' => 4,
-            '5' => 5,
-        ],
-    ])
-    ->add('commentaire', TextareaType::class, [
-        'label' => 'Commentaire : '
-    ])
-    ->getForm();
+                        // Créer le formulaire de modification d'avis
+                        $form = $this->createFormBuilder($avis)
+                        ->add('nb_etoiles', ChoiceType::class, [
+                            'label' => 'Note : ',
+                            'choices' => [
+                                '1' => 1,
+                                '2' => 2,
+                                '3' => 3,
+                                '4' => 4,
+                                '5' => 5,
+                            ],
+                        ])
+                        ->add('commentaire', TextareaType::class, [
+                            'label' => 'Commentaire : '
+                        ])
+                        ->getForm();
 
-    $form->handleRequest($request);
+                        $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        $entityManager->flush();
+                        if ($form->isSubmitted() && $form->isValid()) {
+                            $entityManager->flush();
 
-        // Rediriger vers la même page avec la référence du produit
-        return $this->redirectToRoute('avis_nouveau', ['ref' => $refProduit]);
-    }
+                            // Rediriger vers la même page avec la référence du produit
+                            return $this->redirectToRoute('avis_nouveau', ['ref' => $refProduit]);
 
-    return $this->render('avis/modifier.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
+                            // Ajouter un message flash pour confirmer la modification
+                            $this->addFlash('success', 'Avis modifé avec succès!');
+                        }
+
+                        return $this->render('avis/modifier.html.twig', [
+                            'form' => $form->createView(),
+                        ]);
+                    }
 
  /**
  * @Route("/supprimer-avis/{id}", name="supprimer_avis")
@@ -288,6 +297,9 @@ public function supprimerAvis(Request $request, int $id): Response
 
     $entityManager->remove($avis);
     $entityManager->flush();
+
+    // Ajouter un message flash pour confirmer la suppression de l'avis
+    $this->addFlash('success', 'Votre avis a été supprimé avec succès!');
 
     // Rediriger vers la même page avec la référence du produit
     return $this->redirectToRoute('avis_nouveau', ['ref' => $refProduit]);
@@ -315,6 +327,9 @@ public function signalerAvis(Request $request, int $id): Response
     // Persistez les changements
     $entityManager->persist($avis);
     $entityManager->flush();
+
+    // Ajouter un message flash pour confirmer le signale d'un commentaire
+    $this->addFlash('success', 'le commentaire a été signaler avec succès!');
 
     // Rediriger vers la même page avec la référence du produit
     return $this->redirectToRoute('avis_nouveau', ['ref' => $refProduit]);

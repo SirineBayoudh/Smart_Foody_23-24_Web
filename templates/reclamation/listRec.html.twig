@@ -151,30 +151,36 @@
 
 
 
-    {# Formulaire de réponse à la réclamation #}
-        {% for reclamation in reclamations %}
-            <div id="form-repondre-{{ reclamation.id }}" style="display: none;" class="bg-white p-5 contact-form">
-                <div class="form-group">
-                    <h2><strong>Répondre à la réclamation :</strong></h2>
-                    {% if reclamation.idClient %}
-                        <label for="nom">Nom & Prénom:</label>
-                        <input type="text" id="nom" name="nom" class="form-control" value="{{ reclamation.idClient.nom }} {{ reclamation.idClient.prenom }}" readonly>
-                        <label for="email">Email:</label>
-                        <input type="text" id="email" name="email" class="form-control" value="{{ reclamation.idClient.email }}" readonly>
-                    {% endif %}
-                    <label for="type">Type:</label>
-                    <input type="text" id="type" name="type" class="form-control" value="{{ reclamation.type }}" readonly>
-                    <label for="titre">Titre:</label>
-                    <input type="text" id="titre" name="titre" class="form-control" value="{{ reclamation.titre }}" readonly>
-                    <label for="description">Description:</label>
-                    <textarea id="description" name="description" class="form-control" readonly>{{ reclamation.description }}</textarea>
-                    <label for="reponse">Réponse:</label>
-                    <textarea id="reponse-{{ reclamation.id }}" name="reponse" class="form-control" rows="5"></textarea>
-                </div>
-                <button type="button" class="btn btn-success mr-2" onclick="confirmEnvoi('{{ path('repondre_reclamation', {'id': reclamation.id}) }}')">Envoyer</button>
+    {% for reclamation in reclamations %}
+          {% for message in app.flashes('success') %}
+            <div class="alert alert-success" role="alert">
+              {{ message }}
             </div>
-        {% endfor %}
-
+          {% endfor %}
+    <div id="form-repondre-{{ reclamation.id }}" style="display: none;" class="bg-white p-5 contact-form">
+                   
+        <form method="post" action="{{ path('repondre_reclamation', {'id': reclamation.id}) }}">
+            <div class="form-group">
+                <h2><strong>Répondre à la réclamation :</strong></h2>
+                {% if reclamation.idClient %}
+                    <label for="nom">Nom & Prénom:</label>
+                    <input type="text" id="nom" name="nom" class="form-control" value="{{ reclamation.idClient.nom }} {{ reclamation.idClient.prenom }}" readonly>
+                    <label for="email">Email:</label>
+                    <input type="text" id="email" name="email" class="form-control" value="{{ reclamation.idClient.email }}" readonly>
+                {% endif %}
+                <label for="type">Type:</label>
+                <input type="text" id="type" name="type" class="form-control" value="{{ reclamation.type }}" readonly>
+                <label for="titre">Titre:</label>
+                <input type="text" id="titre" name="titre" class="form-control" value="{{ reclamation.titre }}" readonly>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" class="form-control" readonly>{{ reclamation.description }}</textarea>
+                <label for="reponse">Réponse:</label>
+                <textarea id="reponse" name="reponse" class="form-control" rows="5"></textarea>
+            </div>
+            <button type="submit" class="btn btn-success mr-2">Envoyer</button>
+        </form>
+    </div>
+{% endfor %}
 
 
 

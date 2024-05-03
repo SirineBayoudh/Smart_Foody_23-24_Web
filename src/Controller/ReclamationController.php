@@ -7,6 +7,7 @@ use App\Entity\Utilisateur;
 use App\Form\ReclamationEnvoyerType;
 use App\Repository\ReclamationRepository;
 use App\Repository\UtilisateurRepository;
+use App\Service\BadWordsChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -22,8 +23,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email; 
 
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
-
+use App\Service\PhpBadWords; // Importer la classe PhpBadWords
 
 class ReclamationController extends AbstractController
 {
@@ -106,27 +108,49 @@ public function repondreReclamation(EntityManagerInterface $entityManager, Reque
     if (!$reclamation) {
         throw $this->createNotFoundException('La réclamation n\'existe pas.');
     }
-
+    
     // Récupérer la réponse depuis la requête
-    $emailContent = "
-    <html>
-        <body>
-            <div style='width: 500px; background-color: #aad597; padding: 20px;'>
-                <p style='color: darkgreen; font-size: 14px;'>Bonjour,</p>
-                <p style='color: darkgreen; font-size: 18px;'>Une nouvelle demande a été reçue :</p>
-                <p style='color: black; font-weight: bold; font-size: 16px;'>Objet: "  . "</p>
-                <p style='color: darkgreen; font-weight: bold; font-size: 16px;'>Date de réception: " . "</p>
-                <p style='font-weight: bold;'>Veuillez consulter l'application pour la traiter.</p>
-                <p style='color: gray;'>Ceci est un message automatique. Merci de ne pas répondre.</p>
-            </div>
-        </body>
-    </html>
-    ";
+    $reponse = $request->get('reponse');
+
+    //récupérer la description du message 
+   $desc = $reclamation->getDescription();
+
+   //récupérer la date du message 
+   $dateR = $reclamation->getDateReclamation();
+
+   // Formater la date au format souhaité (par exemple, jour/mois/année)
+    $dateReclamationFormattee = date("d/m/Y", strtotime($dateR));
+
+   //récupérer le nom du client
+   $name = $reclamation->getIdClient()->getNom();
+
+
+// Construction du contenu de l'email
+$emailContent = "
+<html>
+    <body>
+        <div style='width: 500px; background-color: #aad597; padding: 20px;'>
+            <p style='color: darkgreen; font-size: 14px;'>Bonjour M./Mme $name,</p>
+            <p style='color: darkgreen; font-size: 18px;'>Voici la Réponse : " .$reponse. " </p>
+            <p style='color: black; font-weight: bold; font-size: 16px;'>Suite à votre message : $desc</p>
+            <p style='color: darkgreen; font-weight: bold; font-size: 16px;'>Date de réception : " .$dateReclamationFormattee. "</p>
+            <p style='font-weight: bold;'> <em> Merci pour l'intérêt que vous portez à Smart foody! </em>  </p>
+            
+            <td align='left' class='esd-block-image es-p5t es-p5b es-m-txt-c' style='font-size: 0px;'>
+            <a target='_blank' href='https://viewstripo.email'>
+                <img src='https://eetnmyy.stripocdn.email/content/guids/CABINET_02d1bc47a643a3e7bfe02b0f41d6cb58a6c2703f13c0ecd11cddd42b47af504e/images/image.png' alt='Logo' style='display:block' height='45' title='Logo' class='adapt-img'>
+            </a>
+            </td>
+            <p style='color: gray;'> <br> <em>   Bonne compréhension ! </em> </p>
+        </div>
+    </body>
+</html>
+";
 
     // Envoyer un e-mail de réponse
     $email = (new Email())
         ->from('smartfoody.2024@gmail.com')
-        ->to('divinpoadzola@gmail.com') // Supposons que la méthode getClient() retourne l'entité Client associée à la réclamation
+        ->to("divinpoadzola@gmail.com") // Supposons que la méthode getClient() retourne l'entité Client associée à la réclamation
         ->subject('Réponse à votre réclamation')
         ->html($emailContent);
         $mailer->send($email);
@@ -138,7 +162,8 @@ public function repondreReclamation(EntityManagerInterface $entityManager, Reque
         // Enregistrer les changements dans la base de données
         $entityManager->persist($reclamation);
         $entityManager->flush();
-        
+        // Ajouter un message flash pour confirmer l'envoi de la réclamation
+        $this->addFlash('success', 'Reponse envoyé avec succes!');
         // Rediriger ou renvoyer une réponse JSON
         // ...
         
@@ -282,7 +307,7 @@ public function exportToExcel(ReclamationRepository $reclamationRepository)
         // Gérer la soumission du formulaire
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $reponse = new Reponse();
+            $reponse = new Response();
             // Assigner les valeurs du formulaire à votre entité Reponse et les sauvegarder
 
             // Redirection ou autre traitement
@@ -314,15 +339,32 @@ public function exportToExcel(ReclamationRepository $reclamationRepository)
             'user' => $user, // Passer l'utilisateur au formulaire
         ]);
 
+          
+
         // Gérer la soumission du formulaire
         $form->handleRequest($request);
 
-        // Récupérer les réclamations en attente de l'utilisateur
-        $reclamations = $reclamationRepository->findBy(['id_client' => $user, 'statut' => 'Attente']);
+          // Vérifier la présence de gros mots dans la description de la réclamation
+          $description = $reclamation->getDescription();
+          $containsBadWord = 0;
+  
+          // Créer une instance de PhpBadWords
+          $badWordsChecker = new PhpBadWords();
+          $badWordsChecker->setDictionaryFromFile(__DIR__ . "/../Service/listeMots.php");
+          $badWordsChecker->setText($description);
+  
+          if ($badWordsChecker->check()) {
+              // Si un mot interdit est trouvé, mettre la variable à 1
+              $containsBadWord = 1;
+              // Afficher un message d'erreur
+              $this->addFlash('error', 'Le texte contient des gros mots. Veuillez réformuler votre message.');
+              // Rediriger vers la page du formulaire sans enregistrer la réclamation
+              return $this->redirectToRoute('addRec');
+          }
 
 
-        $emptySubmission = false;
-        if ($form->isSubmitted() && $form->isValid()) {
+        elseif($form->isSubmitted() && $form->isValid()) {
+            
             // Créer une nouvelle réclamation avec les données du formulaire
             $nouvelleReclamation = new Reclamation();
             $nouvelleReclamation->setDescription($reclamation->getDescription());
@@ -341,11 +383,15 @@ public function exportToExcel(ReclamationRepository $reclamationRepository)
             // Rediriger vers une autre page après la création de la réclamation
             return $this->redirectToRoute('addRec');
         }
+// Récupérer les réclamations en attente de l'utilisateur
+$reclamations = $reclamationRepository->findBy(['id_client' => $user, 'statut' => 'Attente']);
+
 
         // Afficher le formulaire dans le template
         return $this->render('reclamation/ajout_rec.html.twig', [
             'form' => $form->createView(),
             'reclamations' =>$reclamations,
+            'containsBadWord' => $containsBadWord, // Passer la variable au twig pour le badWords
         ]);
     }
 
@@ -364,6 +410,9 @@ public function supprimerRec(Request $request, int $id): Response
 
     $entityManager->remove($reclamation);
     $entityManager->flush();
+
+    // Ajouter un message flash pour confirmer la supression de la réclamation
+    $this->addFlash('success', 'Votre réclamation a été supprimée');
 
     // Redirection vers une autre page ou afficher un message de succès
     return $this->redirectToRoute('addRec');

@@ -123,8 +123,19 @@
         </div>
         <div class="row block-9">
                       <div class="col-md-6 order-md-last d-flex">
-                          <form action="{{ path('addRec') }}" method="post" id="myForm" class="bg-white p-5 contact-form" novalidate>
-                              {{ form_start(form) }}
+
+                          <form action="{{ path('addRec') }}" method="post" id="myForm" data-contains-bad-word="{{ containsBadWord }}" class="bg-white p-5 contact-form" novalidate>
+                            {% for message in app.flashes('success') %}
+                            <div class="alert alert-success" role="alert">
+                              {{ message }}
+                            </div>
+                            {% endfor %}
+                            {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger" role="alert">
+                              {{ message }}
+                            </div>
+                            {% endfor %} 
+                            {{ form_start(form) }}
                               <div class="form-group">
                                     {{ form_label(form.nom) }}
                                     {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg' ~ (form_errors(form.nom) ? ' is-invalid' : '')}}) }}
@@ -198,7 +209,7 @@
                             <p><strong>Titre:</strong> {{ reclamation.titre }}</p>
                             <p><strong>Description:</strong> {{ reclamation.description }}</p>
                             <div class="d-flex justify-content-end">
-                              <button type="button" class="btn btn-primary mr-2" onclick="confirmModifier('{{ path('modifierRec', {'id': reclamation.id}) }}')">Modifier</button>
+<a href="#" class="btn btn-primary mr-2" onclick="confirmModifier('{{ path('modifierRec', {'id': reclamation.id}) }}')">Modifier</a>
                                 <button type="button" class="btn btn-danger" onclick="confirmSuppression('{{ path('suppRec', {'id': reclamation.id}) }}')">Supprimer</button>                            </div>
                             <hr style="border-top: 1px solid black; width: 100%;" />
                         {% endfor %}
@@ -336,6 +347,8 @@
     });
 </script>
 
+
+
 <script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/dist/js/alertify.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/alertifyjs/build/alertify.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs/build/css/alertify.min.css"/>
@@ -344,35 +357,35 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-      const descriptionInput = document.querySelector('#{{ form.description.vars.id }}');
-      const titreInput = document.querySelector('#{{ form.titre.vars.id }}');
-      const form = document.getElementById('myForm');
+    const form = document.getElementById('myForm');
+    const containsBadWord = form.getAttribute('data-contains-bad-word');
 
-      // Fonction pour vérifier si le champ de description est vide
-      function desFieldEmpty() {
-          return descriptionInput.value.trim() === '';
-      }
+    function desFieldEmpty() {
+        const descriptionInput = document.querySelector('#{{ form.description.vars.id }}');
+        return descriptionInput.value.trim() === '';
+    }
 
-      // Fonction pour vérifier si le champ de titre est vide
-      function titreFieldEmpty() {
-          return titreInput.value.trim() === '';
-      }
+    function titreFieldEmpty() {
+        const titreInput = document.querySelector('#{{ form.titre.vars.id }}');
+        return titreInput.value.trim() === '';
+    }
 
-      // Fonction pour gérer la soumission du formulaire
-      function handleSubmit(event) {
-          if (desFieldEmpty() || titreFieldEmpty()) {
-              event.preventDefault(); // Bloquer l'envoi du formulaire
-              alertify.error("Veuillez remplir tous les champs.");
-          } else {
-              alertify.success("La réclamation a été soumise avec succès!");
-          }
-      }
+    function handleSubmit(event) {
+        if (containsBadWord === '1') {
+            event.preventDefault();
+           // alertify.error("Votre message contient un gros mot. Veuillez modifier votre saisie.");
+        } else if (desFieldEmpty() || titreFieldEmpty()) {
+            event.preventDefault();
+           // alertify.error("Veuillez remplir tous les champs.");
+        } else {
+            //alertify.success("La réclamation a été soumise avec succès!  (containsBadWord = " + containsBadWord + ")!");
+        }
+    }
 
-      // Écouter l'événement de soumission du formulaire
-      form.addEventListener('submit', function(event) {
-          handleSubmit(event);
-      });
-  });
+    form.addEventListener('submit', function(event) {
+        handleSubmit(event);
+    });
+});
 </script>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -410,7 +423,7 @@
     }
 </script>
 
-     
+
 
   <script src="js/jquery.min.js"></script>
   <script src="js/jquery-migrate-3.0.1.min.js"></script>

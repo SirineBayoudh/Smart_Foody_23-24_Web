@@ -214,6 +214,17 @@
 						  <form action="{{ path('avis_nouveau', {'ref': produit.ref}) }}" method="post" id="myForm" class="subscribe-form" novalidate>
 							  <div class="form-group d-grid">
 										  {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+											{% for message in app.flashes('success') %}
+												<div class="alert alert-success" role="alert">
+												{{ message }}
+												</div>
+												{% endfor %}
+												{% for message in app.flashes('error') %}
+												<div class="alert alert-danger" role="alert">
+												{{ message }}
+												</div>
+												{% endfor %} 
 										  
 										  {# Contrôle de validation pour nb_etoiles #}
 										  <div class="form-group">

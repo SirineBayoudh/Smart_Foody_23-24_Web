@@ -176,40 +176,65 @@ h1 {
 
             <div class="row block-9">
                 <div class="col-md-6 order-md-last d-flex">
-                            <form method="post" id="myForm" class="bg-white p-5 contact-form" novalidate>
-                                {{ form_start(form) }}
-                                {{ form_errors(form) }}
-                                <div class="form-group">
-                                    {{ form_label(form.nom) }}
-                                    {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg'}}) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ form_label(form.prenom) }}
-                                    {{ form_widget(form.prenom, {'attr': {'class': 'form-control form-control-lg', 'readonly': 'readonly'}}) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ form_label(form.email) }}
-                                    {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg', 'readonly': 'readonly'}}) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ form_label(form.type) }}
-                                    {{ form_widget(form.type, {'attr': {'class': 'form-control form-control-lg'}}) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ form_label(form.titre) }}
-                                    {{ form_widget(form.titre, {'attr': {'class': 'form-control form-control-lg'}}) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ form_label(form.description) }}
-                                    {{ form_widget(form.description, {'attr': {'class': 'form-control form-control-lg cadreDesc'}}) }}
-                                </div>
-                                <div class="form-group">
-                                    <button type="button" onclick="validateForm()" class="btn btn-primary py-3 px-4">Appliquer</button>
-                                    <!-- <button type="button" class="btn btn-secondary py-3 px-4" onclick="annuler()">Retour</button> -->
-                                </div>
-                                {{ form_end(form) }}
-                            
-                            </form>
+                  <form method="post" id="myForm" class="bg-white p-5 contact-form" novalidate>
+                    {{ form_start(form) }}
+                    {% for message in app.flashes('success') %}
+                    <div class="alert alert-success" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {{ form_errors(form) }}
+                    <div class="form-group">
+                        {{ form_label(form.nom) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.prenom) }}
+                        {{ form_widget(form.prenom, {'attr': {'class': 'form-control form-control-lg', 'readonly': 'readonly'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg', 'readonly': 'readonly'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.type) }}
+                        {{ form_widget(form.type, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.titre) }}
+                        {{ form_widget(form.titre, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control form-control-lg cadreDesc'}}) }}
+                    </div>
+                    <div class="form-group">
+                        <button type="button" onclick="validateForm()" class="btn btn-primary py-3 px-4">Appliquer</button>
+                        <!-- <button type="button" class="btn btn-secondary py-3 px-4" onclick="annuler()">Retour</button> -->
+                    </div>
+                    {{ form_end(form) }}
+                </form>
+                
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs/build/css/alertify.min.css" />
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs/build/css/themes/bootstrap.min.css" />
+                <script src="https://cdn.jsdelivr.net/npm/alertifyjs/build/alertify.min.js"></script>
+                <script>
+                    function validateForm() {
+                        var titre = document.getElementById('{{ form.titre.vars.id }}').value.trim();
+                        var description = document.getElementById('{{ form.description.vars.id }}').value.trim();
+                
+                        if (titre === '' || description === '') {
+                            alertify.error('Veuillez remplir tous les champs obligatoires.');
+                        } else {
+                            document.getElementById('myForm').submit();
+                        }
+                    }
+                </script>
         </div>
         </div>
 
@@ -291,46 +316,6 @@ h1 {
   </footer>
 
 
-<script src="path/to/alertify.min.js"></script>
-<script>
-  function annuler() {
-      window.location.href = "{{ path('addRec') }}";
-  }
-
-  function validateForm() {
-      var titre = document.getElementById("{{ form.titre.vars.id }}");
-      var description = document.getElementById("{{ form.description.vars.id }}");
-
-      if (titre.value.trim() === '') {
-          titre.classList.add('is-invalid');
-      } else {
-          titre.classList.remove('is-invalid');
-      }
-
-      if (description.value.trim() === '') {
-          description.classList.add('is-invalid');
-      } else {
-          description.classList.remove('is-invalid');
-      }
-
-      if (titre.value.trim() === '' || description.value.trim() === '') {
-          alert('Veuillez remplir tous les champs.');
-      } else {
-          document.getElementById("myForm").submit();
-      }
-  }
-
-  // Ajoutez des écouteurs d'événements pour déclencher la vérification lors de la saisie de l'utilisateur
-  document.getElementById("{{ form.titre.vars.id }}").addEventListener('input', validateForm);
-  document.getElementById("{{ form.description.vars.id }}").addEventListener('input', validateForm);
-</script>
-
-<style>
-  .is-invalid {
-      border-color: red !important;
-  }
-
-</style>
 
 
 
